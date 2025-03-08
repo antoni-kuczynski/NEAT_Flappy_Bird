@@ -1,28 +1,46 @@
 package com.antekk.flappybird.game.loop;
 
+import com.antekk.flappybird.game.GameController;
+import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
-
-import static com.antekk.flappybird.view.GamePanel.TOP;
 
 public class GameLoop extends Thread {
     private final GamePanel currentPanel;
     private GameState gameState;
 
-    private final int timeBetweenFramesMillis = 1000 / 60;
+    private final int timeBetweenFramesMillis = 1000 / 180;
 
     private void gameLoop() throws InterruptedException {
         while (gameState != GameState.LOST) {
-
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
             if(gameState == GameState.PAUSED)
                 continue;
 
-            if(true) {
-
-                currentPanel.paintImmediately(0, TOP, currentPanel.getWidth(), currentPanel.getHeight());
+            Bird bird = currentPanel.getBird();
+            if(bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
+                bird.isMovingUp = false;
+                bird.framesSinceBirdStartedMoving = 0;
             }
+
+
+            if(!bird.isMovingUp) {
+                bird.moveUpBy((int) -Math.ceil((4 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
+                if(bird.framesSinceBirdStartedMoving < 90)
+                    bird.framesSinceBirdStartedMoving++;
+            }
+
+
+
+            if(bird.isMovingUp) {
+                bird.moveUpBy((int) Math.floor((4 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60))));
+                bird.framesSinceBirdStartedMoving += 2;
+
+            }
+
+            currentPanel.paintImmediately(bird.getX(),GameController.getBlockSizePx(),
+                    GameController.getBlockSizePx(), currentPanel.getHeight() - GameController.getBlockSizePx());
 
             gameState = updateGameState();
         }

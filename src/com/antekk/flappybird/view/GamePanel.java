@@ -1,11 +1,14 @@
 package com.antekk.flappybird.view;
 
+import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.view.themes.GameColors;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import static com.antekk.flappybird.game.GameController.getBlockSizePx;
 import static com.antekk.flappybird.game.keybinds.GameKeybinds.setupKeyBindings;
@@ -17,6 +20,7 @@ public class GamePanel extends JPanel {
     public static int BOTTOM;
     private final JPanel toolbar = new JPanel();
     private final GameLoop loop = new GameLoop(this);
+    private final Bird bird = new Bird();
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {
@@ -30,6 +34,7 @@ public class GamePanel extends JPanel {
             return;
         }
 
+        bird.draw(g);
     }
 
 
@@ -51,6 +56,7 @@ public class GamePanel extends JPanel {
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
         setBackground(GameColors.backgroundColor);
+        Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
         JButton newGame = new JButton("New game");
         JButton pauseGame = new JButton("Pause game");
@@ -104,8 +110,24 @@ public class GamePanel extends JPanel {
         ActionMap actionMap = getActionMap();
         setupKeyBindings(inputMap, actionMap, this);
 
-        loop.start();
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    bird.flap();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    bird.flap();
+                }
+            }
+        });
+
         repaint();
+        loop.start();
     }
 
     @Override
@@ -125,10 +147,14 @@ public class GamePanel extends JPanel {
     }
 
     public static int getBoardCols() {
-        return 9;
+        return 12;
     }
 
     public GameLoop getGameLoop() {
         return loop;
+    }
+
+    public Bird getBird() {
+        return bird;
     }
 }

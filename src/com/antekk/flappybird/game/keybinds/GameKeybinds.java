@@ -16,13 +16,13 @@ public class GameKeybinds {
         GameKeybind.inputMap = inputMap;
         GameKeybind.actionMap = actionMap;
 
-//        new TetrisKeybind("HARD_DROP", KeyEvent.VK_SPACE,
-//                () ->
-//        ).bindKeyPressed();
-//
-//        new TetrisKeybind("ROTATE_RIGHT", KeyEvent.VK_UP,
-//                () ->
-//        ).bindKeyPressed();
+        new GameKeybind("HARD_DROP", KeyEvent.VK_SPACE,
+                () -> gamePanel.getBird().flap()
+        ).bindKeyPressed();
+
+        new GameKeybind("ROTATE_RIGHT", KeyEvent.VK_UP,
+                () ->gamePanel.getBird().flap()
+        ).bindKeyPressed();
 
         new GameKeybind("PAUSE_GAME_PRESSED", KeyEvent.VK_ESCAPE,
             () -> gamePanel.getGameLoop().pauseAndUnpauseGame()
