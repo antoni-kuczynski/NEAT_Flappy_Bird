@@ -1,7 +1,6 @@
 package com.antekk.flappybird.game.bird;
 
 import com.antekk.flappybird.game.GameController;
-import com.antekk.flappybird.view.GamePanel;
 
 import java.awt.*;
 
@@ -22,11 +21,8 @@ public class Bird {
                 GameController.getBlockSizePx(), GameController.getBlockSizePx());
     }
 
-    public void moveUpBy(int amount) {
-        if(posY + amount + GameController.getBlockSizePx() > GamePanel.BOTTOM + GamePanel.TOP)
-            return;
-
-        posY -= amount;
+    public void moveUpBy(int dy) {
+        posY -= dy;
     }
 
     public int getX() {

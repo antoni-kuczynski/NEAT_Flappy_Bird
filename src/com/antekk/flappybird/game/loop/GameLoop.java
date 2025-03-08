@@ -15,7 +15,7 @@ public class GameLoop extends Thread {
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
-            if(gameState == GameState.PAUSED)
+            if(gameState == GameState.PAUSED || gameState == GameState.STARTING)
                 continue;
 
             Bird bird = currentPanel.getBird();
@@ -35,7 +35,7 @@ public class GameLoop extends Thread {
 
             if(bird.isMovingUp) {
                 bird.moveUpBy((int) Math.floor((4 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60))));
-                bird.framesSinceBirdStartedMoving += 2;
+                bird.framesSinceBirdStartedMoving += 3;
 
             }
 
@@ -49,6 +49,10 @@ public class GameLoop extends Thread {
     private GameState updateGameState() {
         if(gameState == GameState.PAUSED) {
             return GameState.PAUSED;
+        }
+
+        if(currentPanel.getBird().getY() + GameController.getBlockSizePx() >= GamePanel.BOTTOM) {
+            return GameState.LOST;
         }
 
         return GameState.RUNNING;
@@ -67,12 +71,16 @@ public class GameLoop extends Thread {
 
     @Override
     public void run() {
-        gameState = GameState.RUNNING;
+        gameState = GameState.STARTING;
         try {
             gameLoop();
         } catch (InterruptedException e) {
             new ErrorDialog("Game thread interrupted!", e);
         }
+    }
+
+    public void startGame() {
+        gameState = GameState.RUNNING;
     }
 
     public GameLoop(GamePanel panel) {

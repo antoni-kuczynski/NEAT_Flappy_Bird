@@ -1,8 +1,10 @@
 package com.antekk.flappybird.view;
 
+import com.antekk.flappybird.game.GameController;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
+import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
 
 import javax.swing.*;
@@ -18,9 +20,29 @@ public class GamePanel extends JPanel {
     public static int TOP;
     public static int RIGHT;
     public static int BOTTOM;
+    public static int GROUND;
     private final JPanel toolbar = new JPanel();
     private final GameLoop loop = new GameLoop(this);
     private final Bird bird = new Bird();
+
+
+    private MouseAdapter gameMouseListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON1) {
+                loop.startGame();
+                bird.flap();
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON1) {
+                loop.startGame();
+                bird.flap();
+            }
+        }
+    };
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {
@@ -34,6 +56,10 @@ public class GamePanel extends JPanel {
             return;
         }
 
+        g.setColor(Color.GREEN);
+        g.fillRect(LEFT, BOTTOM, getWidth(), 2 * GameController.getBlockSizePx());
+
+        new PipeFormation().draw(g);
         bird.draw(g);
     }
 
@@ -51,6 +77,7 @@ public class GamePanel extends JPanel {
         TOP = getBlockSizePx();
         RIGHT = getBoardRows() * getBlockSizePx();
         BOTTOM =  getBoardCols() * getBlockSizePx();
+        GROUND = BOTTOM - getBlockSizePx();
         parent.setPreferredSize(this.getPreferredSize());
 
         setLayout(new BorderLayout());
@@ -110,25 +137,12 @@ public class GamePanel extends JPanel {
         ActionMap actionMap = getActionMap();
         setupKeyBindings(inputMap, actionMap, this);
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if(e.getButton() == MouseEvent.BUTTON1) {
-                    bird.flap();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if(e.getButton() == MouseEvent.BUTTON1) {
-                    bird.flap();
-                }
-            }
-        });
+        addMouseListener(gameMouseListener);
 
         repaint();
         loop.start();
     }
+
 
     @Override
     public Dimension getPreferredSize() {
