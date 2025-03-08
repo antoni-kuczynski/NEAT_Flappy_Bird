@@ -6,7 +6,7 @@ import java.awt.*;
 
 import static com.antekk.flappybird.game.GameController.getBlockSizePx;
 
-class TopPipe extends Pipe {
+public class TopPipe extends Pipe {
 
     protected TopPipe(int heightInPx) {
         super(GamePanel.TOP, heightInPx);

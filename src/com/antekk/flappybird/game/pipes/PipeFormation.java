@@ -12,7 +12,7 @@ public class PipeFormation {
 
 
     public PipeFormation() {
-        int hGap = 240; //144 36
+        int hGap = 4 * getBlockSizePx();
         int minPipeHeight = getBlockSizePx();
         int dy = GamePanel.GROUND - GamePanel.TOP;
 
@@ -36,4 +36,11 @@ public class PipeFormation {
     public BottomPipe getBottomPipe() {
         return bottomPipe;
     }
+
+    public void moveX(int dx) {
+        getTopPipe().moveX(dx);
+        getBottomPipe().moveX(dx);
+    }
+
+
 }

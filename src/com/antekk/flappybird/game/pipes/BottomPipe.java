@@ -6,7 +6,7 @@ import java.awt.*;
 
 import static com.antekk.flappybird.game.GameController.getBlockSizePx;
 
-class BottomPipe extends Pipe {
+public class BottomPipe extends Pipe {
 
     protected BottomPipe(int heightInPx) {
         super(GamePanel.TOP + GamePanel.GROUND - heightInPx, heightInPx);
@@ -16,6 +16,6 @@ class BottomPipe extends Pipe {
     protected void setEndingRectangle() {
         int rectWidth = (int) (1.5 * getBlockSizePx());
         int rectHeight = getBlockSizePx() / 3;
-        endingRect = new Rectangle((int) (x - 0.25 * getBlockSizePx()), y - rectHeight, rectWidth,getBlockSizePx() / 3);
+        endingRect = new Rectangle((int) (x - 0.25 * getBlockSizePx()), y, rectWidth, rectHeight);
     }
 }

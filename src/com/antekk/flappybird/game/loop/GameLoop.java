@@ -1,13 +1,19 @@
 package com.antekk.flappybird.game.loop;
 
-import com.antekk.flappybird.game.GameController;
 import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
+
+import java.util.Iterator;
+
+import static com.antekk.flappybird.game.GameController.getBlockSizePx;
+import static com.antekk.flappybird.view.GamePanel.*;
 
 public class GameLoop extends Thread {
     private final GamePanel currentPanel;
     private GameState gameState;
+    private int framesSincePipeSpawned = 0;
 
     private final int timeBetweenFramesMillis = 1000 / 180;
 
@@ -17,6 +23,22 @@ public class GameLoop extends Thread {
 
             if(gameState == GameState.PAUSED || gameState == GameState.STARTING)
                 continue;
+
+            if(framesSincePipeSpawned >= 360) {
+                currentPanel.getPipes().add(new PipeFormation());
+                framesSincePipeSpawned = 0;
+            }
+
+
+            for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
+                PipeFormation pipe = it.next();
+                pipe.moveX(-1);
+                if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
+                    it.remove();
+                }
+            }
+
+
 
             Bird bird = currentPanel.getBird();
             if(bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
@@ -39,22 +61,29 @@ public class GameLoop extends Thread {
 
             }
 
-            currentPanel.paintImmediately(bird.getX(),GameController.getBlockSizePx(),
-                    GameController.getBlockSizePx(), currentPanel.getHeight() - GameController.getBlockSizePx());
-
+            framesSincePipeSpawned++;
             gameState = updateGameState();
+            currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
     }
 
     private GameState updateGameState() {
-        if(gameState == GameState.PAUSED) {
+        if (gameState == GameState.PAUSED) {
             return GameState.PAUSED;
         }
 
-        if(currentPanel.getBird().getY() + GameController.getBlockSizePx() >= GamePanel.BOTTOM) {
+        //bird collided with the ground
+        if (currentPanel.getBird().getY() + getBlockSizePx() >= GamePanel.BOTTOM) {
             return GameState.LOST;
         }
 
+        //collision with pipes
+        //can compare with only [0] and [1] here, prob should look into it later
+        for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+            if (currentPanel.getBird().collidesWithPipeFormation(pipeFormation)) {
+                return GameState.LOST;
+            }
+        }
         return GameState.RUNNING;
     }
 

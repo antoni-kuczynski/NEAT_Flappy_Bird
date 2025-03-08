@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import static com.antekk.flappybird.game.GameController.getBlockSizePx;
 import static com.antekk.flappybird.game.keybinds.GameKeybinds.setupKeyBindings;
@@ -24,6 +25,7 @@ public class GamePanel extends JPanel {
     private final JPanel toolbar = new JPanel();
     private final GameLoop loop = new GameLoop(this);
     private final Bird bird = new Bird();
+    private final ArrayList<PipeFormation> pipes = new ArrayList<>();
 
 
     private MouseAdapter gameMouseListener = new MouseAdapter() {
@@ -59,7 +61,9 @@ public class GamePanel extends JPanel {
         g.setColor(Color.GREEN);
         g.fillRect(LEFT, BOTTOM, getWidth(), 2 * GameController.getBlockSizePx());
 
-        new PipeFormation().draw(g);
+        for(PipeFormation pipe : pipes)
+            pipe.draw(g);
+
         bird.draw(g);
     }
 
@@ -170,5 +174,9 @@ public class GamePanel extends JPanel {
 
     public Bird getBird() {
         return bird;
+    }
+
+    public ArrayList<PipeFormation> getPipes() {
+        return pipes;
     }
 }
