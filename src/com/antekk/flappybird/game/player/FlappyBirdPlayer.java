@@ -7,16 +7,11 @@ public class FlappyBirdPlayer {
     public String name;
 
     public void addScore() {
-        score++;
+        score += 10;
         System.out.println(score);
     }
 
-//    /**
-//     * Current game player constructor
-//     * @param scoreDisplay where score rewards are gonna be displayed
-//     */
     public FlappyBirdPlayer() {
-//        this.scoreDisplay = scoreDisplay;
         this.hGap = -1; //TODO temp
     }
 

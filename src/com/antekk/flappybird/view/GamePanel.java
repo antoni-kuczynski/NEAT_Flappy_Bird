@@ -8,6 +8,8 @@ import com.antekk.flappybird.view.themes.GameColors;
 import com.antekk.flappybird.view.themes.Theme;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -28,6 +30,7 @@ public class GamePanel extends JPanel {
     private GameLoop loop = new GameLoop(this);
     private final Bird bird = new Bird();
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
+    private final ScoreDisplay scoreDisplay;
 
 
     private MouseAdapter gameMouseListener = new MouseAdapter() {
@@ -72,18 +75,19 @@ public class GamePanel extends JPanel {
             g.drawImage(GameColors.ground, i, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
 
         }
-//        g.drawImage(GameColors.ground, LEFT, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
-//        g.drawImage(GameColors.ground, LEFT + 9 * getBlockSizePx(), GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
 
         for(PipeFormation pipe : pipes)
             pipe.draw(g);
 
+        bird.draw(g);
+
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 300), null);
+            return;
         }
 
 
-        bird.draw(g);
+        scoreDisplay.draw(g);
 
         if(loop.getGameState() == GameState.LOST) {
             g.drawImage(GameColors.gameOver, 3 * getBlockSizePx(), 3 * getBlockSizePx(), 6 * getBlockSizePx(), (int) (0.219 * 6 * getBlockSizePx()), null);
@@ -107,8 +111,10 @@ public class GamePanel extends JPanel {
         GROUND = BOTTOM - 3 * getBlockSizePx();
         backgroundWidth = (int) (0.5625 * GROUND);
         groundX = LEFT;
+        scoreDisplay = new ScoreDisplay(this);
         parent.setPreferredSize(this.getPreferredSize());
         GameColors.setTheme(Theme.LIGHT);
+
 
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
@@ -126,8 +132,10 @@ public class GamePanel extends JPanel {
         options.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
 
         BoxLayout layout = new BoxLayout(toolbar, BoxLayout.X_AXIS);
+        toolbar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(233, 252, 217)));
+        toolbar.setBackground(GameColors.groundColor);
+        toolbar.setPreferredSize(new Dimension(0, getBlockSizePx()));
         toolbar.setLayout(layout);
-
         toolbar.add(Box.createRigidArea(new Dimension(getBlockSizePx(), 3)));
         toolbar.add(newGame);
         toolbar.add(Box.createRigidArea(new Dimension(getBlockSizePx(), 3)));
@@ -173,13 +181,6 @@ public class GamePanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(LEFT + RIGHT, BOTTOM + TOP);
-    }
-
-    @Override
-    public void setBackground(Color bg) {
-        super.setBackground(bg);
-        if(toolbar != null)
-            toolbar.setBackground(bg);
     }
 
     public static int getBoardRows() {

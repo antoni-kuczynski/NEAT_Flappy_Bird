@@ -5,12 +5,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GameColors {
     public static Color boardColor;
     public static Color backgroundColor;
     public static Color foregroundColor;
-    public static Color borderColor;
+    public static Color groundColor;
     public static Color shapeBorderColor;
 
     public static BufferedImage birdMidFlap;
@@ -22,13 +23,14 @@ public class GameColors {
     public static BufferedImage pipeEnd;
     public static BufferedImage startingMessage;
     public static BufferedImage gameOver;
+    public static ArrayList<BufferedImage> numbers = new ArrayList<>();
 
 
     private static void setDarkThemeValues() {
         boardColor = new Color(49, 54, 63);
         backgroundColor = new Color(34, 40, 49);
         foregroundColor = new Color(238, 238, 238);
-        borderColor = new Color(34, 40, 49);
+        groundColor = new Color(34, 40, 49);
         shapeBorderColor = Color.BLACK;
 
         try {
@@ -41,6 +43,11 @@ public class GameColors {
             pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
             startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
             gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
+
+            numbers.clear();
+            for(int i = 0; i <= 9; i++) {
+                numbers.add(ImageIO.read(new File("assets/sprites/numbers/" + i + ".png")));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -50,7 +57,7 @@ public class GameColors {
         boardColor = new Color(147, 197, 243);
         backgroundColor = new Color(238,238,238);
         foregroundColor = new Color(28, 28, 28);
-        borderColor = new Color(28, 28, 28);
+        groundColor = new Color(78, 192, 202);
         shapeBorderColor = Color.BLACK;
 
         try {
@@ -63,6 +70,12 @@ public class GameColors {
             pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
             startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
             gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
+
+            numbers.clear();
+            for(int i = 0; i <= 9; i++) {
+                numbers.add(ImageIO.read(new File("assets/sprites/numbers/" + i + ".png")));
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

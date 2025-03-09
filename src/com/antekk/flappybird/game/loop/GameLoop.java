@@ -26,8 +26,7 @@ public class GameLoop extends Thread {
 
             if(gameState == GameState.PAUSED)
                 continue;
-
-            if(gameState == GameState.STARTING) {
+            else if(gameState == GameState.STARTING) {
                 groundX -= 4;
                 currentPanel.repaint();
 //                currentPanel.paintImmediately(LEFT, GROUND, RIGHT - LEFT, 2 * getBlockSizePx());
@@ -69,7 +68,6 @@ public class GameLoop extends Thread {
             }
 
             framesSincePipeSpawned++;
-            gameState = updateGameState();
 
             for (PipeFormation pipeFormation : currentPanel.getPipes()) {
                 if (bird.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
@@ -90,7 +88,7 @@ public class GameLoop extends Thread {
             if(!wasAdded)
                 wasScoreAddedAtCurrentPipe = false;
 
-
+            gameState = updateGameState();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
     }
@@ -146,5 +144,9 @@ public class GameLoop extends Thread {
 
     public GameState getGameState() {
         return gameState;
+    }
+
+    public FlappyBirdPlayer getPlayer() {
+        return player;
     }
 }
