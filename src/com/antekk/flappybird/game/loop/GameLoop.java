@@ -36,6 +36,8 @@ public class GameLoop extends Thread {
                     it.remove();
                 }
             }
+            groundX -= 4;
+
 
             Bird bird = currentPanel.getBird();
             if(bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
@@ -67,7 +69,7 @@ public class GameLoop extends Thread {
         }
 
         //bird collided with the ground
-        if (currentPanel.getBird().getY() + getBlockSizePx() >= GamePanel.BOTTOM) {
+        if (currentPanel.getBird().getY() >= GROUND) {
             return GameState.LOST;
         }
 

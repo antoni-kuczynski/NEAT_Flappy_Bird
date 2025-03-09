@@ -23,6 +23,8 @@ public class GamePanel extends JPanel {
     public static int RIGHT;
     public static int BOTTOM;
     public static int GROUND;
+    private static int backgroundWidth;
+    public static int groundX;
     private final JPanel toolbar = new JPanel();
     private GameLoop loop = new GameLoop(this);
     private final Bird bird = new Bird();
@@ -59,25 +61,16 @@ public class GamePanel extends JPanel {
             return;
         }
 
-        g.setColor(Color.YELLOW);
-        g.fillOval(13 * getBlockSizePx(), 2 * getBlockSizePx(), 2 * getBlockSizePx(), 2 * getBlockSizePx());
-        for (int i = 0; i < 360; i += 30) {
-            double angle = Math.toRadians(i);
-            int x1 = 14 * getBlockSizePx() + (int) (50 * Math.cos(angle));
-            int y1 = 3 * getBlockSizePx() + (int) (50 * Math.sin(angle));
-            int x2 = 14 * getBlockSizePx() + (int) (100 * Math.cos(angle));
-            int y2 = 3 * getBlockSizePx() + (int) (100 * Math.sin(angle));
-            g.drawLine(x1, y1, x2, y2);
+        //660
+        g.drawImage(GameColors.background, LEFT, TOP, backgroundWidth, GROUND, null);
+        g.drawImage(GameColors.background, LEFT + backgroundWidth, TOP, backgroundWidth, GROUND, null);
+
+        for(int i = groundX; i <= RIGHT; i+= 9 * getBlockSizePx()) {
+            g.drawImage(GameColors.ground, i, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
+
         }
-
-        g.setColor(Color.WHITE);
-        g.fillOval(100, 100, 80, 60);
-        g.fillOval(140, 80, 100, 70);
-        g.fillOval(180, 100, 80, 60);
-        g.fillOval(130, 120, 90, 60);
-
-        g.setColor(Color.GREEN);
-        g.fillRect(LEFT, BOTTOM, getWidth(), 2 * GameController.getBlockSizePx());
+//        g.drawImage(GameColors.ground, LEFT, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
+//        g.drawImage(GameColors.ground, LEFT + 9 * getBlockSizePx(), GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
 
         for(PipeFormation pipe : pipes)
             pipe.draw(g);
@@ -97,15 +90,17 @@ public class GamePanel extends JPanel {
     protected GamePanel(JFrame parent) {
         LEFT = 0;
         TOP = getBlockSizePx();
-        RIGHT = getBoardRows() * getBlockSizePx();
-        BOTTOM =  getBoardCols() * getBlockSizePx();
-        GROUND = BOTTOM - getBlockSizePx();
+        RIGHT = getBoardCols() * getBlockSizePx();
+        BOTTOM =  getBoardRows() * getBlockSizePx();
+        GROUND = BOTTOM - 3 * getBlockSizePx();
+        backgroundWidth = (int) (0.5625 * GROUND);
+        groundX = LEFT;
         parent.setPreferredSize(this.getPreferredSize());
         GameColors.setTheme(Theme.LIGHT);
 
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
-        setBackground(GameColors.boardColor);
+//        setBackground(GameColors.boardColor);
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
         JButton newGame = new JButton("New game");
@@ -158,12 +153,14 @@ public class GamePanel extends JPanel {
 
         repaint();
         loop.start();
+        parent.setMinimumSize(this.getPreferredSize());
+        parent.setPreferredSize(this.getPreferredSize());
     }
 
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(RIGHT + LEFT, BOTTOM + TOP);
+        return new Dimension(LEFT + RIGHT, BOTTOM + TOP);
     }
 
     @Override

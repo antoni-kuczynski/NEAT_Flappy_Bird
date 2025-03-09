@@ -4,20 +4,31 @@ import com.antekk.flappybird.game.pipes.BottomPipe;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.pipes.TopPipe;
 import com.antekk.flappybird.view.GamePanel;
+import com.antekk.flappybird.view.themes.GameColors;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import static com.antekk.flappybird.game.GameController.getBlockSizePx;
+import static com.antekk.flappybird.view.themes.GameColors.*;
 
 public class Bird {
     private int posX;
     private int posY;
+    private int width;
+    private int height;
     public boolean isMovingUp = false;
     public int framesSinceBirdStartedMoving = 0;
 
+
     public void resetPosition() {
-        posX = GamePanel.getBoardCols() * getBlockSizePx() / 2;
+        posX = (GamePanel.getBoardCols() - 2) * getBlockSizePx() / 2;
         posY = (int) (3.33 * getBlockSizePx());
+        width = (int) (1.41 * getBlockSizePx());
+        height = getBlockSizePx();
     }
 
     public void flap() {
@@ -26,9 +37,14 @@ public class Bird {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.YELLOW);
-        g.fillRect(posX, posY,
-                getBlockSizePx(), getBlockSizePx());
+        //TODO: bird rotation when falling
+        if(isMovingUp && framesSinceBirdStartedMoving != 0) {
+            g.drawImage(birdUpFlap, getX(), getY(), getWidth(), getHeight(), null);
+        } else if(!isMovingUp && framesSinceBirdStartedMoving != 0) {
+            g.drawImage(birdDownFlap, getX(), getY(), getWidth(), getHeight(), null);
+        } else {
+            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
+        }
     }
 
     public void moveUpBy(int dy) {
@@ -42,7 +58,7 @@ public class Bird {
         //bottom pipe collision from top
         if((getX() >= bottomPipe.getEndingRect().x &&
                 getX() <= bottomPipe.getEndingRect().x + bottomPipe.getEndingRect().width) &&
-                getY() + getBlockSizePx() >= bottomPipe.getY()) {
+                getY() + getHeight() >= bottomPipe.getY()) {
             return true;
         }
 
@@ -54,7 +70,7 @@ public class Bird {
         }
 
         //collisions for pipes sides
-        if((getX() + getBlockSizePx() >= topPipe.getX() && getX() <= topPipe.getX() + getBlockSizePx()) &&
+        if((getX() + getWidth() >= topPipe.getX() && getX() <= topPipe.getX() + getBlockSizePx()) &&
                 (getY() <= (topPipe.getY() + topPipe.getHeight()) || getY() >= (bottomPipe.getY()))) {
             return true;
         }
@@ -62,9 +78,9 @@ public class Bird {
         Rectangle top = topPipe.getEndingRect();
         Rectangle bottom = bottomPipe.getEndingRect();
 
-        if((getX() + getBlockSizePx() >= top.x && getX() <= top.x + top.width) &&
+        if((getX() + getWidth() >= top.x && getX() <= top.x + top.width) &&
                 ((getY() <= (top.y + top.height) && getY() + getBlockSizePx() >= top.y) ||
-                (getY() + getBlockSizePx() >= bottom.y && getY() <= bottom.y + bottom.height))) {
+                (getY() + getHeight() >= bottom.y && getY() <= bottom.y + bottom.height))) {
             return true;
         }
 
@@ -81,5 +97,13 @@ public class Bird {
 
     public int getY() {
         return posY;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }
