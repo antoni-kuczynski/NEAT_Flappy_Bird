@@ -6,6 +6,7 @@ import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
 
+import javax.swing.*;
 import java.util.Iterator;
 
 import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
@@ -91,6 +92,16 @@ public class GameLoop extends Thread {
             gameState = updateGameState();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
+
+        player.name = JOptionPane.showInputDialog(
+                null,
+                "Enter your name",
+                "Game over",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        if(player.name != null && !player.name.isEmpty())
+            FlappyBirdPlayer.getStatsFile().addPlayer(player);
     }
 
     private GameState updateGameState() {

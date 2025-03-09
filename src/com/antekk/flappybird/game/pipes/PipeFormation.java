@@ -9,10 +9,10 @@ import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 public class PipeFormation {
     private TopPipe topPipe;
     private BottomPipe bottomPipe;
+    private int hGap = 3 * getBlockSizePx();
 
 
     public PipeFormation() {
-        int hGap = 3 * getBlockSizePx();
         int minPipeHeight = getBlockSizePx();
         int dy = GamePanel.GROUND - GamePanel.TOP;
 

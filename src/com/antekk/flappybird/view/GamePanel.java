@@ -31,6 +31,7 @@ public class GamePanel extends JPanel {
     private final Bird bird = new Bird();
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
     private final ScoreDisplay scoreDisplay;
+    private final BestPlayersDialog bestPlayersDialog;
 
 
     private MouseAdapter gameMouseListener = new MouseAdapter() {
@@ -112,6 +113,7 @@ public class GamePanel extends JPanel {
         backgroundWidth = (int) (0.5625 * GROUND);
         groundX = LEFT;
         scoreDisplay = new ScoreDisplay(this);
+        bestPlayersDialog = new BestPlayersDialog(this);
         parent.setPreferredSize(this.getPreferredSize());
         GameColors.setTheme(Theme.LIGHT);
 
@@ -165,6 +167,8 @@ public class GamePanel extends JPanel {
             repaint();
         });
 
+        showBestPlayers.addActionListener(e -> showBestPlayersDialog(!bestPlayersDialog.isVisible()));
+
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
         setupKeyBindings(inputMap, actionMap, this);
@@ -177,6 +181,20 @@ public class GamePanel extends JPanel {
         parent.setPreferredSize(this.getPreferredSize());
     }
 
+    public void showBestPlayersDialog(boolean show) {
+        if(!show) {
+            bestPlayersDialog.dispose();
+            return;
+        }
+
+        if(getGameLoop().getGameState() == GameState.RUNNING) {
+            getGameLoop().pauseAndUnpauseGame();
+        }
+        repaint();
+
+        bestPlayersDialog.reloadData();
+        bestPlayersDialog.setVisible(true);
+    }
 
     @Override
     public Dimension getPreferredSize() {
