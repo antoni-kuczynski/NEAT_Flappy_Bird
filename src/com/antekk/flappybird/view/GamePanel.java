@@ -6,6 +6,7 @@ import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
+import com.antekk.flappybird.view.themes.Theme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +24,7 @@ public class GamePanel extends JPanel {
     public static int BOTTOM;
     public static int GROUND;
     private final JPanel toolbar = new JPanel();
-    private final GameLoop loop = new GameLoop(this);
+    private GameLoop loop = new GameLoop(this);
     private final Bird bird = new Bird();
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
 
@@ -58,6 +59,23 @@ public class GamePanel extends JPanel {
             return;
         }
 
+        g.setColor(Color.YELLOW);
+        g.fillOval(13 * getBlockSizePx(), 2 * getBlockSizePx(), 2 * getBlockSizePx(), 2 * getBlockSizePx());
+        for (int i = 0; i < 360; i += 30) {
+            double angle = Math.toRadians(i);
+            int x1 = 14 * getBlockSizePx() + (int) (50 * Math.cos(angle));
+            int y1 = 3 * getBlockSizePx() + (int) (50 * Math.sin(angle));
+            int x2 = 14 * getBlockSizePx() + (int) (100 * Math.cos(angle));
+            int y2 = 3 * getBlockSizePx() + (int) (100 * Math.sin(angle));
+            g.drawLine(x1, y1, x2, y2);
+        }
+
+        g.setColor(Color.WHITE);
+        g.fillOval(100, 100, 80, 60);
+        g.fillOval(140, 80, 100, 70);
+        g.fillOval(180, 100, 80, 60);
+        g.fillOval(130, 120, 90, 60);
+
         g.setColor(Color.GREEN);
         g.fillRect(LEFT, BOTTOM, getWidth(), 2 * GameController.getBlockSizePx());
 
@@ -83,10 +101,11 @@ public class GamePanel extends JPanel {
         BOTTOM =  getBoardCols() * getBlockSizePx();
         GROUND = BOTTOM - getBlockSizePx();
         parent.setPreferredSize(this.getPreferredSize());
+        GameColors.setTheme(Theme.LIGHT);
 
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
-        setBackground(GameColors.backgroundColor);
+        setBackground(GameColors.boardColor);
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
         JButton newGame = new JButton("New game");
@@ -101,7 +120,6 @@ public class GamePanel extends JPanel {
 
         BoxLayout layout = new BoxLayout(toolbar, BoxLayout.X_AXIS);
         toolbar.setLayout(layout);
-        toolbar.setBackground(GameColors.backgroundColor);
 
         toolbar.add(Box.createRigidArea(new Dimension(getBlockSizePx(), 3)));
         toolbar.add(newGame);
@@ -120,16 +138,11 @@ public class GamePanel extends JPanel {
         options.setFocusable(false);
 
         newGame.addActionListener(e -> {
-            int option = JOptionPane.showConfirmDialog(null,
-                    "Do you really want to start a new game at level " + -1 + "?",
-                    "Are you sure?",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
-            );
-
-            if(option == 1)
-                return;
-
+            bird.resetPosition();
+            loop = new GameLoop(this);
+            loop.start();
+            pipes.clear();
+            repaint();
         });
 
         pauseGame.addActionListener(e -> {

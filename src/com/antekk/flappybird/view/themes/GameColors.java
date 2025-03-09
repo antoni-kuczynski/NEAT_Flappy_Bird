@@ -19,7 +19,7 @@ public class GameColors {
     }
 
     private static void setLightThemeValues() {
-        boardColor = new Color(250, 250, 255);
+        boardColor = new Color(147, 197, 243);
         backgroundColor = new Color(238,238,238);
         foregroundColor = new Color(28, 28, 28);
         borderColor = new Color(28, 28, 28);

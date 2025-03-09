@@ -15,7 +15,7 @@ public class GameLoop extends Thread {
     private GameState gameState;
     private int framesSincePipeSpawned = 0;
 
-    private final int timeBetweenFramesMillis = 1000 / 180;
+    private final int timeBetweenFramesMillis = 1000 / 60;
 
     private void gameLoop() throws InterruptedException {
         while (gameState != GameState.LOST) {
@@ -24,21 +24,18 @@ public class GameLoop extends Thread {
             if(gameState == GameState.PAUSED || gameState == GameState.STARTING)
                 continue;
 
-            if(framesSincePipeSpawned >= 360) {
+            if(framesSincePipeSpawned >= 90) {
                 currentPanel.getPipes().add(new PipeFormation());
                 framesSincePipeSpawned = 0;
             }
 
-
             for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
                 PipeFormation pipe = it.next();
-                pipe.moveX(-1);
+                pipe.moveX(-4);
                 if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
                     it.remove();
                 }
             }
-
-
 
             Bird bird = currentPanel.getBird();
             if(bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
@@ -46,18 +43,15 @@ public class GameLoop extends Thread {
                 bird.framesSinceBirdStartedMoving = 0;
             }
 
-
             if(!bird.isMovingUp) {
-                bird.moveUpBy((int) -Math.ceil((4 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
+                bird.moveUpBy((int) -Math.ceil((10 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
                 if(bird.framesSinceBirdStartedMoving < 90)
-                    bird.framesSinceBirdStartedMoving++;
+                    bird.framesSinceBirdStartedMoving += 5;
             }
 
-
-
             if(bird.isMovingUp) {
-                bird.moveUpBy((int) Math.floor((4 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60))));
-                bird.framesSinceBirdStartedMoving += 3;
+                bird.moveUpBy((int) Math.floor((8 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60))));
+                bird.framesSinceBirdStartedMoving += 8;
 
             }
 

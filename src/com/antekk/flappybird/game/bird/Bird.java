@@ -10,10 +10,15 @@ import java.awt.*;
 import static com.antekk.flappybird.game.GameController.getBlockSizePx;
 
 public class Bird {
-    private int posX = GamePanel.getBoardCols() * getBlockSizePx() / 2;
-    private int posY = (int) (3.33 * getBlockSizePx());
+    private int posX;
+    private int posY;
     public boolean isMovingUp = false;
     public int framesSinceBirdStartedMoving = 0;
+
+    public void resetPosition() {
+        posX = GamePanel.getBoardCols() * getBlockSizePx() / 2;
+        posY = (int) (3.33 * getBlockSizePx());
+    }
 
     public void flap() {
         framesSinceBirdStartedMoving = 0;
@@ -64,6 +69,10 @@ public class Bird {
         }
 
         return false;
+    }
+
+    public Bird() {
+        resetPosition();
     }
 
     public int getX() {
