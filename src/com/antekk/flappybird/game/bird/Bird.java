@@ -4,15 +4,10 @@ import com.antekk.flappybird.game.pipes.BottomPipe;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.pipes.TopPipe;
 import com.antekk.flappybird.view.GamePanel;
-import com.antekk.flappybird.view.themes.GameColors;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import static com.antekk.flappybird.game.GameController.getBlockSizePx;
+import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.themes.GameColors.*;
 
 public class Bird {
@@ -85,6 +80,13 @@ public class Bird {
         }
 
         return false;
+    }
+
+    public boolean isBetweenPipes(PipeFormation pipeFormation) {
+        return (getX() + getWidth() >= pipeFormation.getTopPipe().getX() &&
+                getX() <= pipeFormation.getTopPipe().getX() + pipeFormation.getTopPipe().getWidth() &&
+                getY() >= pipeFormation.getTopPipe().getY() + pipeFormation.getTopPipe().getHeight() &&
+                getY() + getHeight() <= pipeFormation.getBottomPipe().getY());
     }
 
     public Bird() {

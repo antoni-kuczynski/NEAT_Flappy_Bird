@@ -1,6 +1,5 @@
 package com.antekk.flappybird.view;
 
-import com.antekk.flappybird.game.GameController;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
@@ -14,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import static com.antekk.flappybird.game.GameController.getBlockSizePx;
 import static com.antekk.flappybird.game.keybinds.GameKeybinds.setupKeyBindings;
 
 public class GamePanel extends JPanel {
@@ -25,6 +23,7 @@ public class GamePanel extends JPanel {
     public static int GROUND;
     private static int backgroundWidth;
     public static int groundX;
+    private static int blockSizePx = 60;
     private final JPanel toolbar = new JPanel();
     private GameLoop loop = new GameLoop(this);
     private final Bird bird = new Bird();
@@ -48,6 +47,10 @@ public class GamePanel extends JPanel {
             }
         }
     };
+
+    public static int getBlockSizePx() {
+        return blockSizePx;
+    }
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {

@@ -4,11 +4,12 @@ import com.antekk.flappybird.view.GamePanel;
 
 import java.awt.*;
 
-import static com.antekk.flappybird.game.GameController.getBlockSizePx;
+import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 
 public abstract class Pipe {
     protected int x;
     protected final int y;
+    protected final int width = getBlockSizePx();
     protected final int height;
     protected Rectangle endingRect;
 
@@ -21,7 +22,7 @@ public abstract class Pipe {
 
     public void draw(Graphics g) {
         g.setColor(Color.GREEN.darker());
-        g.fillRect(x, y, getBlockSizePx(), height);
+        g.fillRect(x, y, width, height);
 
         g.fillRect(endingRect.x, endingRect.y, endingRect.width, endingRect.height);
     }
@@ -38,6 +39,10 @@ public abstract class Pipe {
 
     public int getHeight() {
         return height;
+    }
+
+    public int getWidth() {
+        return width;
     }
 
     public Rectangle getEndingRect() {

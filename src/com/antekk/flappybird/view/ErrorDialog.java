@@ -1,7 +1,5 @@
 package com.antekk.flappybird.view;
 
-import com.antekk.flappybird.game.GameController;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -10,7 +8,7 @@ import java.awt.event.WindowEvent;
 public class ErrorDialog extends JDialog {
 
     public ErrorDialog(String text, Exception e) {
-        Dimension dimension = new Dimension(9 * GameController.getBlockSizePx(), 4 * GameController.getBlockSizePx());
+        Dimension dimension = new Dimension(9 * GamePanel.getBlockSizePx(), 4 * GamePanel.getBlockSizePx());
         setMinimumSize(dimension);
         setPreferredSize(dimension);
         setMinimumSize(dimension);

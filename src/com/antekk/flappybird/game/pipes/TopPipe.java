@@ -4,7 +4,7 @@ import com.antekk.flappybird.view.GamePanel;
 
 import java.awt.*;
 
-import static com.antekk.flappybird.game.GameController.getBlockSizePx;
+import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 
 public class TopPipe extends Pipe {
 

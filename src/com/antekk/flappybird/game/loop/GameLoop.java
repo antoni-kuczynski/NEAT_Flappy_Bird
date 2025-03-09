@@ -2,17 +2,20 @@ package com.antekk.flappybird.game.loop;
 
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.pipes.PipeFormation;
+import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
 
 import java.util.Iterator;
 
-import static com.antekk.flappybird.game.GameController.getBlockSizePx;
+import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.GamePanel.*;
 
 public class GameLoop extends Thread {
     private final GamePanel currentPanel;
     private GameState gameState;
+    private final FlappyBirdPlayer player = new FlappyBirdPlayer();
+    private boolean wasScoreAddedAtCurrentPipe = false;
     private int framesSincePipeSpawned = 0;
 
     private final int timeBetweenFramesMillis = 1000 / 60;
@@ -59,6 +62,27 @@ public class GameLoop extends Thread {
 
             framesSincePipeSpawned++;
             gameState = updateGameState();
+
+            for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+                if (bird.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
+                    player.addScore();
+                    wasScoreAddedAtCurrentPipe = true;
+                    break;
+                }
+            }
+
+            boolean wasAdded = false;
+            for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+                if (bird.isBetweenPipes(pipeFormation)) {
+                    wasAdded = true;
+                    break;
+                }
+            }
+
+            if(!wasAdded)
+                wasScoreAddedAtCurrentPipe = false;
+
+
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
     }
