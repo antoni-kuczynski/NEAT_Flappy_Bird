@@ -51,15 +51,15 @@ public class Bird {
         TopPipe topPipe = pipeFormation.getTopPipe();
 
         //bottom pipe collision from top
-        if((getX() >= bottomPipe.getEndingRect().x &&
-                getX() <= bottomPipe.getEndingRect().x + bottomPipe.getEndingRect().width) &&
+        if((getX() + getWidth() >= bottomPipe.getX() &&
+                getX() <= bottomPipe.getX() + bottomPipe.getWidth()) &&
                 getY() + getHeight() >= bottomPipe.getY()) {
             return true;
         }
 
         //top pipe collision from bottom
-        if((getX() >= topPipe.getEndingRect().x &&
-                getX() <= topPipe.getEndingRect().x + topPipe.getEndingRect().width) &&
+        if((getX() >= topPipe.getX() &&
+                getX() <= topPipe.getX() + topPipe.getWidth()) &&
                 getY() <= topPipe.getY() + topPipe.getHeight()) {
             return true;
         }
@@ -67,15 +67,6 @@ public class Bird {
         //collisions for pipes sides
         if((getX() + getWidth() >= topPipe.getX() && getX() <= topPipe.getX() + getBlockSizePx()) &&
                 (getY() <= (topPipe.getY() + topPipe.getHeight()) || getY() >= (bottomPipe.getY()))) {
-            return true;
-        }
-
-        Rectangle top = topPipe.getEndingRect();
-        Rectangle bottom = bottomPipe.getEndingRect();
-
-        if((getX() + getWidth() >= top.x && getX() <= top.x + top.width) &&
-                ((getY() <= (top.y + top.height) && getY() + getBlockSizePx() >= top.y) ||
-                (getY() + getHeight() >= bottom.y && getY() <= bottom.y + bottom.height))) {
             return true;
         }
 

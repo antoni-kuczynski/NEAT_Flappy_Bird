@@ -18,6 +18,8 @@ public class GameColors {
     public static BufferedImage birdUpFlap;
     public static BufferedImage background;
     public static BufferedImage ground;
+    public static BufferedImage pipe;
+    public static BufferedImage pipeEnd;
 
 
     private static void setDarkThemeValues() {
@@ -33,6 +35,8 @@ public class GameColors {
             birdUpFlap = ImageIO.read(new File("assets/sprites/yellowbird-upflap.png"));
             background = ImageIO.read(new File("assets/sprites/background-night.png"));
             ground = ImageIO.read(new File("assets/sprites/base.png"));
+            pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
+            pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -51,6 +55,8 @@ public class GameColors {
             birdUpFlap = ImageIO.read(new File("assets/sprites/yellowbird-upflap.png"));
             background = ImageIO.read(new File("assets/sprites/background-day.png"));
             ground = ImageIO.read(new File("assets/sprites/base.png"));
+            pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
+            pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

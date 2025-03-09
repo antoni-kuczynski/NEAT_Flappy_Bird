@@ -1,10 +1,9 @@
 package com.antekk.flappybird.game.pipes;
 
 import com.antekk.flappybird.view.GamePanel;
+import com.antekk.flappybird.view.themes.GameColors;
 
 import java.awt.*;
-
-import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 
 public class BottomPipe extends Pipe {
 
@@ -13,9 +12,12 @@ public class BottomPipe extends Pipe {
     }
 
     @Override
-    protected void setEndingRectangle() {
-        int rectWidth = (int) (1.5 * getBlockSizePx());
-        int rectHeight = getBlockSizePx() / 3;
-        endingRect = new Rectangle((int) (x - 0.25 * getBlockSizePx()), y, rectWidth, rectHeight);
+    public void draw(Graphics g) {
+        int i;
+        for(i = (int) (0.46 * width); i <= height; i++) {
+            g.drawImage(GameColors.pipe, x, i + y, width, 1, null);
+        }
+        g.drawImage(GameColors.pipeEnd, x, y, width, (int) (0.46 * width), null);
     }
+
 }
