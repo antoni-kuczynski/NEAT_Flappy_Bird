@@ -24,13 +24,21 @@ public class GameLoop extends Thread {
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
-            if(gameState == GameState.PAUSED || gameState == GameState.STARTING)
+            if(gameState == GameState.PAUSED)
                 continue;
+
+            if(gameState == GameState.STARTING) {
+                groundX -= 4;
+                currentPanel.repaint();
+//                currentPanel.paintImmediately(LEFT, GROUND, RIGHT - LEFT, 2 * getBlockSizePx());
+                continue;
+            }
 
             if(framesSincePipeSpawned >= 90) {
                 currentPanel.getPipes().add(new PipeFormation());
                 framesSincePipeSpawned = 0;
             }
+            groundX -= 4;
 
             for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
                 PipeFormation pipe = it.next();
@@ -39,7 +47,7 @@ public class GameLoop extends Thread {
                     it.remove();
                 }
             }
-            groundX -= 4;
+
 
 
             Bird bird = currentPanel.getBird();

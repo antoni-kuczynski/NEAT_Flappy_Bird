@@ -20,8 +20,8 @@ public class Bird {
 
 
     public void resetPosition() {
-        posX = (GamePanel.getBoardCols() - 2) * getBlockSizePx() / 2;
-        posY = (int) (3.33 * getBlockSizePx());
+        posX = (int) ((GamePanel.getBoardCols() - 1.5) * getBlockSizePx() / 2);
+        posY = (GamePanel.getBoardRows() - 2) * getBlockSizePx() / 2;
         width = (int) (1.41 * getBlockSizePx());
         height = getBlockSizePx();
     }

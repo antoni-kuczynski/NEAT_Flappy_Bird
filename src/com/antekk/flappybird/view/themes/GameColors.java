@@ -20,6 +20,8 @@ public class GameColors {
     public static BufferedImage ground;
     public static BufferedImage pipe;
     public static BufferedImage pipeEnd;
+    public static BufferedImage startingMessage;
+    public static BufferedImage gameOver;
 
 
     private static void setDarkThemeValues() {
@@ -37,6 +39,8 @@ public class GameColors {
             ground = ImageIO.read(new File("assets/sprites/base.png"));
             pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
             pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
+            startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
+            gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -57,6 +61,8 @@ public class GameColors {
             ground = ImageIO.read(new File("assets/sprites/base.png"));
             pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
             pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
+            startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
+            gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
