@@ -83,7 +83,7 @@ public class GamePanel extends JPanel {
         bird.draw(g);
 
         if(loop.getGameState() == GameState.STARTING) {
-            g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 300), null);
+            g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
             return;
         }
 

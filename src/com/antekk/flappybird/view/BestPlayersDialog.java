@@ -36,6 +36,7 @@ public class BestPlayersDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
+
         model.addColumn("Place");
         model.addColumn("Name");
         model.addColumn("Score");

@@ -29,6 +29,7 @@ public class GameLoop extends Thread {
                 continue;
             else if(gameState == GameState.STARTING) {
                 groundX -= (int) (0.067 * getBlockSizePx());
+//                groundX -= 4;
                 currentPanel.repaint();
 //                currentPanel.paintImmediately(LEFT, GROUND, RIGHT - LEFT, 2 * getBlockSizePx());
                 continue;
@@ -38,11 +39,12 @@ public class GameLoop extends Thread {
                 currentPanel.getPipes().add(new PipeFormation());
                 framesSincePipeSpawned = 0;
             }
+//            groundX -= 4;
             groundX -= (int) (0.067 * getBlockSizePx());
 
             for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
                 PipeFormation pipe = it.next();
-                pipe.moveX(-4);
+                pipe.moveX(-(int) (0.067 * getBlockSizePx()));
                 if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
                     it.remove();
                 }
@@ -63,7 +65,7 @@ public class GameLoop extends Thread {
             }
 
             if(bird.isMovingUp) {
-                bird.moveUpBy((int) Math.floor((0.13 * getBlockSizePx() * Math.cos((double) bird.framesSinceBirdStartedMoving / 60))));
+                bird.moveUpBy((int) Math.floor(getBlockSizePx() / 7.5 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
                 bird.framesSinceBirdStartedMoving += 8;
 
             }
