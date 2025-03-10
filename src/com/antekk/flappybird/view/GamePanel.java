@@ -1,5 +1,6 @@
 package com.antekk.flappybird.view;
 
+import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
@@ -8,7 +9,6 @@ import com.antekk.flappybird.view.themes.GameColors;
 import com.antekk.flappybird.view.themes.Theme;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -105,6 +105,7 @@ public class GamePanel extends JPanel {
     }
 
     protected GamePanel(JFrame parent) {
+        ConfigJSON.initializeValuesFromConfigFile();
         LEFT = 0;
         TOP = getBlockSizePx();
         RIGHT = getBoardCols() * getBlockSizePx();
@@ -169,6 +170,7 @@ public class GamePanel extends JPanel {
 
         showBestPlayers.addActionListener(e -> showBestPlayersDialog(!bestPlayersDialog.isVisible()));
 
+        options.addActionListener(e -> new OptionsDialog(GamePanel.this).setVisible(true));
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
         setupKeyBindings(inputMap, actionMap, this);
@@ -219,5 +221,9 @@ public class GamePanel extends JPanel {
 
     public ArrayList<PipeFormation> getPipes() {
         return pipes;
+    }
+
+    public static void setBlockSizePx(int blockSizePx) {
+        GamePanel.blockSizePx = blockSizePx;
     }
 }

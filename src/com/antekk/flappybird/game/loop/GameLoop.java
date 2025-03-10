@@ -28,7 +28,7 @@ public class GameLoop extends Thread {
             if(gameState == GameState.PAUSED)
                 continue;
             else if(gameState == GameState.STARTING) {
-                groundX -= 4;
+                groundX -= (int) (0.067 * getBlockSizePx());
                 currentPanel.repaint();
 //                currentPanel.paintImmediately(LEFT, GROUND, RIGHT - LEFT, 2 * getBlockSizePx());
                 continue;
@@ -38,7 +38,7 @@ public class GameLoop extends Thread {
                 currentPanel.getPipes().add(new PipeFormation());
                 framesSincePipeSpawned = 0;
             }
-            groundX -= 4;
+            groundX -= (int) (0.067 * getBlockSizePx());
 
             for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
                 PipeFormation pipe = it.next();
@@ -57,13 +57,13 @@ public class GameLoop extends Thread {
             }
 
             if(!bird.isMovingUp) {
-                bird.moveUpBy((int) -Math.ceil((10 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
+                bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
                 if(bird.framesSinceBirdStartedMoving < 90)
                     bird.framesSinceBirdStartedMoving += 5;
             }
 
             if(bird.isMovingUp) {
-                bird.moveUpBy((int) Math.floor((8 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60))));
+                bird.moveUpBy((int) Math.floor((0.13 * getBlockSizePx() * Math.cos((double) bird.framesSinceBirdStartedMoving / 60))));
                 bird.framesSinceBirdStartedMoving += 8;
 
             }
