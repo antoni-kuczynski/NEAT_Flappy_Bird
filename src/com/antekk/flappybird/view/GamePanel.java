@@ -28,7 +28,7 @@ public class GamePanel extends JPanel {
     private static int blockSizePx = 60;
     private final JPanel toolbar = new JPanel();
     private GameLoop loop = new GameLoop(this);
-    private final Bird bird = new Bird();
+    private final Bird bird;
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
     private final ScoreDisplay scoreDisplay;
     private final BestPlayersDialog bestPlayersDialog;
@@ -113,6 +113,7 @@ public class GamePanel extends JPanel {
         GROUND = BOTTOM - 3 * getBlockSizePx();
         backgroundWidth = (int) (0.5625 * GROUND);
         groundX = LEFT;
+        bird = new Bird();
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
         parent.setPreferredSize(this.getPreferredSize());
