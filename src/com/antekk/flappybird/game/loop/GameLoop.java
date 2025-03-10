@@ -75,12 +75,12 @@ public class GameLoop extends Thread {
             if(!bird.isMovingUp) {
                 bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
                 if(bird.framesSinceBirdStartedMoving < 90)
-                    bird.framesSinceBirdStartedMoving += 7;
+                    bird.framesSinceBirdStartedMoving += 9;
             }
 
             if(bird.isMovingUp) {
                 bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
-                bird.framesSinceBirdStartedMoving += 5;
+                bird.framesSinceBirdStartedMoving += 6;
 
             }
 
@@ -107,6 +107,18 @@ public class GameLoop extends Thread {
 
             gameState = updateGameState();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
+        }
+
+        Bird bird = currentPanel.getBird();
+        bird.framesSinceBirdStartedMoving = 30;
+        while(bird.getY() < GROUND) {
+            bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 3 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
+//            bird.moveUpBy(-(int) Math.ceil(Math.log(bird.framesSinceBirdStartedMoving * bird.framesSinceBirdStartedMoving)));
+//            System.out.println(Math.exp(bird.framesSinceBirdStartedMoving) + "\t" + bird.framesSinceBirdStartedMoving);
+            if (bird.framesSinceBirdStartedMoving < 90)
+                bird.framesSinceBirdStartedMoving += 1;
+            currentPanel.repaint();
+            Thread.sleep(timeBetweenFramesMillis);
         }
 
         player.name = JOptionPane.showInputDialog(

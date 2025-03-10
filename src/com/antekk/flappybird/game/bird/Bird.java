@@ -6,6 +6,8 @@ import com.antekk.flappybird.game.pipes.TopPipe;
 import com.antekk.flappybird.view.GamePanel;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.themes.GameColors.*;
@@ -18,6 +20,30 @@ public class Bird {
     public boolean isMovingUp = false;
     public int framesSinceBirdStartedMoving = 0;
 
+    private static BufferedImage rotateImage(BufferedImage image, double angle) {
+        int w = image.getWidth();
+        int h = image.getHeight();
+        double radians = Math.toRadians(angle);
+
+        int newWidth = (int) Math.round(w * Math.abs(Math.cos(radians)) + h * Math.abs(Math.sin(radians)));
+        int newHeight = (int) Math.round(h * Math.abs(Math.cos(radians)) + w * Math.abs(Math.sin(radians)));
+
+        BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = rotatedImage.createGraphics();
+
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        AffineTransform transform = new AffineTransform();
+        transform.translate((newWidth - w) / 2.0, (newHeight - h) / 2.0);
+        transform.rotate(radians, w / 2.0, h / 2.0);
+        g2d.setTransform(transform);
+
+        g2d.drawImage(image, 0, 0, null);
+        g2d.dispose();
+
+        return rotatedImage;
+    }
 
     public void resetPosition() {
         posX = (int) ((GamePanel.getBoardCols() - 1.5) * getBlockSizePx() / 2);
@@ -32,13 +58,28 @@ public class Bird {
     }
 
     public void draw(Graphics g) {
+        g.setColor(Color.RED);
+        g.drawRect(getX(), getY(), getWidth(), getHeight());
+
         //TODO: bird rotation when falling
+        int width = getWidth();
+        int height = getHeight();
+        if(framesSinceBirdStartedMoving == 90) {
+            int temp = width;
+            width = height;
+            height = temp;
+        }
+
         if(isMovingUp && framesSinceBirdStartedMoving != 0) {
-            g.drawImage(birdUpFlap, getX(), getY(), getWidth(), getHeight(), null);
+//            g.drawImage(birdUpFlap, getX(), getY(), getWidth(), getHeight(), null);
+            BufferedImage img = rotateImage(birdUpFlap, -20);
+            g.drawImage(img, getX(), getY(), width, getHeight(), null);
         } else if(!isMovingUp && framesSinceBirdStartedMoving != 0) {
-            g.drawImage(birdDownFlap, getX(), getY(), getWidth(), getHeight(), null);
+//            g.drawImage(birdDownFlap, getX(), getY(), getWidth(), getHeight(), null);
+            g.drawImage(rotateImage(birdDownFlap, framesSinceBirdStartedMoving), getX(), getY(), width, height, null);
         } else {
-            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
+//            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
+            g.drawImage(rotateImage(birdMidFlap, framesSinceBirdStartedMoving), getX(), getY(), width, height, null);
         }
     }
 
