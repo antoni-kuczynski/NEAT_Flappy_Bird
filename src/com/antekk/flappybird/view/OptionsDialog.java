@@ -56,7 +56,7 @@ public class OptionsDialog extends JDialog {
 
         JPanel blockSize = new JPanel();
         blockSize.add(new JLabel("Block size (px): "));
-        SpinnerNumberModel blockSizeModel = new SpinnerNumberModel(ConfigJSON.getBlockSize(),5,Integer.MAX_VALUE,5);
+        SpinnerNumberModel blockSizeModel = new SpinnerNumberModel(ConfigJSON.getBlockSize(),35,Integer.MAX_VALUE,5);
         JSpinner sizeSpinner = new JSpinner(blockSizeModel);
         sizeSpinner.setPreferredSize(new Dimension(80,25));
         blockSize.add(sizeSpinner);

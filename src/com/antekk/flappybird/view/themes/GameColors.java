@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class GameColors {
-    public static Color boardColor;
     public static Color backgroundColor;
     public static Color foregroundColor;
     public static Color groundColor;
@@ -27,7 +26,6 @@ public class GameColors {
 
 
     private static void setDarkThemeValues() {
-        boardColor = new Color(49, 54, 63);
         backgroundColor = new Color(34, 40, 49);
         foregroundColor = new Color(238, 238, 238);
         groundColor = new Color(34, 40, 49);
@@ -54,8 +52,7 @@ public class GameColors {
     }
 
     private static void setLightThemeValues() {
-        boardColor = new Color(147, 197, 243);
-        backgroundColor = new Color(238,238,238);
+        backgroundColor = new Color(78, 192, 202);
         foregroundColor = new Color(28, 28, 28);
         groundColor = new Color(78, 192, 202);
         shapeBorderColor = Color.BLACK;

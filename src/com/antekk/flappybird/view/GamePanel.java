@@ -36,14 +36,6 @@ public class GamePanel extends JPanel {
 
     private MouseAdapter gameMouseListener = new MouseAdapter() {
         @Override
-        public void mouseClicked(MouseEvent e) {
-            if(e.getButton() == MouseEvent.BUTTON1) {
-                loop.startGame();
-                bird.flap();
-            }
-        }
-
-        @Override
         public void mousePressed(MouseEvent e) {
             if(e.getButton() == MouseEvent.BUTTON1) {
                 loop.startGame();
@@ -68,14 +60,7 @@ public class GamePanel extends JPanel {
             return;
         }
 
-        //660
-        g.drawImage(GameColors.background, LEFT, TOP, backgroundWidth, GROUND, null);
-        g.drawImage(GameColors.background, LEFT + backgroundWidth, TOP, backgroundWidth, GROUND, null);
-
-        for(int i = groundX; i <= RIGHT; i+= 9 * getBlockSizePx()) {
-            g.drawImage(GameColors.ground, i, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
-
-        }
+        drawBackgroundAndGround(g);
 
         for(PipeFormation pipe : pipes)
             pipe.draw(g);
@@ -87,27 +72,67 @@ public class GamePanel extends JPanel {
             return;
         }
 
-
         scoreDisplay.draw(g);
 
         if(loop.getGameState() == GameState.LOST) {
-            g.drawImage(GameColors.gameOver, 3 * getBlockSizePx(), 3 * getBlockSizePx(), 6 * getBlockSizePx(), (int) (0.219 * 6 * getBlockSizePx()), null);
+            g.drawImage(GameColors.gameOver, 3 * getBlockSizePx(), 2 * getBlockSizePx(), 6 * getBlockSizePx(), (int) (0.219 * 6 * getBlockSizePx()), null);
+        }
+    }
+
+    private void drawBackgroundAndGround(Graphics g) {
+        g.drawImage(GameColors.background, LEFT, TOP, backgroundWidth, GROUND, null);
+        g.drawImage(GameColors.background, LEFT + backgroundWidth, TOP, backgroundWidth, GROUND, null);
+
+        for(int i = groundX; i <= RIGHT; i+= 9 * getBlockSizePx()) {
+            g.drawImage(GameColors.ground, i, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
+
         }
     }
 
 
     private void drawPauseScreen(Graphics g) {
-        g.setColor(GameColors.boardColor);
-        g.fillRect(0,0,getWidth(),getHeight());
+        drawBackgroundAndGround(g);
 
         g.setColor(GameColors.foregroundColor);
+        g.setFont(g.getFont().deriveFont((float) getBlockSizePx()));
         g.drawString("Game paused", getBlockSizePx() * 2, getBlockSizePx() * 4);
     }
 
     protected GamePanel(JFrame parent) {
         ConfigJSON.initializeValuesFromConfigFile();
+
+        JButton newGame = new JButton("New game");
+        JButton pauseGame = new JButton("Pause game");
+        JButton showBestPlayers = new JButton("Best players");
+        JButton options = new JButton("Options");
+
+        newGame.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
+        pauseGame.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
+        showBestPlayers.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
+        options.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
+
+
+
+        newGame.setFocusable(false);
+        pauseGame.setFocusable(false);
+        showBestPlayers.setFocusable(false);
+        options.setFocusable(false);
+
+        BoxLayout layout = new BoxLayout(toolbar, BoxLayout.X_AXIS);
+        toolbar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(233, 252, 217)));
+        toolbar.setBackground(GameColors.groundColor);
+        toolbar.setLayout(layout);
+        toolbar.add(Box.createHorizontalGlue());
+        toolbar.add(newGame);
+        toolbar.add(Box.createHorizontalGlue());
+        toolbar.add(pauseGame);
+        toolbar.add(Box.createHorizontalGlue());
+        toolbar.add(showBestPlayers);
+        toolbar.add(Box.createHorizontalGlue());
+        toolbar.add(options);
+
         LEFT = 0;
-        TOP = getBlockSizePx();
+        TOP = toolbar.getPreferredSize().height;
         RIGHT = getBoardCols() * getBlockSizePx();
         BOTTOM =  getBoardRows() * getBlockSizePx();
         GROUND = BOTTOM - 3 * getBlockSizePx();
@@ -125,36 +150,7 @@ public class GamePanel extends JPanel {
 //        setBackground(GameColors.boardColor);
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
-        JButton newGame = new JButton("New game");
-        JButton pauseGame = new JButton("Pause game");
-        JButton showBestPlayers = new JButton("Best players");
-        JButton options = new JButton("Options");
 
-        newGame.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
-        pauseGame.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
-        showBestPlayers.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
-        options.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
-
-        BoxLayout layout = new BoxLayout(toolbar, BoxLayout.X_AXIS);
-        toolbar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(233, 252, 217)));
-        toolbar.setBackground(GameColors.groundColor);
-        toolbar.setPreferredSize(new Dimension(0, getBlockSizePx()));
-        toolbar.setLayout(layout);
-        toolbar.add(Box.createRigidArea(new Dimension(getBlockSizePx(), 3)));
-        toolbar.add(newGame);
-        toolbar.add(Box.createRigidArea(new Dimension(getBlockSizePx(), 3)));
-        toolbar.add(pauseGame);
-        toolbar.add(Box.createRigidArea(new Dimension(getBlockSizePx(), 3)));
-        toolbar.add(showBestPlayers);
-        toolbar.add(Box.createRigidArea(new Dimension(getBlockSizePx(), 3)));
-        toolbar.add(options);
-
-        add(toolbar, BorderLayout.PAGE_START);
-
-        newGame.setFocusable(false);
-        pauseGame.setFocusable(false);
-        showBestPlayers.setFocusable(false);
-        options.setFocusable(false);
 
         newGame.addActionListener(e -> {
             bird.resetPosition();
@@ -176,6 +172,7 @@ public class GamePanel extends JPanel {
         ActionMap actionMap = getActionMap();
         setupKeyBindings(inputMap, actionMap, this);
 
+        add(toolbar, BorderLayout.PAGE_START);
         addMouseListener(gameMouseListener);
 
         repaint();

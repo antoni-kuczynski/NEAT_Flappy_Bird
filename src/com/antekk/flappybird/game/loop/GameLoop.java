@@ -18,6 +18,7 @@ public class GameLoop extends Thread {
     private final FlappyBirdPlayer player = new FlappyBirdPlayer();
     private boolean wasScoreAddedAtCurrentPipe = false;
     private int framesSincePipeSpawned = 0;
+    private int framesSinceIdleSpriteChanged = 0;
 
     private final int timeBetweenFramesMillis = 1000 / 60;
 
@@ -25,13 +26,29 @@ public class GameLoop extends Thread {
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
-            if(gameState == GameState.PAUSED)
-                continue;
-            else if(gameState == GameState.STARTING) {
+            if(gameState == GameState.PAUSED) {
                 groundX -= (int) (0.067 * getBlockSizePx());
-//                groundX -= 4;
                 currentPanel.repaint();
-//                currentPanel.paintImmediately(LEFT, GROUND, RIGHT - LEFT, 2 * getBlockSizePx());
+                continue;
+            }
+
+            Bird bird = currentPanel.getBird();
+            if(gameState == GameState.STARTING) {
+                groundX -= (int) (0.067 * getBlockSizePx());
+
+                framesSinceIdleSpriteChanged++;
+                if(framesSinceIdleSpriteChanged <= 45) {
+                    currentPanel.repaint();
+                    continue;
+                }
+
+                if(currentPanel.getBird().framesSinceBirdStartedMoving != 0)
+                    currentPanel.getBird().isMovingUp = !currentPanel.getBird().isMovingUp;
+
+                currentPanel.getBird().framesSinceBirdStartedMoving = 90;
+
+                framesSinceIdleSpriteChanged = 0;
+                currentPanel.repaint();
                 continue;
             }
 
@@ -39,7 +56,6 @@ public class GameLoop extends Thread {
                 currentPanel.getPipes().add(new PipeFormation());
                 framesSincePipeSpawned = 0;
             }
-//            groundX -= 4;
             groundX -= (int) (0.067 * getBlockSizePx());
 
             for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
@@ -51,8 +67,6 @@ public class GameLoop extends Thread {
             }
 
 
-
-            Bird bird = currentPanel.getBird();
             if(bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
                 bird.isMovingUp = false;
                 bird.framesSinceBirdStartedMoving = 0;
@@ -61,12 +75,12 @@ public class GameLoop extends Thread {
             if(!bird.isMovingUp) {
                 bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
                 if(bird.framesSinceBirdStartedMoving < 90)
-                    bird.framesSinceBirdStartedMoving += 5;
+                    bird.framesSinceBirdStartedMoving += 7;
             }
 
             if(bird.isMovingUp) {
-                bird.moveUpBy((int) Math.floor(getBlockSizePx() / 7.5 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
-                bird.framesSinceBirdStartedMoving += 8;
+                bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
+                bird.framesSinceBirdStartedMoving += 5;
 
             }
 
