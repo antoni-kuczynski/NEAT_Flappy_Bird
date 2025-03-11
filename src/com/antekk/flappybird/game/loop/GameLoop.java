@@ -19,6 +19,7 @@ public class GameLoop extends Thread {
     private boolean wasScoreAddedAtCurrentPipe = false;
     private int framesSincePipeSpawned = 0;
     private int framesSinceIdleSpriteChanged = 0;
+    private int idleSpriteMovementAngle = -2;
 
     private final int timeBetweenFramesMillis = 1000 / 60;
 
@@ -35,19 +36,37 @@ public class GameLoop extends Thread {
             Bird bird = currentPanel.getBird();
             if(gameState == GameState.STARTING) {
                 groundX -= (int) (0.067 * getBlockSizePx());
+//                bird.rotationAngle = 0;
+                idleSpriteMovementAngle += 2;
+
+                if(idleSpriteMovementAngle / (0.2 * getBlockSizePx()) >= 14) {
+                    idleSpriteMovementAngle = 0;
+                }
+                System.out.println(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx())));
+
+                bird.moveUpBy((int) (Math.sin(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx()))) * 2));
+
+
 
                 framesSinceIdleSpriteChanged++;
-                if(framesSinceIdleSpriteChanged <= 45) {
+                if(framesSinceIdleSpriteChanged <= 20) {
                     currentPanel.repaint();
                     continue;
                 }
+//                System.out.println(idleSpriteMovementAngle);
+//                if(idleSpriteMovementAngle != 270 && idleSpriteMovementAngle != 180 && idleSpriteMovementAngle != 90 && idleSpriteMovementAngle != 0) {
+//                    currentPanel.repaint();
+//                    continue;
+//                }
 
                 if(currentPanel.getBird().framesSinceBirdStartedMoving != 0)
                     currentPanel.getBird().isMovingUp = !currentPanel.getBird().isMovingUp;
 
+                bird.rotationAngle = 0;
                 currentPanel.getBird().framesSinceBirdStartedMoving = 90;
 
                 framesSinceIdleSpriteChanged = 0;
+
                 currentPanel.repaint();
                 continue;
             }
@@ -73,12 +92,14 @@ public class GameLoop extends Thread {
             }
 
             if(!bird.isMovingUp) {
+                bird.rotationAngle++;
                 bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
                 if(bird.framesSinceBirdStartedMoving < 90)
                     bird.framesSinceBirdStartedMoving += 9;
             }
 
             if(bird.isMovingUp) {
+                bird.rotationAngle = 0;
                 bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
                 bird.framesSinceBirdStartedMoving += 6;
 
@@ -109,14 +130,18 @@ public class GameLoop extends Thread {
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
 
+        //game over falling animation
+        int gameOverFallingFrames = 25;
         Bird bird = currentPanel.getBird();
-        bird.framesSinceBirdStartedMoving = 30;
+        bird.rotationAngle = 15;
+        bird.isMovingUp = false;
         while(bird.getY() < GROUND) {
-            bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 3 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
-//            bird.moveUpBy(-(int) Math.ceil(Math.log(bird.framesSinceBirdStartedMoving * bird.framesSinceBirdStartedMoving)));
-//            System.out.println(Math.exp(bird.framesSinceBirdStartedMoving) + "\t" + bird.framesSinceBirdStartedMoving);
-            if (bird.framesSinceBirdStartedMoving < 90)
-                bird.framesSinceBirdStartedMoving += 1;
+            bird.isMovingUp = false;
+            bird.rotationAngle++;
+            bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 3 * Math.tan((double) gameOverFallingFrames / 60))));
+            if (gameOverFallingFrames < 90)
+                gameOverFallingFrames += 1;
+            bird.framesSinceBirdStartedMoving = gameOverFallingFrames;
             currentPanel.repaint();
             Thread.sleep(timeBetweenFramesMillis);
         }

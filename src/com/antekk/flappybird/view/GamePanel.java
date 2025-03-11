@@ -65,13 +65,14 @@ public class GamePanel extends JPanel {
         for(PipeFormation pipe : pipes)
             pipe.draw(g);
 
-        bird.draw(g);
+
 
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
+            bird.drawWithoutRotation(g);
             return;
         }
-
+        bird.draw(g);
         scoreDisplay.draw(g);
 
         if(loop.getGameState() == GameState.LOST) {

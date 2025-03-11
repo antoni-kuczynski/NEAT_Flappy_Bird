@@ -7,8 +7,7 @@ public class FlappyBirdPlayer {
     public String name;
 
     public void addScore() {
-        score += 10;
-        System.out.println(score);
+        score++;
     }
 
     public FlappyBirdPlayer() {

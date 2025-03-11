@@ -19,20 +19,25 @@ public class Bird {
     private int height;
     public boolean isMovingUp = false;
     public int framesSinceBirdStartedMoving = 0;
+    public int rotationAngle = 0;
 
     private static BufferedImage rotateImage(BufferedImage image, double angle) {
         int w = image.getWidth();
+//        int w = width;
         int h = image.getHeight();
+//        int h = height;
         double radians = Math.toRadians(angle);
 
         int newWidth = (int) Math.round(w * Math.abs(Math.cos(radians)) + h * Math.abs(Math.sin(radians)));
         int newHeight = (int) Math.round(h * Math.abs(Math.cos(radians)) + w * Math.abs(Math.sin(radians)));
 
+//        System.out.println(newWidth + " " + newHeight);
+
         BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = rotatedImage.createGraphics();
 
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 
         AffineTransform transform = new AffineTransform();
         transform.translate((newWidth - w) / 2.0, (newHeight - h) / 2.0);
@@ -58,28 +63,30 @@ public class Bird {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.RED);
-        g.drawRect(getX(), getY(), getWidth(), getHeight());
-
-        //TODO: bird rotation when falling
-        int width = getWidth();
-        int height = getHeight();
-        if(framesSinceBirdStartedMoving == 90) {
-            int temp = width;
-            width = height;
-            height = temp;
+        //so that the bird doesnt flip when falling
+        if(rotationAngle > 33) {
+            rotationAngle = 33;
         }
 
-        if(isMovingUp && framesSinceBirdStartedMoving != 0) {
-//            g.drawImage(birdUpFlap, getX(), getY(), getWidth(), getHeight(), null);
+        if(isMovingUp && framesSinceBirdStartedMoving != 0 || rotationAngle < 15) {
             BufferedImage img = rotateImage(birdUpFlap, -20);
-            g.drawImage(img, getX(), getY(), width, getHeight(), null);
+            g.drawImage(img, getX(), getY(), getWidth(), getHeight(), null);
         } else if(!isMovingUp && framesSinceBirdStartedMoving != 0) {
-//            g.drawImage(birdDownFlap, getX(), getY(), getWidth(), getHeight(), null);
-            g.drawImage(rotateImage(birdDownFlap, framesSinceBirdStartedMoving), getX(), getY(), width, height, null);
+            g.drawImage(rotateImage(birdDownFlap, 3 * rotationAngle - 15), getX(), getY(), getWidth(), getHeight(), null);
+
         } else {
-//            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
-            g.drawImage(rotateImage(birdMidFlap, framesSinceBirdStartedMoving), getX(), getY(), width, height, null);
+            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
+        }
+    }
+
+    public void drawWithoutRotation(Graphics g) {
+        if(isMovingUp && framesSinceBirdStartedMoving != 0) {
+            g.drawImage(birdUpFlap, getX(), getY(), getWidth(), getHeight(), null);
+        } else if(!isMovingUp && framesSinceBirdStartedMoving != 0) {
+            g.drawImage(birdDownFlap, getX(), getY(), getWidth(), getHeight(), null);
+
+        } else {
+            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
         }
     }
 
