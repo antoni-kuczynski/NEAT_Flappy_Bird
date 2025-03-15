@@ -15,11 +15,12 @@ import static com.antekk.flappybird.view.themes.GameColors.*;
 public class Bird {
     private int posX;
     private int posY;
-    private int width;
-    private int height;
+    private int spriteWidth;
+    private int spriteHeight;
     public boolean isMovingUp = false;
     public int framesSinceBirdStartedMoving = 0;
     public int rotationAngle = 0;
+
 
     private static BufferedImage rotateImage(BufferedImage image, double angle) {
         int w = image.getWidth();
@@ -53,8 +54,9 @@ public class Bird {
     public void resetPosition() {
         posX = (int) ((GamePanel.getBoardCols() - 1.5) * getBlockSizePx() / 2);
         posY = (GamePanel.getBoardRows() - 2) * getBlockSizePx() / 2;
-        width = (int) (1.41 * getBlockSizePx());
-        height = getBlockSizePx();
+//        spriteWidth = (int) (1.41 * getBlockSizePx());
+        spriteWidth = (int) (1.7 * getBlockSizePx());
+        spriteHeight = (int) (1.7 * getBlockSizePx());
     }
 
     public void flap() {
@@ -70,23 +72,34 @@ public class Bird {
 
         if(isMovingUp && framesSinceBirdStartedMoving != 0 || rotationAngle < 15) {
             BufferedImage img = rotateImage(birdUpFlap, -20);
-            g.drawImage(img, getX(), getY(), getWidth(), getHeight(), null);
+            g.drawImage(
+                    img,
+                    getX(),
+                    getY(),
+//                    (int) (1.17 * getSpriteWidth()),
+                    (int) (1.17 * getSpriteWidth()),
+//                    (int) (0.971 * getSpriteHeight()),
+                    (int) (1.17 * getSpriteHeight()),
+                    null
+            );
         } else if(!isMovingUp && framesSinceBirdStartedMoving != 0) {
-            g.drawImage(rotateImage(birdDownFlap, 3 * rotationAngle - 15), getX(), getY(), getWidth(), getHeight(), null);
+            BufferedImage img = rotateImage(birdDownFlap, 3 * rotationAngle - 15);
+            g.drawImage(img,
+                    getX(), getY(), getSpriteWidth(), getSpriteHeight(), null);
 
         } else {
-            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
+            g.drawImage(birdMidFlap, getX(), getY(), getSpriteWidth(), getSpriteHeight(), null);
         }
     }
 
     public void drawWithoutRotation(Graphics g) {
         if(isMovingUp && framesSinceBirdStartedMoving != 0) {
-            g.drawImage(birdUpFlap, getX(), getY(), getWidth(), getHeight(), null);
+            g.drawImage(birdUpFlap, getX(), getY(), getSpriteWidth(), getSpriteHeight(), null);
         } else if(!isMovingUp && framesSinceBirdStartedMoving != 0) {
-            g.drawImage(birdDownFlap, getX(), getY(), getWidth(), getHeight(), null);
+            g.drawImage(birdDownFlap, getX(), getY(), getSpriteWidth(), getSpriteHeight(), null);
 
         } else {
-            g.drawImage(birdMidFlap, getX(), getY(), getWidth(), getHeight(), null);
+            g.drawImage(birdMidFlap, getX(), getY(), getSpriteWidth(), getSpriteHeight(), null);
         }
     }
 
@@ -99,9 +112,9 @@ public class Bird {
         TopPipe topPipe = pipeFormation.getTopPipe();
 
         //bottom pipe collision from top
-        if((getX() + getWidth() >= bottomPipe.getX() &&
+        if((getX() + getSpriteWidth() >= bottomPipe.getX() &&
                 getX() <= bottomPipe.getX() + bottomPipe.getWidth()) &&
-                getY() + getHeight() >= bottomPipe.getY()) {
+                getY() + getSpriteHeight() >= bottomPipe.getY()) {
             return true;
         }
 
@@ -113,7 +126,7 @@ public class Bird {
         }
 
         //collisions for pipes sides
-        if((getX() + getWidth() >= topPipe.getX() && getX() <= topPipe.getX() + getBlockSizePx()) &&
+        if((getX() + getSpriteWidth() >= topPipe.getX() && getX() <= topPipe.getX() + getBlockSizePx()) &&
                 (getY() <= (topPipe.getY() + topPipe.getHeight()) || getY() >= (bottomPipe.getY()))) {
             return true;
         }
@@ -122,10 +135,10 @@ public class Bird {
     }
 
     public boolean isBetweenPipes(PipeFormation pipeFormation) {
-        return (getX() + getWidth() >= pipeFormation.getTopPipe().getX() &&
+        return (getX() + getSpriteWidth() >= pipeFormation.getTopPipe().getX() &&
                 getX() <= pipeFormation.getTopPipe().getX() + pipeFormation.getTopPipe().getWidth() &&
                 getY() >= pipeFormation.getTopPipe().getY() + pipeFormation.getTopPipe().getHeight() &&
-                getY() + getHeight() <= pipeFormation.getBottomPipe().getY());
+                getY() + getSpriteHeight() <= pipeFormation.getBottomPipe().getY());
     }
 
     public Bird() {
@@ -140,11 +153,11 @@ public class Bird {
         return posY;
     }
 
-    public int getWidth() {
-        return width;
+    public int getSpriteWidth() {
+        return spriteWidth;
     }
 
-    public int getHeight() {
-        return height;
+    public int getSpriteHeight() {
+        return spriteHeight;
     }
 }

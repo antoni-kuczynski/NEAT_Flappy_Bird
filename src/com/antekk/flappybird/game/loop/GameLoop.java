@@ -46,7 +46,7 @@ public class GameLoop extends Thread {
                 if(idleSpriteMovementAngle / (0.2 * getBlockSizePx()) >= 0.23 * getBlockSizePx()) {
                     idleSpriteMovementAngle = 0;
                 }
-                System.out.println(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx())));
+//                System.out.println(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx())));
 
                 bird.moveUpBy((int) (Math.sin(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx()))) * 2));
 

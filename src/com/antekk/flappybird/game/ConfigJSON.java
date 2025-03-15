@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 
+import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
+
 public final class ConfigJSON {
     private static final File file = new File("flappy_bird_config.json");
     private static JSONObject object;
@@ -63,7 +65,7 @@ public final class ConfigJSON {
             object = new JSONObject(jsonText.toString());
         } catch (JSONException e) {
             object = new JSONObject();
-            object.put("vertical_pipes_gap", 1);
+            object.put("vertical_pipes_gap", 3 * getBlockSizePx());
             object.put("theme", "LIGHT");
             object.put("block_size", 30);
             writeToFile();

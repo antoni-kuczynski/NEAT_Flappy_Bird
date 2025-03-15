@@ -33,7 +33,9 @@ public class OptionsDialog extends JDialog {
             model.addElement(theme);
         model.setSelectedItem(ConfigJSON.getTheme());
 
-        SpinnerNumberModel pipesGapModel = new SpinnerNumberModel(ConfigJSON.getPipesVGap(),parent.getBird().getHeight(),GamePanel.getBoardRows() * getBlockSizePx(),10);
+
+        SpinnerNumberModel pipesGapModel = getSpinnerNumberModel();
+
         JSpinner pipesGap = new JSpinner(pipesGapModel);
         pipesGap.setPreferredSize(new Dimension(80,25));
 
@@ -56,7 +58,17 @@ public class OptionsDialog extends JDialog {
 
         JPanel blockSize = new JPanel();
         blockSize.add(new JLabel("Block size (px): "));
-        SpinnerNumberModel blockSizeModel = new SpinnerNumberModel(ConfigJSON.getBlockSize(),35,Integer.MAX_VALUE,5);
+
+        int currentBlockSizeModel = ConfigJSON.getBlockSize();
+        if(currentBlockSizeModel < 35) {
+            currentBlockSizeModel = 35;
+        }
+        SpinnerNumberModel blockSizeModel = new SpinnerNumberModel(
+                currentBlockSizeModel,
+                35,
+                Integer.MAX_VALUE,
+                5
+        );
         JSpinner sizeSpinner = new JSpinner(blockSizeModel);
         sizeSpinner.setPreferredSize(new Dimension(80,25));
         blockSize.add(sizeSpinner);
@@ -108,5 +120,20 @@ public class OptionsDialog extends JDialog {
         add(buttons, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private static SpinnerNumberModel getSpinnerNumberModel() {
+        int currentPipesGap = ConfigJSON.getPipesVGap();
+        if(currentPipesGap < 3 * getBlockSizePx() ||
+                currentPipesGap > GamePanel.getBoardRows() / 2 * getBlockSizePx()) {
+            currentPipesGap = 3 * getBlockSizePx();
+        }
+
+        return new SpinnerNumberModel(
+                currentPipesGap,
+                3 * getBlockSizePx(),
+                GamePanel.getBoardRows() / 2 * getBlockSizePx(),
+                10
+        );
     }
 }
