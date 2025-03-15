@@ -1,6 +1,7 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
+import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
 import com.antekk.flappybird.view.themes.Theme;
@@ -77,15 +78,18 @@ public class OptionsDialog extends JDialog {
                 setBlockSizePx(newBlockSize);
             }
 
-            if(newPipesGap != PipeFormation.futureGap) {
+            if(newPipesGap != PipeFormation.futureGap &&
+                    (parent.getGameLoop().getGameState() == GameState.RUNNING ||
+                    parent.getGameLoop().getGameState() == GameState.PAUSED)) {
                 JOptionPane.showMessageDialog(
                         null,
                         "Pipes vertical gap setting will take effect after starting a new game.",
                         "Info",
                         JOptionPane.INFORMATION_MESSAGE
                 );
-                PipeFormation.futureGap = newPipesGap;
             }
+            if(newPipesGap != PipeFormation.futureGap)
+                PipeFormation.futureGap = newPipesGap;
 
             ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize);
             this.dispose();

@@ -10,7 +10,7 @@ public class PipeFormation {
     private TopPipe topPipe;
     private BottomPipe bottomPipe;
     private static int gap = 3 * getBlockSizePx();
-    public static int futureGap = gap;
+    public static int futureGap = 0;
 
 
     public PipeFormation() {

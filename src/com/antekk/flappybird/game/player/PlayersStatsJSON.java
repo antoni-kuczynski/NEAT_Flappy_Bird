@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class PlayersStatsJSON {
-    private File playersFile = new File("./best_players.json");
+    private File playersFile = new File("./flappy_bird_best_players.json");
     private JSONArray players;
 
     private void initialize() throws IOException {
@@ -38,12 +38,12 @@ public class PlayersStatsJSON {
         JSONObject playerAtIndex = players.getJSONObject(index); //TODO exception handling here
 
         int loadedScore;
-        int loadedHgap;
+        int loadedPipesGap;
         String loadedName;
 
         try {
             loadedScore = playerAtIndex.getInt("score");
-            loadedHgap = playerAtIndex.getInt("hgap");
+            loadedPipesGap = playerAtIndex.getInt("vertical_pipes_gap");
             loadedName = playerAtIndex.getString("name");
         } catch (Exception e) {
             new ErrorDialog("Missing JSON key in players statistics file!", e);
@@ -51,7 +51,7 @@ public class PlayersStatsJSON {
         }
 
         FlappyBirdPlayer player = new FlappyBirdPlayer(
-                loadedScore,loadedHgap,loadedName
+                loadedScore,loadedPipesGap,loadedName
         );
 
 
@@ -61,7 +61,7 @@ public class PlayersStatsJSON {
     private JSONObject createPlayerJSONObject(FlappyBirdPlayer player) {
         JSONObject object = new JSONObject();
         object.put("score", player.score);
-        object.put("hgap", player.hGap);
+        object.put("vertical_pipes_gap", player.pipesVerticalGap);
         object.put("name", player.name);
         return object;
     }

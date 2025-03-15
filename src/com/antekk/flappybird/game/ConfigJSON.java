@@ -1,5 +1,6 @@
 package com.antekk.flappybird.game;
 
+import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
 import com.antekk.flappybird.view.themes.GameColors;
@@ -14,7 +15,7 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 
 public final class ConfigJSON {
-    private static final File file = new File("tetris_config.json");
+    private static final File file = new File("flappy_bird_config.json");
     private static JSONObject object;
 
     public static void initializeValuesFromConfigFile() {
@@ -36,6 +37,9 @@ public final class ConfigJSON {
         }
 
         GameColors.setTheme(theme);
+        PipeFormation.futureGap = object.getInt("vertical_pipes_gap");
+        PipeFormation.updatePipeGap();
+
     }
 
     public static void saveValues(int pipesVGap, Theme theme, int blockSize) {

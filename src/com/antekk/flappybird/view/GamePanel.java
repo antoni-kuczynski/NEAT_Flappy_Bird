@@ -156,9 +156,10 @@ public class GamePanel extends JPanel {
 
 
         newGame.addActionListener(e -> {
-            bird.resetPosition();
+            loop.endGame();
             loop = new GameLoop(this);
             loop.start();
+            bird.resetPosition();
             pipes.clear();
             repaint();
         });

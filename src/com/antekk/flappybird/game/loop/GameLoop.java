@@ -27,6 +27,10 @@ public class GameLoop extends Thread {
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
+            if(gameState == GameState.ENDED) {
+                return;
+            }
+
             if(gameState == GameState.PAUSED) {
                 groundX -= (int) (0.067 * getBlockSizePx());
                 currentPanel.repaint();
@@ -127,6 +131,7 @@ public class GameLoop extends Thread {
                 wasScoreAddedAtCurrentPipe = false;
 
             gameState = updateGameState();
+//            currentPanel.repaint();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
 
@@ -200,7 +205,12 @@ public class GameLoop extends Thread {
 
     public void startGame() {
         gameState = GameState.RUNNING;
+        player.pipesVerticalGap = PipeFormation.futureGap;
         PipeFormation.updatePipeGap();
+    }
+
+    public void endGame() {
+        gameState = GameState.ENDED;
     }
 
     public GameLoop(GamePanel panel) {

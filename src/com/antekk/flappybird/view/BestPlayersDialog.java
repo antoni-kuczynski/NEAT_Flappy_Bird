@@ -22,7 +22,7 @@ public class BestPlayersDialog extends JDialog {
                     String.valueOf(place),
                     player.name,
                     String.valueOf(player.score),
-                    String.valueOf(player.hGap),
+                    String.valueOf(player.pipesVerticalGap),
             });
             place++;
         }
