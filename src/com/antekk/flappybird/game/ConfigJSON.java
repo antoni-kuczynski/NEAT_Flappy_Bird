@@ -27,7 +27,6 @@ public final class ConfigJSON {
         }
 
         GamePanel.setBlockSizePx(object.getInt("block_size"));
-//        TetrisPlayer.defaultGameLevel = object.getInt("starting_level") - 1;
         Theme theme;
         try {
             theme = Theme.valueOf(object.getString("theme"));
@@ -39,8 +38,8 @@ public final class ConfigJSON {
         GameColors.setTheme(theme);
     }
 
-    public static void saveValues(int level, Theme theme, int blockSize) {
-        object.put("starting_level", level);
+    public static void saveValues(int pipesVGap, Theme theme, int blockSize) {
+        object.put("vertical_pipes_gap", pipesVGap);
         object.put("theme", theme);
         object.put("block_size", blockSize);
         writeToFile();
@@ -60,7 +59,7 @@ public final class ConfigJSON {
             object = new JSONObject(jsonText.toString());
         } catch (JSONException e) {
             object = new JSONObject();
-            object.put("starting_level", 1);
+            object.put("vertical_pipes_gap", 1);
             object.put("theme", "LIGHT");
             object.put("block_size", 30);
             writeToFile();
@@ -76,8 +75,8 @@ public final class ConfigJSON {
         }
     }
 
-    public static int getLevel() {
-        return object.getInt("starting_level");
+    public static int getPipesVGap() {
+        return object.getInt("vertical_pipes_gap");
     }
 
     public static int getBlockSize() {
@@ -85,6 +84,12 @@ public final class ConfigJSON {
     }
 
     public static Theme getTheme() {
-        return Theme.valueOf(object.getString("theme"));
+        String theme;
+        try {
+            theme = object.getString("theme");
+        } catch (JSONException e) {
+            return Theme.values()[0];
+        }
+        return Theme.valueOf(theme);
     }
 }

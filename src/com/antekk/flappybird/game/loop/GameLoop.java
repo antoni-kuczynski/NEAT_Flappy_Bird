@@ -39,7 +39,7 @@ public class GameLoop extends Thread {
 //                bird.rotationAngle = 0;
                 idleSpriteMovementAngle += 2;
 
-                if(idleSpriteMovementAngle / (0.2 * getBlockSizePx()) >= 14) {
+                if(idleSpriteMovementAngle / (0.2 * getBlockSizePx()) >= 0.23 * getBlockSizePx()) {
                     idleSpriteMovementAngle = 0;
                 }
                 System.out.println(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx())));
@@ -200,6 +200,7 @@ public class GameLoop extends Thread {
 
     public void startGame() {
         gameState = GameState.RUNNING;
+        PipeFormation.updatePipeGap();
     }
 
     public GameLoop(GamePanel panel) {

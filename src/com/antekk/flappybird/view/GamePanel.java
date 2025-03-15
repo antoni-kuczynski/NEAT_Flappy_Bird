@@ -37,10 +37,12 @@ public class GamePanel extends JPanel {
     private MouseAdapter gameMouseListener = new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent e) {
-            if(e.getButton() == MouseEvent.BUTTON1) {
-                loop.startGame();
-                bird.flap();
+            if(e.getButton() != MouseEvent.BUTTON1) {
+                return;
             }
+            if(loop.getGameState() == GameState.STARTING)
+                loop.startGame();
+            bird.flap();
         }
     };
 

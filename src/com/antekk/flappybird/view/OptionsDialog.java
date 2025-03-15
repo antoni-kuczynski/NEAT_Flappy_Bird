@@ -1,7 +1,7 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
-import com.antekk.flappybird.game.player.FlappyBirdPlayer;
+import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
 import com.antekk.flappybird.view.themes.Theme;
 
@@ -32,16 +32,15 @@ public class OptionsDialog extends JDialog {
             model.addElement(theme);
         model.setSelectedItem(ConfigJSON.getTheme());
 
-        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(ConfigJSON.getLevel(),1,30,1);
-        JSpinner level = new JSpinner(spinnerModel);
-        level.setPreferredSize(new Dimension(80,25));
-//        level.addChangeListener(e -> TetrisPlayer.defaultGameLevel = (int) spinnerModel.getValue() - 1);
+        SpinnerNumberModel pipesGapModel = new SpinnerNumberModel(ConfigJSON.getPipesVGap(),parent.getBird().getHeight(),GamePanel.getBoardRows() * getBlockSizePx(),10);
+        JSpinner pipesGap = new JSpinner(pipesGapModel);
+        pipesGap.setPreferredSize(new Dimension(80,25));
 
-        JPanel setGameLevel = new JPanel();
-        setGameLevel.add(new JLabel("Set starting game level: "));
-        setGameLevel.add(level);
+        JPanel setPipesGap = new JPanel();
+        setPipesGap.add(new JLabel("Vertical gap between pipes: "));
+        setPipesGap.add(pipesGap);
 
-        generalOptions.add(setGameLevel);
+        generalOptions.add(setPipesGap);
 
         JPanel theme = new JPanel();
         theme.add(new JLabel("Theme: "));
@@ -66,8 +65,8 @@ public class OptionsDialog extends JDialog {
         JPanel buttons = new JPanel();
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {
-//            TetrisPlayer.defaultGameLevel = (int) spinnerModel.getValue() - 1;
             int newBlockSize = (int) blockSizeModel.getValue();
+            int newPipesGap = (int) pipesGapModel.getValue();
             if(newBlockSize != getBlockSizePx()) {
                 JOptionPane.showMessageDialog(
                         null,
@@ -78,7 +77,17 @@ public class OptionsDialog extends JDialog {
                 setBlockSizePx(newBlockSize);
             }
 
-            ConfigJSON.saveValues((Integer) level.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize);
+            if(newPipesGap != PipeFormation.futureGap) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Pipes vertical gap setting will take effect after starting a new game.",
+                        "Info",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                PipeFormation.futureGap = newPipesGap;
+            }
+
+            ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize);
             this.dispose();
             parent.repaint();
         });
