@@ -140,7 +140,7 @@ public class GameLoop extends Thread {
         Bird bird = currentPanel.getBird();
         bird.rotationAngle = 15;
         bird.isMovingUp = false;
-        while(bird.getY() < GROUND) {
+        while(bird.getSpritePosY() < GROUND) {
             bird.isMovingUp = false;
             bird.rotationAngle++;
             bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 3 * Math.tan((double) gameOverFallingFrames / 60))));
@@ -168,7 +168,7 @@ public class GameLoop extends Thread {
         }
 
         //bird collided with the ground
-        if (currentPanel.getBird().getY() >= GROUND) {
+        if (currentPanel.getBird().getSpritePosY() >= GROUND) {
             return GameState.LOST;
         }
 

@@ -17,8 +17,8 @@ public class OptionsDialog extends JDialog {
     protected OptionsDialog(GamePanel parent) {
         super(SwingUtilities.getWindowAncestor(parent));
         setTitle("Options");
-        setPreferredSize(new Dimension(GamePanel.getBoardCols() * getBlockSizePx() * 2,
-                (int) (0.8 * GamePanel.getBoardRows() * getBlockSizePx())));
+        setPreferredSize(new Dimension((int) (GamePanel.getBoardCols() * getBlockSizePx() * 0.75),
+                (int) (0.6 * GamePanel.getBoardRows() * getBlockSizePx())));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
