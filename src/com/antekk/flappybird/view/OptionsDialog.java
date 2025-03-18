@@ -51,7 +51,6 @@ public class OptionsDialog extends JDialog {
         themeSelection.setSelectedItem(ConfigJSON.getTheme());
         themeSelection.addItemListener(e -> {
             GameColors.setTheme((Theme) e.getItem());
-            //TODO
             parent.repaint();
         });
 

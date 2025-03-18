@@ -90,6 +90,7 @@ public class GamePanel extends JPanel {
             g.drawImage(GameColors.ground, i, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
 
         }
+        toolbar.setBackground(GameColors.groundColor);
     }
 
 
