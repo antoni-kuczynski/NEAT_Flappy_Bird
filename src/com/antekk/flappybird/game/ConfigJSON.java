@@ -34,8 +34,8 @@ public final class ConfigJSON {
         try {
             theme = Theme.valueOf(object.getString("theme"));
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-//            theme = Theme.values()[0];
+//            throw new RuntimeException(e);
+            theme = Theme.values()[0];
         }
 
         GameColors.setTheme(theme);
@@ -93,9 +93,9 @@ public final class ConfigJSON {
         String theme;
         try {
             theme = object.getString("theme");
-        } catch (JSONException e) {
+            return Theme.valueOf(theme);
+        } catch (Exception e) {
             return Theme.values()[0];
         }
-        return Theme.valueOf(theme);
     }
 }

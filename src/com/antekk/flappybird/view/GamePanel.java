@@ -145,8 +145,6 @@ public class GamePanel extends JPanel {
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
         parent.setPreferredSize(this.getPreferredSize());
-        GameColors.setTheme(Theme.DAY);
-
 
         setLayout(new BorderLayout());
         setDoubleBuffered(true);

@@ -125,15 +125,15 @@ public class OptionsDialog extends JDialog {
 
     private static SpinnerNumberModel getSpinnerNumberModel() {
         int currentPipesGap = ConfigJSON.getPipesVGap();
-        if(currentPipesGap < 3 * getBlockSizePx() ||
+        if(currentPipesGap < 1.5 * getBlockSizePx() ||
                 currentPipesGap > GamePanel.getBoardRows() / 2 * getBlockSizePx()) {
             currentPipesGap = 3 * getBlockSizePx();
         }
 
         return new SpinnerNumberModel(
                 currentPipesGap,
-                3 * getBlockSizePx(),
-                GamePanel.getBoardRows() / 2 * getBlockSizePx(),
+                (int) (1.5 * getBlockSizePx()),
+                (int) GamePanel.getBoardRows() / 2 * getBlockSizePx(),
                 10
         );
     }
