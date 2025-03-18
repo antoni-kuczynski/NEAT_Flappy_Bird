@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class GameColors {
@@ -23,8 +24,13 @@ public class GameColors {
     public static BufferedImage startingMessage;
     public static BufferedImage gameOver;
     public static ArrayList<BufferedImage> numbers = new ArrayList<>();
+    private static final ClassLoader classLoader = GameColors.class.getClassLoader();
 
+    private static InputStream getResource(String resource) {
+        return classLoader.getResourceAsStream(resource);
+    }
 
+    
     private static void setDarkThemeValues() {
         backgroundColor = new Color(0, 135, 147);
         foregroundColor = new Color(238, 238, 238);
@@ -32,7 +38,7 @@ public class GameColors {
         shapeBorderColor = Color.BLACK;
 
         try {
-            background = ImageIO.read(new File("assets/sprites/background-night.png"));
+            background = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/background-night.png"));
             setDefaultSprites();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -40,18 +46,18 @@ public class GameColors {
     }
 
     private static void setDefaultSprites() throws IOException {
-        birdMidFlap = ImageIO.read(new File("assets/sprites/yellowbird-midflap.png"));
-        birdDownFlap = ImageIO.read(new File("assets/sprites/yellowbird-downflap.png"));
-        birdUpFlap = ImageIO.read(new File("assets/sprites/yellowbird-upflap.png"));
-        ground = ImageIO.read(new File("assets/sprites/base.png"));
-        pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
-        pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
-        startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
-        gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
+        birdMidFlap = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/yellowbird-midflap.png"));
+        birdDownFlap = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/yellowbird-downflap.png"));
+        birdUpFlap = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/yellowbird-upflap.png"));
+        ground = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/base.png"));
+        pipe = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/pipe-green1.png"));
+        pipeEnd = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/pipe-green2.png"));
+        startingMessage = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/message.png"));
+        gameOver = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/gameover.png"));
 
         numbers.clear();
         for(int i = 0; i <= 9; i++) {
-            numbers.add(ImageIO.read(new File("assets/sprites/numbers/" + i + ".png")));
+            numbers.add(ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/numbers/" + i + ".png")));
         }
     }
 
@@ -62,7 +68,7 @@ public class GameColors {
         shapeBorderColor = Color.BLACK;
 
         try {
-            background = ImageIO.read(new File("assets/sprites/background-day.png"));
+            background = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/background-day.png"));
             setDefaultSprites();
 
         } catch (IOException e) {
