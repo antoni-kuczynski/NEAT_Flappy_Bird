@@ -32,22 +32,26 @@ public class GameColors {
         shapeBorderColor = Color.BLACK;
 
         try {
-            birdMidFlap = ImageIO.read(new File("assets/sprites/yellowbird-midflap.png"));
-            birdDownFlap = ImageIO.read(new File("assets/sprites/yellowbird-downflap.png"));
-            birdUpFlap = ImageIO.read(new File("assets/sprites/yellowbird-upflap.png"));
             background = ImageIO.read(new File("assets/sprites/background-night.png"));
-            ground = ImageIO.read(new File("assets/sprites/base.png"));
-            pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
-            pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
-            startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
-            gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
-
-            numbers.clear();
-            for(int i = 0; i <= 9; i++) {
-                numbers.add(ImageIO.read(new File("assets/sprites/numbers/" + i + ".png")));
-            }
+            setDefaultSprites();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void setDefaultSprites() throws IOException {
+        birdMidFlap = ImageIO.read(new File("assets/sprites/yellowbird-midflap.png"));
+        birdDownFlap = ImageIO.read(new File("assets/sprites/yellowbird-downflap.png"));
+        birdUpFlap = ImageIO.read(new File("assets/sprites/yellowbird-upflap.png"));
+        ground = ImageIO.read(new File("assets/sprites/base.png"));
+        pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
+        pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
+        startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
+        gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
+
+        numbers.clear();
+        for(int i = 0; i <= 9; i++) {
+            numbers.add(ImageIO.read(new File("assets/sprites/numbers/" + i + ".png")));
         }
     }
 
@@ -58,20 +62,8 @@ public class GameColors {
         shapeBorderColor = Color.BLACK;
 
         try {
-            birdMidFlap = ImageIO.read(new File("assets/sprites/yellowbird-midflap.png"));
-            birdDownFlap = ImageIO.read(new File("assets/sprites/yellowbird-downflap.png"));
-            birdUpFlap = ImageIO.read(new File("assets/sprites/yellowbird-upflap.png"));
             background = ImageIO.read(new File("assets/sprites/background-day.png"));
-            ground = ImageIO.read(new File("assets/sprites/base.png"));
-            pipe = ImageIO.read(new File("assets/sprites/pipe-green1.png"));
-            pipeEnd = ImageIO.read(new File("assets/sprites/pipe-green2.png"));
-            startingMessage = ImageIO.read(new File("assets/sprites/message.png"));
-            gameOver = ImageIO.read(new File("assets/sprites/gameover.png"));
-
-            numbers.clear();
-            for(int i = 0; i <= 9; i++) {
-                numbers.add(ImageIO.read(new File("assets/sprites/numbers/" + i + ".png")));
-            }
+            setDefaultSprites();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -79,9 +71,9 @@ public class GameColors {
     }
 
     public static void setTheme(Theme theme) {
-        if(theme == Theme.LIGHT) {
+        if(theme == Theme.DAY) {
             setLightThemeValues();
-        } else if(theme == Theme.DARK) {
+        } else if(theme == Theme.NIGHT) {
             setDarkThemeValues();
         }
     }

@@ -34,8 +34,8 @@ public final class ConfigJSON {
         try {
             theme = Theme.valueOf(object.getString("theme"));
         } catch (IllegalArgumentException e) {
-            new ErrorDialog("Invalid theme value in config!", e);
-            return;
+            throw new RuntimeException(e);
+//            theme = Theme.values()[0];
         }
 
         GameColors.setTheme(theme);
@@ -66,8 +66,8 @@ public final class ConfigJSON {
         } catch (JSONException e) {
             object = new JSONObject();
             object.put("vertical_pipes_gap", 3 * getBlockSizePx());
-            object.put("theme", "LIGHT");
-            object.put("block_size", 30);
+            object.put("theme", "DAY");
+            object.put("block_size", 50);
             writeToFile();
         }
     }

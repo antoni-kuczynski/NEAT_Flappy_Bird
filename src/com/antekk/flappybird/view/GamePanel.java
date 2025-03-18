@@ -145,7 +145,7 @@ public class GamePanel extends JPanel {
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
         parent.setPreferredSize(this.getPreferredSize());
-        GameColors.setTheme(Theme.LIGHT);
+        GameColors.setTheme(Theme.DAY);
 
 
         setLayout(new BorderLayout());
@@ -179,10 +179,10 @@ public class GamePanel extends JPanel {
         add(toolbar, BorderLayout.PAGE_START);
         addMouseListener(gameMouseListener);
 
-        repaint();
         loop.start();
         parent.setMinimumSize(this.getPreferredSize());
         parent.setPreferredSize(this.getPreferredSize());
+        repaint();
     }
 
     public void showBestPlayersDialog(boolean show) {

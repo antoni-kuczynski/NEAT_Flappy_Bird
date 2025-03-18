@@ -28,15 +28,11 @@ public class Bird {
 
     private static BufferedImage rotateImage(BufferedImage image, double angle) {
         int w = image.getWidth();
-//        int w = width;
         int h = image.getHeight();
-//        int h = height;
         double radians = Math.toRadians(angle);
 
         int newWidth = (int) Math.round(w * Math.abs(Math.cos(radians)) + h * Math.abs(Math.sin(radians)));
         int newHeight = (int) Math.round(h * Math.abs(Math.cos(radians)) + w * Math.abs(Math.sin(radians)));
-
-//        System.out.println(newWidth + " " + newHeight);
 
         BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = rotatedImage.createGraphics();
@@ -57,7 +53,7 @@ public class Bird {
 
     public void resetPosition() {
         spritePosX = (int) ((GamePanel.getBoardCols() - 1.5) * getBlockSizePx() / 2);
-        spritePosY = (GamePanel.getBoardRows() - 2) * getBlockSizePx() / 2;
+        spritePosY = (GamePanel.getBoardRows() - 3) * getBlockSizePx() / 2;
         spriteWidth = (int) (1.7 * getBlockSizePx());
         spriteHeight = (int) (1.7 * getBlockSizePx());
 
@@ -78,8 +74,6 @@ public class Bird {
             rotationAngle = 33;
         }
 
-
-
         if(isMovingUp && framesSinceBirdStartedMoving != 0 || rotationAngle < 15) {
             BufferedImage img = rotateImage(birdUpFlap, -20);
             g.drawImage(
@@ -98,10 +92,6 @@ public class Bird {
         } else {
             g.drawImage(birdMidFlap, getSpriteXPos(), getSpritePosY(), getSpriteWidth(), getSpriteHeight(), null);
         }
-
-
-        g.setColor(Color.RED);
-        g.drawRect(getHitboxPosX(), getHitboxPosY(), hitboxWidth, hitboxHeight);
     }
 
     public void drawWithoutRotation(Graphics g) {
@@ -113,9 +103,6 @@ public class Bird {
         } else {
             g.drawImage(birdMidFlap, getSpriteXPos(), getSpritePosY(), getSpriteWidth(), getSpriteHeight(), null);
         }
-
-        g.setColor(Color.RED);
-        g.drawRect(getHitboxPosX(), getHitboxPosY(), hitboxWidth, hitboxHeight);
     }
 
     public void moveUpBy(int dy) {

@@ -46,8 +46,9 @@ public class OptionsDialog extends JDialog {
         generalOptions.add(setPipesGap);
 
         JPanel theme = new JPanel();
-        theme.add(new JLabel("Theme: "));
+        theme.add(new JLabel("Time of day: "));
         theme.add(themeSelection);
+        themeSelection.setSelectedItem(ConfigJSON.getTheme());
         themeSelection.addItemListener(e -> {
             GameColors.setTheme((Theme) e.getItem());
             //TODO
