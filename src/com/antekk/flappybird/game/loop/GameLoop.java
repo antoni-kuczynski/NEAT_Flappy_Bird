@@ -19,13 +19,15 @@ public class GameLoop extends Thread {
     private boolean wasScoreAddedAtCurrentPipe = false;
     private int framesSincePipeSpawned = 0;
     private int framesSinceIdleSpriteChanged = 0;
-    private int idleSpriteMovementAngle = -2;
-
     private final int timeBetweenFramesMillis = 1000 / 60;
 
     private void gameLoop() throws InterruptedException {
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
+
+            if(gameState == GameState.ENDED) {
+                return;
+            }
 
             if(gameState == GameState.PAUSED) {
                 groundX -= (int) (0.067 * getBlockSizePx());
@@ -36,28 +38,12 @@ public class GameLoop extends Thread {
             Bird bird = currentPanel.getBird();
             if(gameState == GameState.STARTING) {
                 groundX -= (int) (0.067 * getBlockSizePx());
-//                bird.rotationAngle = 0;
-                idleSpriteMovementAngle += 2;
-
-                if(idleSpriteMovementAngle / (0.2 * getBlockSizePx()) >= 14) {
-                    idleSpriteMovementAngle = 0;
-                }
-                System.out.println(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx())));
-
-                bird.moveUpBy((int) (Math.sin(Math.ceil(idleSpriteMovementAngle / (0.2 * getBlockSizePx()))) * 2));
-
-
 
                 framesSinceIdleSpriteChanged++;
                 if(framesSinceIdleSpriteChanged <= 20) {
                     currentPanel.repaint();
                     continue;
                 }
-//                System.out.println(idleSpriteMovementAngle);
-//                if(idleSpriteMovementAngle != 270 && idleSpriteMovementAngle != 180 && idleSpriteMovementAngle != 90 && idleSpriteMovementAngle != 0) {
-//                    currentPanel.repaint();
-//                    continue;
-//                }
 
                 if(currentPanel.getBird().framesSinceBirdStartedMoving != 0)
                     currentPanel.getBird().isMovingUp = !currentPanel.getBird().isMovingUp;
@@ -127,6 +113,7 @@ public class GameLoop extends Thread {
                 wasScoreAddedAtCurrentPipe = false;
 
             gameState = updateGameState();
+//            currentPanel.repaint();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
 
@@ -135,7 +122,7 @@ public class GameLoop extends Thread {
         Bird bird = currentPanel.getBird();
         bird.rotationAngle = 15;
         bird.isMovingUp = false;
-        while(bird.getY() < GROUND) {
+        while(bird.getSpritePosY() < GROUND) {
             bird.isMovingUp = false;
             bird.rotationAngle++;
             bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 3 * Math.tan((double) gameOverFallingFrames / 60))));
@@ -163,7 +150,7 @@ public class GameLoop extends Thread {
         }
 
         //bird collided with the ground
-        if (currentPanel.getBird().getY() >= GROUND) {
+        if (currentPanel.getBird().getSpritePosY() >= GROUND) {
             return GameState.LOST;
         }
 
@@ -200,6 +187,12 @@ public class GameLoop extends Thread {
 
     public void startGame() {
         gameState = GameState.RUNNING;
+        player.pipesVerticalGap = PipeFormation.futureGap;
+        PipeFormation.updatePipeGap();
+    }
+
+    public void endGame() {
+        gameState = GameState.ENDED;
     }
 
     public GameLoop(GamePanel panel) {

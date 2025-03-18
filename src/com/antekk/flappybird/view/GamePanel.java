@@ -37,10 +37,12 @@ public class GamePanel extends JPanel {
     private MouseAdapter gameMouseListener = new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent e) {
-            if(e.getButton() == MouseEvent.BUTTON1) {
-                loop.startGame();
-                bird.flap();
+            if(e.getButton() != MouseEvent.BUTTON1) {
+                return;
             }
+            if(loop.getGameState() == GameState.STARTING)
+                loop.startGame();
+            bird.flap();
         }
     };
 
@@ -88,6 +90,7 @@ public class GamePanel extends JPanel {
             g.drawImage(GameColors.ground, i, GROUND + TOP, 9 * getBlockSizePx(), 3 * getBlockSizePx(), null);
 
         }
+        toolbar.setBackground(GameColors.groundColor);
     }
 
 
@@ -143,8 +146,6 @@ public class GamePanel extends JPanel {
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
         parent.setPreferredSize(this.getPreferredSize());
-        GameColors.setTheme(Theme.LIGHT);
-
 
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
@@ -154,9 +155,10 @@ public class GamePanel extends JPanel {
 
 
         newGame.addActionListener(e -> {
-            bird.resetPosition();
+            loop.endGame();
             loop = new GameLoop(this);
             loop.start();
+            bird.resetPosition();
             pipes.clear();
             repaint();
         });
@@ -176,10 +178,10 @@ public class GamePanel extends JPanel {
         add(toolbar, BorderLayout.PAGE_START);
         addMouseListener(gameMouseListener);
 
-        repaint();
         loop.start();
         parent.setMinimumSize(this.getPreferredSize());
         parent.setPreferredSize(this.getPreferredSize());
+        repaint();
     }
 
     public void showBestPlayersDialog(boolean show) {

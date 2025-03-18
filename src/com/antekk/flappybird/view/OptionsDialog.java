@@ -1,7 +1,8 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
-import com.antekk.flappybird.game.player.FlappyBirdPlayer;
+import com.antekk.flappybird.game.loop.GameState;
+import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
 import com.antekk.flappybird.view.themes.Theme;
 
@@ -16,8 +17,8 @@ public class OptionsDialog extends JDialog {
     protected OptionsDialog(GamePanel parent) {
         super(SwingUtilities.getWindowAncestor(parent));
         setTitle("Options");
-        setPreferredSize(new Dimension(GamePanel.getBoardCols() * getBlockSizePx() * 2,
-                (int) (0.8 * GamePanel.getBoardRows() * getBlockSizePx())));
+        setPreferredSize(new Dimension((int) (GamePanel.getBoardCols() * getBlockSizePx() * 0.75),
+                (int) (0.6 * GamePanel.getBoardRows() * getBlockSizePx())));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -32,23 +33,24 @@ public class OptionsDialog extends JDialog {
             model.addElement(theme);
         model.setSelectedItem(ConfigJSON.getTheme());
 
-        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(ConfigJSON.getLevel(),1,30,1);
-        JSpinner level = new JSpinner(spinnerModel);
-        level.setPreferredSize(new Dimension(80,25));
-//        level.addChangeListener(e -> TetrisPlayer.defaultGameLevel = (int) spinnerModel.getValue() - 1);
 
-        JPanel setGameLevel = new JPanel();
-        setGameLevel.add(new JLabel("Set starting game level: "));
-        setGameLevel.add(level);
+        SpinnerNumberModel pipesGapModel = getSpinnerNumberModel();
 
-        generalOptions.add(setGameLevel);
+        JSpinner pipesGap = new JSpinner(pipesGapModel);
+        pipesGap.setPreferredSize(new Dimension(80,25));
+
+        JPanel setPipesGap = new JPanel();
+        setPipesGap.add(new JLabel("Vertical gap between pipes: "));
+        setPipesGap.add(pipesGap);
+
+        generalOptions.add(setPipesGap);
 
         JPanel theme = new JPanel();
-        theme.add(new JLabel("Theme: "));
+        theme.add(new JLabel("Time of day: "));
         theme.add(themeSelection);
+        themeSelection.setSelectedItem(ConfigJSON.getTheme());
         themeSelection.addItemListener(e -> {
             GameColors.setTheme((Theme) e.getItem());
-            //TODO
             parent.repaint();
         });
 
@@ -56,7 +58,17 @@ public class OptionsDialog extends JDialog {
 
         JPanel blockSize = new JPanel();
         blockSize.add(new JLabel("Block size (px): "));
-        SpinnerNumberModel blockSizeModel = new SpinnerNumberModel(ConfigJSON.getBlockSize(),35,Integer.MAX_VALUE,5);
+
+        int currentBlockSizeModel = ConfigJSON.getBlockSize();
+        if(currentBlockSizeModel < 35) {
+            currentBlockSizeModel = 35;
+        }
+        SpinnerNumberModel blockSizeModel = new SpinnerNumberModel(
+                currentBlockSizeModel,
+                35,
+                Integer.MAX_VALUE,
+                5
+        );
         JSpinner sizeSpinner = new JSpinner(blockSizeModel);
         sizeSpinner.setPreferredSize(new Dimension(80,25));
         blockSize.add(sizeSpinner);
@@ -66,8 +78,8 @@ public class OptionsDialog extends JDialog {
         JPanel buttons = new JPanel();
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {
-//            TetrisPlayer.defaultGameLevel = (int) spinnerModel.getValue() - 1;
             int newBlockSize = (int) blockSizeModel.getValue();
+            int newPipesGap = (int) pipesGapModel.getValue();
             if(newBlockSize != getBlockSizePx()) {
                 JOptionPane.showMessageDialog(
                         null,
@@ -78,7 +90,20 @@ public class OptionsDialog extends JDialog {
                 setBlockSizePx(newBlockSize);
             }
 
-            ConfigJSON.saveValues((Integer) level.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize);
+            if(newPipesGap != PipeFormation.futureGap &&
+                    (parent.getGameLoop().getGameState() == GameState.RUNNING ||
+                    parent.getGameLoop().getGameState() == GameState.PAUSED)) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Pipes vertical gap setting will take effect after starting a new game.",
+                        "Info",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+            if(newPipesGap != PipeFormation.futureGap)
+                PipeFormation.futureGap = newPipesGap;
+
+            ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize);
             this.dispose();
             parent.repaint();
         });
@@ -95,5 +120,20 @@ public class OptionsDialog extends JDialog {
         add(buttons, BorderLayout.PAGE_END);
 
         pack();
+    }
+
+    private static SpinnerNumberModel getSpinnerNumberModel() {
+        int currentPipesGap = ConfigJSON.getPipesVGap();
+        if(currentPipesGap < 1.5 * getBlockSizePx() ||
+                currentPipesGap > GamePanel.getBoardRows() / 2 * getBlockSizePx()) {
+            currentPipesGap = 3 * getBlockSizePx();
+        }
+
+        return new SpinnerNumberModel(
+                currentPipesGap,
+                (int) (1.5 * getBlockSizePx()),
+                (int) GamePanel.getBoardRows() / 2 * getBlockSizePx(),
+                10
+        );
     }
 }

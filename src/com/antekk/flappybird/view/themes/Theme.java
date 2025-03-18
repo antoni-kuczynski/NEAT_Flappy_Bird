@@ -1,8 +1,8 @@
 package com.antekk.flappybird.view.themes;
 
 public enum Theme {
-    LIGHT,
-    DARK;
+    DAY,
+    NIGHT;
 
 
     @Override

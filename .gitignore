@@ -1,4 +1,4 @@
-./best_players.json
+flappy_bird_best_players.json
 
 ### IntelliJ IDEA ###
 out/
@@ -29,5 +29,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-/best_players.json
-/tetris_config.json
+/flappy_bird_best_players.json
+/flappy_bird_config.json

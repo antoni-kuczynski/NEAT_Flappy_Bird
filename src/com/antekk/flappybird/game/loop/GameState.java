@@ -4,5 +4,6 @@ public enum GameState {
     RUNNING,
     LOST,
     PAUSED,
-    STARTING
+    STARTING,
+    ENDED
 }

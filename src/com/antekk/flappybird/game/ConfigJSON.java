@@ -1,5 +1,6 @@
 package com.antekk.flappybird.game;
 
+import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
 import com.antekk.flappybird.view.themes.GameColors;
@@ -13,8 +14,10 @@ import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 
+import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
+
 public final class ConfigJSON {
-    private static final File file = new File("tetris_config.json");
+    private static final File file = new File("flappy_bird_config.json");
     private static JSONObject object;
 
     public static void initializeValuesFromConfigFile() {
@@ -27,20 +30,22 @@ public final class ConfigJSON {
         }
 
         GamePanel.setBlockSizePx(object.getInt("block_size"));
-//        TetrisPlayer.defaultGameLevel = object.getInt("starting_level") - 1;
         Theme theme;
         try {
             theme = Theme.valueOf(object.getString("theme"));
         } catch (IllegalArgumentException e) {
-            new ErrorDialog("Invalid theme value in config!", e);
-            return;
+//            throw new RuntimeException(e);
+            theme = Theme.values()[0];
         }
 
         GameColors.setTheme(theme);
+        PipeFormation.futureGap = object.getInt("vertical_pipes_gap");
+        PipeFormation.updatePipeGap();
+
     }
 
-    public static void saveValues(int level, Theme theme, int blockSize) {
-        object.put("starting_level", level);
+    public static void saveValues(int pipesVGap, Theme theme, int blockSize) {
+        object.put("vertical_pipes_gap", pipesVGap);
         object.put("theme", theme);
         object.put("block_size", blockSize);
         writeToFile();
@@ -60,9 +65,9 @@ public final class ConfigJSON {
             object = new JSONObject(jsonText.toString());
         } catch (JSONException e) {
             object = new JSONObject();
-            object.put("starting_level", 1);
-            object.put("theme", "LIGHT");
-            object.put("block_size", 30);
+            object.put("vertical_pipes_gap", 3 * getBlockSizePx());
+            object.put("theme", "DAY");
+            object.put("block_size", 50);
             writeToFile();
         }
     }
@@ -76,8 +81,8 @@ public final class ConfigJSON {
         }
     }
 
-    public static int getLevel() {
-        return object.getInt("starting_level");
+    public static int getPipesVGap() {
+        return object.getInt("vertical_pipes_gap");
     }
 
     public static int getBlockSize() {
@@ -85,6 +90,12 @@ public final class ConfigJSON {
     }
 
     public static Theme getTheme() {
-        return Theme.valueOf(object.getString("theme"));
+        String theme;
+        try {
+            theme = object.getString("theme");
+            return Theme.valueOf(theme);
+        } catch (Exception e) {
+            return Theme.values()[0];
+        }
     }
 }

@@ -3,7 +3,7 @@ package com.antekk.flappybird.game.player;
 public class FlappyBirdPlayer {
     public static final PlayersStatsJSON playerStats = new PlayersStatsJSON();
     public long score = 0;
-    public int hGap = 0;
+    public int pipesVerticalGap = 0;
     public String name;
 
     public void addScore() {
@@ -11,12 +11,12 @@ public class FlappyBirdPlayer {
     }
 
     public FlappyBirdPlayer() {
-        this.hGap = -1; //TODO temp
+        this.pipesVerticalGap = -1; //TODO temp
     }
 
-    public FlappyBirdPlayer(long score, int hGap, String name) {
+    public FlappyBirdPlayer(long score, int pipesVerticalGap, String name) {
         this.score = score;
-        this.hGap = hGap;
+        this.pipesVerticalGap = pipesVerticalGap;
         this.name = name;
     }
 
