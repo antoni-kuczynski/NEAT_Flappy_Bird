@@ -3,10 +3,9 @@ A Flappy Bird clone written in Java.
 
 # Features
 - Saving player score to JSON file
-- ~~Customizable sprites~~
-- ~~Light / Dark theme~~
+- Flappy bird
 
 # Screenshots
-![Screenshot_20250309_222745](https://github.com/user-attachments/assets/cb01bcaf-de70-43b5-b6ac-e38d1fe70c14)
+![flappy_bird_night](https://github.com/user-attachments/assets/8d56182d-4beb-4814-b1c1-ba536e7f3cb4)
 
-![Screenshot_20250309_222759-1](https://github.com/user-attachments/assets/521cdde1-47c4-442d-ab9c-b7d638094f46)
+![flappy_bird_day](https://github.com/user-attachments/assets/6f2476e6-ec84-4584-b623-3a8a2444d443)
