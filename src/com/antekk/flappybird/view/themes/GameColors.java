@@ -28,7 +28,7 @@ public class GameColors {
     private static void setDarkThemeValues() {
         backgroundColor = new Color(0, 135, 147);
         foregroundColor = new Color(238, 238, 238);
-        groundColor = new Color(34, 40, 49);
+        groundColor = new Color(0, 135, 147);
         shapeBorderColor = Color.BLACK;
 
         try {
