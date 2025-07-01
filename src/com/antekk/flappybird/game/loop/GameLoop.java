@@ -1,5 +1,6 @@
 package com.antekk.flappybird.game.loop;
 
+import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.bird.Birds;
 import com.antekk.flappybird.game.pipes.PipeFormation;
@@ -74,6 +75,9 @@ public class GameLoop extends Thread {
             currentPanel.repaint();
             Thread.sleep(timeBetweenFramesMillis);
         }
+
+        if(!ConfigJSON.showNewBestDialog())
+            return;
 
         player.name = JOptionPane.showInputDialog(
                 null,

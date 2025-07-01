@@ -44,10 +44,11 @@ public final class ConfigJSON {
 
     }
 
-    public static void saveValues(int pipesVGap, Theme theme, int blockSize) {
+    public static void saveValues(int pipesVGap, Theme theme, int blockSize, boolean showNewBestDialog) {
         object.put("vertical_pipes_gap", pipesVGap);
         object.put("theme", theme);
         object.put("block_size", blockSize);
+        object.put("show_new_best_dialog", showNewBestDialog);
         writeToFile();
     }
 
@@ -68,6 +69,7 @@ public final class ConfigJSON {
             object.put("vertical_pipes_gap", 3 * getBlockSizePx());
             object.put("theme", "DAY");
             object.put("block_size", 50);
+            object.put("show_new_best_dialog", true);
             writeToFile();
         }
     }
@@ -97,5 +99,9 @@ public final class ConfigJSON {
         } catch (Exception e) {
             return Theme.values()[0];
         }
+    }
+
+    public static boolean showNewBestDialog() {
+        return object.getBoolean("show_new_best_dialog");
     }
 }

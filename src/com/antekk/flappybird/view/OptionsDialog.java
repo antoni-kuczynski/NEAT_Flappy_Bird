@@ -75,6 +75,14 @@ public class OptionsDialog extends JDialog {
 
         generalOptions.add(blockSize);
 
+        JPanel showNewBestDialogPanel = new JPanel();
+        JCheckBox showNewBestDialogBox = new JCheckBox();
+        showNewBestDialogPanel.add(new JLabel("Show new best dialog: "));
+        showNewBestDialogPanel.add(showNewBestDialogBox);
+        showNewBestDialogBox.setSelected(ConfigJSON.showNewBestDialog());
+        generalOptions.add(showNewBestDialogPanel);
+
+
         JPanel buttons = new JPanel();
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {
@@ -103,7 +111,7 @@ public class OptionsDialog extends JDialog {
             if(newPipesGap != PipeFormation.futureGap)
                 PipeFormation.futureGap = newPipesGap;
 
-            ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize);
+            ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize, showNewBestDialogBox.isSelected());
             this.dispose();
             parent.repaint();
         });
