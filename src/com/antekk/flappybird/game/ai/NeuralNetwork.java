@@ -29,12 +29,14 @@ public class NeuralNetwork {
             double in1 = hiddenNeuron.compute(input1, inputs.get(0));
             double in2 = hiddenNeuron.compute(input2, inputs.get(1));
 
-            System.out.println("\tTotal for Neuron " + hiddenNeuron.getId() + " = " + (in1 + in2));
-            System.out.println("\tComputed output for Neuron " + hiddenNeuron.getId() + " = " + output.compute(in1 + in2, hiddenNeuron));
+//            System.out.println("\tTotal for Neuron " + hiddenNeuron.getId() + " = " + (in1 + in2));
+//            System.out.println("\tComputed output for Neuron " + hiddenNeuron.getId() + " = " + output.compute(in1 + in2, hiddenNeuron));
             z += output.compute(in1 + in2, hiddenNeuron);
         }
 
-        return sigmoid(z);
+        double prediction = sigmoid(z);
+        System.out.println("\tPrediction = " + prediction);
+        return prediction;
     }
 
     private static double sigmoid(double x) {

@@ -29,6 +29,9 @@ public class PipeFormation {
         bottomPipe.draw(g);
     }
 
+    public int getCenterY() {
+        return (bottomPipe.y - (topPipe.y + topPipe.height)) / 2;
+    }
 
     public TopPipe getTopPipe() {
         return topPipe;

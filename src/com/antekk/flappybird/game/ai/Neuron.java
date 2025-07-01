@@ -26,7 +26,7 @@ class Neuron {
         double z = 0;
         z += input * incomingConnections.get(neuron);
 
-        System.out.println("Neuron " + id + " = " + z);
+//        System.out.println("Neuron " + id + " = " + z);
         return z;
     }
 

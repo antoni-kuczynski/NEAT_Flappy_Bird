@@ -1,5 +1,6 @@
 package com.antekk.flappybird.game.bird;
 
+import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.pipes.BottomPipe;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.pipes.TopPipe;
@@ -12,7 +13,7 @@ import java.awt.image.BufferedImage;
 import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.themes.GameColors.*;
 
-public class Bird {
+public class Bird implements PlayerBird{
     private int spritePosX;
     private int spritePosY;
     private int spriteWidth;
@@ -24,6 +25,8 @@ public class Bird {
     public boolean isMovingUp = false;
     public int framesSinceBirdStartedMoving = 0;
     public int rotationAngle = 0;
+    public boolean isAlive = true;
+    private NeuralNetwork brain;
 
 
     private static BufferedImage rotateImage(BufferedImage image, double angle) {
@@ -137,6 +140,14 @@ public class Bird {
         return false;
     }
 
+    private int distanceToPipeFormationX(PipeFormation pipeFormation) {
+        return pipeFormation.getTopPipe().getX() - (getHitboxPosX() + getHitboxWidth());
+    }
+
+    private int distanceToPipeCenterY(PipeFormation pipeFormation) {
+        return (getHitboxPosY() + getHitboxHeight() / 2) - pipeFormation.getCenterY();
+    }
+
     public boolean isBetweenPipes(PipeFormation pipeFormation) {
         return (getHitboxPosX() + getHitboxWidth() >= pipeFormation.getTopPipe().getX() &&
                 getHitboxPosX() <= pipeFormation.getTopPipe().getX() + pipeFormation.getTopPipe().getWidth() &&
@@ -146,6 +157,21 @@ public class Bird {
 
     public Bird() {
         resetPosition();
+    }
+
+    public Bird(NeuralNetwork network) {
+        resetPosition();
+        this.brain = network;
+    }
+
+    public void nextMove(PipeFormation closestPipeFormation) {
+        if(brain == null) return;
+        if(brain.predict(distanceToPipeFormationX(closestPipeFormation), distanceToPipeCenterY(closestPipeFormation)) >= 0.5) {
+            flap();
+        }
+
+        System.out.println(distanceToPipeFormationX(closestPipeFormation));
+        System.out.println(distanceToPipeCenterY(closestPipeFormation));
     }
 
     public int getSpriteXPos() {

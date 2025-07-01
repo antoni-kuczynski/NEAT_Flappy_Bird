@@ -1,21 +1,17 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
-import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.bird.Birds;
+import com.antekk.flappybird.game.keybinds.GameKeybinds;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
-import com.antekk.flappybird.view.themes.Theme;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
-import static com.antekk.flappybird.game.keybinds.GameKeybinds.setupKeyBindings;
 
 public class GamePanel extends JPanel {
     public static int LEFT;
@@ -28,23 +24,10 @@ public class GamePanel extends JPanel {
     private static int blockSizePx = 60;
     private final JPanel toolbar = new JPanel();
     private GameLoop loop = new GameLoop(this);
-    private final Bird bird;
+    private final Birds birds;
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
     private final ScoreDisplay scoreDisplay;
     private final BestPlayersDialog bestPlayersDialog;
-
-
-    private MouseAdapter gameMouseListener = new MouseAdapter() {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if(e.getButton() != MouseEvent.BUTTON1) {
-                return;
-            }
-            if(loop.getGameState() == GameState.STARTING)
-                loop.startGame();
-            bird.flap();
-        }
-    };
 
     public static int getBlockSizePx() {
         return blockSizePx;
@@ -71,10 +54,10 @@ public class GamePanel extends JPanel {
 
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
-            bird.drawWithoutRotation(g);
+            birds.drawWithoutRotation(g);
             return;
         }
-        bird.draw(g);
+        birds.draw(g);
         scoreDisplay.draw(g);
 
         if(loop.getGameState() == GameState.LOST) {
@@ -142,7 +125,7 @@ public class GamePanel extends JPanel {
         GROUND = BOTTOM - 3 * getBlockSizePx();
         backgroundWidth = (int) (0.5625 * GROUND);
         groundX = LEFT;
-        bird = new Bird();
+        birds = new Birds(10);
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
         parent.setPreferredSize(this.getPreferredSize());
@@ -158,7 +141,7 @@ public class GamePanel extends JPanel {
             loop.endGame();
             loop = new GameLoop(this);
             loop.start();
-            bird.resetPosition();
+            birds.resetPosition();
             pipes.clear();
             repaint();
         });
@@ -171,12 +154,14 @@ public class GamePanel extends JPanel {
         showBestPlayers.addActionListener(e -> showBestPlayersDialog(!bestPlayersDialog.isVisible()));
 
         options.addActionListener(e -> new OptionsDialog(GamePanel.this).setVisible(true));
+
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
-        setupKeyBindings(inputMap, actionMap, this);
+        GameKeybinds keybinds = new GameKeybinds(this);
+        keybinds.setupKeyBindings(inputMap, actionMap);
+        addMouseListener(keybinds);
 
         add(toolbar, BorderLayout.PAGE_START);
-        addMouseListener(gameMouseListener);
 
         loop.start();
         parent.setMinimumSize(this.getPreferredSize());
@@ -216,8 +201,8 @@ public class GamePanel extends JPanel {
         return loop;
     }
 
-    public Bird getBird() {
-        return bird;
+    public Birds getBirds() {
+        return birds;
     }
 
     public ArrayList<PipeFormation> getPipes() {

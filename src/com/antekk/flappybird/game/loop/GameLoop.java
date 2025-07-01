@@ -22,6 +22,7 @@ public class GameLoop extends Thread {
     private final int timeBetweenFramesMillis = 1000 / 60;
 
     private void gameLoop() throws InterruptedException {
+        currentPanel.getPipes().add(new PipeFormation());
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
@@ -35,91 +36,27 @@ public class GameLoop extends Thread {
                 continue;
             }
 
-            Bird bird = currentPanel.getBird();
-            if(gameState == GameState.STARTING) {
-                groundX -= (int) (0.067 * getBlockSizePx());
-
-                framesSinceIdleSpriteChanged++;
-                if(framesSinceIdleSpriteChanged <= 20) {
-                    currentPanel.repaint();
-                    continue;
-                }
-
-                if(currentPanel.getBird().framesSinceBirdStartedMoving != 0)
-                    currentPanel.getBird().isMovingUp = !currentPanel.getBird().isMovingUp;
-
-                bird.rotationAngle = 0;
-                currentPanel.getBird().framesSinceBirdStartedMoving = 90;
-
-                framesSinceIdleSpriteChanged = 0;
-
-                currentPanel.repaint();
+            if (gameState == GameState.STARTING) {
+                gameStartingLogic();
                 continue;
             }
 
-            if(framesSincePipeSpawned >= 90) {
-                currentPanel.getPipes().add(new PipeFormation());
-                framesSincePipeSpawned = 0;
-            }
-            groundX -= (int) (0.067 * getBlockSizePx());
+            pipeLogic();
 
-            for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
-                PipeFormation pipe = it.next();
-                pipe.moveX(-(int) (0.067 * getBlockSizePx()));
-                if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
-                    it.remove();
-                }
+            for(Bird bird : currentPanel.getBirds()) {
+                birdLogic(bird);
+                birdDeathLogic(bird);
             }
 
-
-            if(bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
-                bird.isMovingUp = false;
-                bird.framesSinceBirdStartedMoving = 0;
-            }
-
-            if(!bird.isMovingUp) {
-                bird.rotationAngle++;
-                bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
-                if(bird.framesSinceBirdStartedMoving < 90)
-                    bird.framesSinceBirdStartedMoving += 9;
-            }
-
-            if(bird.isMovingUp) {
-                bird.rotationAngle = 0;
-                bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
-                bird.framesSinceBirdStartedMoving += 6;
-
-            }
-
-            framesSincePipeSpawned++;
-
-            for (PipeFormation pipeFormation : currentPanel.getPipes()) {
-                if (bird.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
-                    player.addScore();
-                    wasScoreAddedAtCurrentPipe = true;
-                    break;
-                }
-            }
-
-            boolean wasAdded = false;
-            for (PipeFormation pipeFormation : currentPanel.getPipes()) {
-                if (bird.isBetweenPipes(pipeFormation)) {
-                    wasAdded = true;
-                    break;
-                }
-            }
-
-            if(!wasAdded)
-                wasScoreAddedAtCurrentPipe = false;
+            scoreLogic();
 
             gameState = updateGameState();
-//            currentPanel.repaint();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
         }
 
         //game over falling animation
         int gameOverFallingFrames = 25;
-        Bird bird = currentPanel.getBird();
+        Bird bird = currentPanel.getBirds().getDefault(); //TODO: temp
         bird.rotationAngle = 15;
         bird.isMovingUp = false;
         while(bird.getSpritePosY() < GROUND) {
@@ -144,23 +81,109 @@ public class GameLoop extends Thread {
             FlappyBirdPlayer.getStatsFile().addPlayer(player);
     }
 
-    private GameState updateGameState() {
-        if (gameState == GameState.PAUSED) {
-            return GameState.PAUSED;
-        }
-
+    private void birdDeathLogic(Bird bird) {
         //bird collided with the ground
-        if (currentPanel.getBird().getSpritePosY() >= GROUND) {
-            return GameState.LOST;
+        if (bird.getSpritePosY() >= GROUND) {
+            bird.isAlive = false;
         }
 
         //collision with pipes
         //can compare with only [0] and [1] here, prob should look into it later
         for (PipeFormation pipeFormation : currentPanel.getPipes()) {
-            if (currentPanel.getBird().collidesWithPipeFormation(pipeFormation)) {
-                return GameState.LOST;
+            if (bird.collidesWithPipeFormation(pipeFormation)) {
+                bird.isAlive = false;
             }
         }
+    }
+
+    private void scoreLogic() {
+        Bird bird = currentPanel.getBirds().getDefault();
+        for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+            if (bird.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
+                player.addScore();
+                wasScoreAddedAtCurrentPipe = true;
+                break;
+            }
+        }
+
+        boolean wasAdded = false;
+        for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+            if (bird.isBetweenPipes(pipeFormation)) {
+                wasAdded = true;
+                break;
+            }
+        }
+
+        if (!wasAdded)
+            wasScoreAddedAtCurrentPipe = false;
+    }
+
+    private void pipeLogic() {
+        if(framesSincePipeSpawned >= 90) {
+            currentPanel.getPipes().add(new PipeFormation());
+            framesSincePipeSpawned = 0;
+        }
+        groundX -= (int) (0.067 * getBlockSizePx());
+
+        for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
+            PipeFormation pipe = it.next();
+            pipe.moveX(-(int) (0.067 * getBlockSizePx()));
+            if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
+                it.remove();
+            }
+        }
+        framesSincePipeSpawned++;
+    }
+
+    private void birdLogic(Bird bird) {
+        if (bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
+            bird.isMovingUp = false;
+            bird.framesSinceBirdStartedMoving = 0;
+        }
+
+        if (!bird.isMovingUp) {
+            bird.rotationAngle++;
+            bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
+            if (bird.framesSinceBirdStartedMoving < 90)
+                bird.framesSinceBirdStartedMoving += 9;
+        }
+
+        if (bird.isMovingUp) {
+            bird.rotationAngle = 0;
+            bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
+            bird.framesSinceBirdStartedMoving += 6;
+        }
+        bird.nextMove(currentPanel.getPipes().get(0));
+    }
+
+    private void gameStartingLogic() {
+        for(Bird bird : currentPanel.getBirds()) {
+            framesSinceIdleSpriteChanged++;
+            if (framesSinceIdleSpriteChanged <= 20) {
+                currentPanel.repaint();
+                continue;
+            }
+
+            framesSinceIdleSpriteChanged = 0;
+
+            groundX -= (int) (0.067 * getBlockSizePx());
+            if (bird.framesSinceBirdStartedMoving != 0)
+                bird.isMovingUp = !bird.isMovingUp;
+
+            bird.rotationAngle = 0;
+            bird.framesSinceBirdStartedMoving = 90;
+        }
+    }
+
+    private GameState updateGameState() {
+        if (gameState == GameState.PAUSED) {
+            return GameState.PAUSED;
+        }
+
+        if(currentPanel.getBirds().areAllBirdsDead()) {
+            return GameState.LOST; //TODO: temp
+        }
+
         return GameState.RUNNING;
     }
 
