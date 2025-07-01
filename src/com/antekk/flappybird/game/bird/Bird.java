@@ -165,7 +165,7 @@ public class Bird implements PlayerBird{
     }
 
     public void nextMove(PipeFormation closestPipeFormation) {
-        if(brain == null) return;
+        if(brain == null || !isAlive) return;
         if(brain.predict(distanceToPipeFormationX(closestPipeFormation), distanceToPipeCenterY(closestPipeFormation)) >= 0.5) {
             flap();
         }

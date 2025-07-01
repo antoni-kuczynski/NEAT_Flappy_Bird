@@ -1,12 +1,14 @@
 package com.antekk.flappybird.game.loop;
 
 import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.bird.Birds;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
@@ -16,13 +18,16 @@ public class GameLoop extends Thread {
     private final GamePanel currentPanel;
     private GameState gameState;
     private final FlappyBirdPlayer player = new FlappyBirdPlayer();
+    private final ArrayList<PipeFormation> pipes = new ArrayList<>();
+    private final Birds birds = new Birds(10);
+
     private boolean wasScoreAddedAtCurrentPipe = false;
     private int framesSincePipeSpawned = 0;
     private int framesSinceIdleSpriteChanged = 0;
     private final int timeBetweenFramesMillis = 1000 / 60;
 
     private void gameLoop() throws InterruptedException {
-        currentPanel.getPipes().add(new PipeFormation());
+        pipes.add(new PipeFormation());
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
@@ -43,7 +48,7 @@ public class GameLoop extends Thread {
 
             pipeLogic();
 
-            for(Bird bird : currentPanel.getBirds()) {
+            for(Bird bird : birds) {
                 birdLogic(bird);
                 birdDeathLogic(bird);
             }
@@ -56,7 +61,7 @@ public class GameLoop extends Thread {
 
         //game over falling animation
         int gameOverFallingFrames = 25;
-        Bird bird = currentPanel.getBirds().getDefault(); //TODO: temp
+        Bird bird = birds.getDefault(); //TODO: temp
         bird.rotationAngle = 15;
         bird.isMovingUp = false;
         while(bird.getSpritePosY() < GROUND) {
@@ -89,7 +94,7 @@ public class GameLoop extends Thread {
 
         //collision with pipes
         //can compare with only [0] and [1] here, prob should look into it later
-        for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+        for (PipeFormation pipeFormation : pipes) {
             if (bird.collidesWithPipeFormation(pipeFormation)) {
                 bird.isAlive = false;
             }
@@ -97,8 +102,8 @@ public class GameLoop extends Thread {
     }
 
     private void scoreLogic() {
-        Bird bird = currentPanel.getBirds().getDefault();
-        for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+        Bird bird = birds.getDefault();
+        for (PipeFormation pipeFormation : pipes) {
             if (bird.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
                 player.addScore();
                 wasScoreAddedAtCurrentPipe = true;
@@ -107,7 +112,7 @@ public class GameLoop extends Thread {
         }
 
         boolean wasAdded = false;
-        for (PipeFormation pipeFormation : currentPanel.getPipes()) {
+        for (PipeFormation pipeFormation : pipes) {
             if (bird.isBetweenPipes(pipeFormation)) {
                 wasAdded = true;
                 break;
@@ -120,12 +125,12 @@ public class GameLoop extends Thread {
 
     private void pipeLogic() {
         if(framesSincePipeSpawned >= 90) {
-            currentPanel.getPipes().add(new PipeFormation());
+            pipes.add(new PipeFormation());
             framesSincePipeSpawned = 0;
         }
         groundX -= (int) (0.067 * getBlockSizePx());
 
-        for(Iterator<PipeFormation> it = currentPanel.getPipes().iterator(); it.hasNext();) {
+        for(Iterator<PipeFormation> it = pipes.iterator(); it.hasNext();) {
             PipeFormation pipe = it.next();
             pipe.moveX(-(int) (0.067 * getBlockSizePx()));
             if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
@@ -153,11 +158,11 @@ public class GameLoop extends Thread {
             bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
             bird.framesSinceBirdStartedMoving += 6;
         }
-        bird.nextMove(currentPanel.getPipes().get(0));
+        bird.nextMove(pipes.get(0));
     }
 
     private void gameStartingLogic() {
-        for(Bird bird : currentPanel.getBirds()) {
+        for(Bird bird : birds) {
             framesSinceIdleSpriteChanged++;
             if (framesSinceIdleSpriteChanged <= 20) {
                 currentPanel.repaint();
@@ -180,7 +185,7 @@ public class GameLoop extends Thread {
             return GameState.PAUSED;
         }
 
-        if(currentPanel.getBirds().areAllBirdsDead()) {
+        if(birds.areAllBirdsDead()) {
             return GameState.LOST; //TODO: temp
         }
 
@@ -196,6 +201,16 @@ public class GameLoop extends Thread {
         } else {
             gameState = GameState.PAUSED;
         }
+    }
+
+    public GameLoop(GamePanel panel) {
+        this.currentPanel = panel;
+        birds.resetPosition();
+        pipes.clear();
+    }
+
+    public Bird getDefaultBird() {
+        return birds.getDefault();
     }
 
     @Override
@@ -218,15 +233,19 @@ public class GameLoop extends Thread {
         gameState = GameState.ENDED;
     }
 
-    public GameLoop(GamePanel panel) {
-        this.currentPanel = panel;
-    }
-
     public GameState getGameState() {
         return gameState;
     }
 
     public FlappyBirdPlayer getPlayer() {
         return player;
+    }
+
+    public ArrayList<PipeFormation> getPipes() {
+        return pipes;
+    }
+
+    public Birds getBirds() {
+        return birds;
     }
 }

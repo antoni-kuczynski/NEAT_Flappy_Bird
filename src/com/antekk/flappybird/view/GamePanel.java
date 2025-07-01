@@ -1,7 +1,6 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
-import com.antekk.flappybird.game.bird.Birds;
 import com.antekk.flappybird.game.keybinds.GameKeybinds;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
@@ -11,7 +10,6 @@ import com.antekk.flappybird.view.themes.GameColors;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class GamePanel extends JPanel {
     public static int LEFT;
@@ -24,14 +22,8 @@ public class GamePanel extends JPanel {
     private static int blockSizePx = 60;
     private final JPanel toolbar = new JPanel();
     private GameLoop loop = new GameLoop(this);
-    private final Birds birds;
-    private final ArrayList<PipeFormation> pipes = new ArrayList<>();
     private final ScoreDisplay scoreDisplay;
     private final BestPlayersDialog bestPlayersDialog;
-
-    public static int getBlockSizePx() {
-        return blockSizePx;
-    }
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {
@@ -47,17 +39,17 @@ public class GamePanel extends JPanel {
 
         drawBackgroundAndGround(g);
 
-        for(PipeFormation pipe : pipes)
+        for(PipeFormation pipe : loop.getPipes())
             pipe.draw(g);
 
 
 
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
-            birds.drawWithoutRotation(g);
+            loop.getBirds().drawWithoutRotation(g);
             return;
         }
-        birds.draw(g);
+        loop.getBirds().draw(g);
         scoreDisplay.draw(g);
 
         if(loop.getGameState() == GameState.LOST) {
@@ -98,8 +90,6 @@ public class GamePanel extends JPanel {
         showBestPlayers.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
         options.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
 
-
-
         newGame.setFocusable(false);
         pauseGame.setFocusable(false);
         showBestPlayers.setFocusable(false);
@@ -125,7 +115,6 @@ public class GamePanel extends JPanel {
         GROUND = BOTTOM - 3 * getBlockSizePx();
         backgroundWidth = (int) (0.5625 * GROUND);
         groundX = LEFT;
-        birds = new Birds(10);
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
         parent.setPreferredSize(this.getPreferredSize());
@@ -135,14 +124,17 @@ public class GamePanel extends JPanel {
 //        setBackground(GameColors.boardColor);
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
-
+        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getActionMap();
+        GameKeybinds keybinds = new GameKeybinds(loop);
+        keybinds.setupKeyBindings(inputMap, actionMap);
+        addMouseListener(keybinds);
 
         newGame.addActionListener(e -> {
             loop.endGame();
             loop = new GameLoop(this);
             loop.start();
-            birds.resetPosition();
-            pipes.clear();
+            keybinds.setGameLoop(loop);
             repaint();
         });
 
@@ -154,12 +146,6 @@ public class GamePanel extends JPanel {
         showBestPlayers.addActionListener(e -> showBestPlayersDialog(!bestPlayersDialog.isVisible()));
 
         options.addActionListener(e -> new OptionsDialog(GamePanel.this).setVisible(true));
-
-        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = getActionMap();
-        GameKeybinds keybinds = new GameKeybinds(this);
-        keybinds.setupKeyBindings(inputMap, actionMap);
-        addMouseListener(keybinds);
 
         add(toolbar, BorderLayout.PAGE_START);
 
@@ -201,15 +187,11 @@ public class GamePanel extends JPanel {
         return loop;
     }
 
-    public Birds getBirds() {
-        return birds;
-    }
-
-    public ArrayList<PipeFormation> getPipes() {
-        return pipes;
-    }
-
     public static void setBlockSizePx(int blockSizePx) {
         GamePanel.blockSizePx = blockSizePx;
+    }
+
+    public static int getBlockSizePx() {
+        return blockSizePx;
     }
 }
