@@ -1,5 +1,7 @@
 package com.antekk.flappybird.game.bird;
 
+import com.antekk.flappybird.game.pipes.PipeFormation;
+
 import java.awt.*;
 
 public interface PlayerBird {
@@ -8,4 +10,5 @@ public interface PlayerBird {
     void drawWithoutRotation(Graphics g);
     void resetPosition();
     void flap();
+    boolean isBetweenPipes(PipeFormation pipeFormation);
 }

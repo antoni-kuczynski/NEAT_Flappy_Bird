@@ -5,5 +5,6 @@ public enum GameState {
     LOST,
     PAUSED,
     STARTING,
-    ENDED
+    ENDED,
+    NEXT_GENERATION
 }

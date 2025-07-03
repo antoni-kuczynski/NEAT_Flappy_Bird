@@ -9,7 +9,9 @@ import com.antekk.flappybird.view.GamePanel;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
+import static com.antekk.flappybird.view.GamePanel.TOP;
 import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.themes.GameColors.*;
 
@@ -26,7 +28,8 @@ public class Bird implements PlayerBird{
     public int framesSinceBirdStartedMoving = 0;
     public int rotationAngle = 0;
     public boolean isAlive = true;
-    private NeuralNetwork brain;
+    public NeuralNetwork brain;
+    public long totalTraveledDistance = 0;
 
 
     private static BufferedImage rotateImage(BufferedImage image, double angle) {
@@ -64,6 +67,12 @@ public class Bird implements PlayerBird{
         hitboxPosY = spritePosY + getBlockSizePx() / 2;
         hitboxWidth = (int) (getBlockSizePx() * 0.75);
         hitboxHeight = (int) (getBlockSizePx() * 0.75);
+
+        totalTraveledDistance = 0;
+        isAlive = true;
+        isMovingUp = false;
+        framesSinceBirdStartedMoving = 0;
+        rotationAngle = 0;
     }
 
     public void flap() {
@@ -162,16 +171,37 @@ public class Bird implements PlayerBird{
     public Bird(NeuralNetwork network) {
         resetPosition();
         this.brain = network;
+        brain.fitnessTotalDistance = 0;
     }
 
-    public void nextMove(PipeFormation closestPipeFormation) {
+    public void nextMove(ArrayList<PipeFormation> pipes) {
         if(brain == null || !isAlive) return;
-        if(brain.predict(distanceToPipeFormationX(closestPipeFormation), distanceToPipeCenterY(closestPipeFormation)) >= 0.5) {
-            flap();
+        PipeFormation closestPipeFormation = pipes.get(0);
+        int distX;
+        int distY;
+
+        if(hitboxPosX < closestPipeFormation.getTopPipe().getX() + closestPipeFormation.getTopPipe().getWidth()) {
+            distX = distanceToPipeFormationX(closestPipeFormation);
+            distY = distanceToPipeCenterY(closestPipeFormation);
+        } else {
+            distX = distanceToPipeFormationX(pipes.get(1));
+            distY = distanceToPipeCenterY(pipes.get(1));
         }
 
-        System.out.println(distanceToPipeFormationX(closestPipeFormation));
-        System.out.println(distanceToPipeCenterY(closestPipeFormation));
+        double prediction = brain.predict(distX, -distY);
+        if(prediction > 0.5) {
+            flap();
+        }
+        System.out.println(prediction);
+
+        if(getHitboxPosY() <= GamePanel.TOP) {
+            brain.fitnessTotalDistance = 0;
+        } else {
+            brain.fitnessTotalDistance = totalTraveledDistance - distX;
+        }
+//        System.out.println(distX);
+//        System.out.println(distY);
+//        System.out.println(getFitness());
     }
 
     public int getSpriteXPos() {
@@ -204,5 +234,9 @@ public class Bird implements PlayerBird{
 
     public int getHitboxPosY() {
         return hitboxPosY;
+    }
+
+    public long getFitness() {
+        return brain.fitnessTotalDistance;
     }
 }

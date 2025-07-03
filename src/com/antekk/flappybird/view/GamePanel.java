@@ -21,7 +21,7 @@ public class GamePanel extends JPanel {
     public static int groundX;
     private static int blockSizePx = 60;
     private final JPanel toolbar = new JPanel();
-    private GameLoop loop = new GameLoop(this);
+    private GameLoop loop;
     private final ScoreDisplay scoreDisplay;
     private final BestPlayersDialog bestPlayersDialog;
 
@@ -123,6 +123,8 @@ public class GamePanel extends JPanel {
         setDoubleBuffered(true);
 //        setBackground(GameColors.boardColor);
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
+
+        loop = new GameLoop(this);
 
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();

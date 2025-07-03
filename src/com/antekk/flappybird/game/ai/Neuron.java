@@ -1,52 +1,64 @@
 package com.antekk.flappybird.game.ai;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.Random;
 
-class Neuron {
+public class Neuron implements Cloneable{
     public double bias;
-    private final LinkedHashMap<Neuron, Double> incomingConnections = new LinkedHashMap<>();
     private final Random random = new Random();
     private static int number = 0;
     private int id;
+    private ArrayList<Double> weights = new ArrayList<>();
 
-    Neuron(Neuron... connections) {
-        for(Neuron neuron : connections) {
-            incomingConnections.putIfAbsent(neuron, random.nextDouble(-1,1));
-        }
+    Neuron(int amountOfWeights) {
+        bias = random.nextDouble(-1,1);
+        for(int i = 0; i < amountOfWeights; i++) weights.add(random.nextDouble(-1,1));
         id = number;
         number++;
     }
 
-    protected void addConnection(Neuron neuron) {
-        incomingConnections.putIfAbsent(neuron, random.nextDouble(-1,1));
+    protected double compute(double... input) {
+        double z = 0;
+        for(int i = 0; i < input.length; i++) {
+            z += input[i] * weights.get(i);
+        }
+        z += bias;
+
+        return sigmoid(z);
     }
 
-    protected double compute(double input, Neuron neuron) {
-        double z = 0;
-        z += input * incomingConnections.get(neuron);
-
-//        System.out.println("Neuron " + id + " = " + z);
-        return z;
+    private static double sigmoid(double x) {
+        return 1 / (1 + Math.exp(-x));
     }
 
     @Override
     public String toString() {
-        if(incomingConnections.isEmpty())
-            return "Neuron " + id + " { " + 0 + " connections" + ", bias = " + bias + "}";
-
-        StringBuilder s = new StringBuilder();
-        s.append("{");
-        for(Neuron neuron : incomingConnections.keySet()) {
-            String neuronString = "Neuron " + neuron.id + " with weight = " + incomingConnections.get(neuron);
-            s.append(neuronString).append(", ");
-        }
-        s.append("}");
-
-        return "Neuron " + id + " { " + incomingConnections.size() + " connections = " + s +  ", bias = " + bias + "}";
+        return "Neuron{" +
+                "bias=" + bias +
+                ", id=" + id +
+                ", weights=" + weights +
+                '}';
     }
 
     public int getId() {
         return id;
+    }
+
+    public ArrayList<Double> getWeights() {
+        return weights;
+    }
+
+    @Override
+    public Neuron clone() {
+        try {
+            Neuron clone = (Neuron) super.clone();
+            clone.weights = new ArrayList<>();
+            clone.weights.addAll(weights);
+            clone.bias = bias;
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

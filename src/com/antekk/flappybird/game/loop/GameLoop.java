@@ -47,6 +47,16 @@ public class GameLoop extends Thread {
                 continue;
             }
 
+            if(gameState == GameState.NEXT_GENERATION) {
+                birds.newPopulation();
+                pipes.clear();
+                framesSincePipeSpawned = 0;
+                pipes.add(new PipeFormation());
+                player.score = 0;
+                gameState = GameState.RUNNING;
+                continue;
+            }
+
             pipeLogic();
 
             for(Bird bird : birds) {
@@ -54,7 +64,7 @@ public class GameLoop extends Thread {
                 birdDeathLogic(bird);
             }
 
-            scoreLogic();
+            scoreLogic(birds);
 
             gameState = updateGameState();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
@@ -105,10 +115,9 @@ public class GameLoop extends Thread {
         }
     }
 
-    private void scoreLogic() {
-        Bird bird = birds.getDefault();
+    private void scoreLogic(Birds birds) {
         for (PipeFormation pipeFormation : pipes) {
-            if (bird.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
+            if (birds.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
                 player.addScore();
                 wasScoreAddedAtCurrentPipe = true;
                 break;
@@ -117,7 +126,7 @@ public class GameLoop extends Thread {
 
         boolean wasAdded = false;
         for (PipeFormation pipeFormation : pipes) {
-            if (bird.isBetweenPipes(pipeFormation)) {
+            if (birds.isBetweenPipes(pipeFormation)) {
                 wasAdded = true;
                 break;
             }
@@ -145,6 +154,9 @@ public class GameLoop extends Thread {
     }
 
     private void birdLogic(Bird bird) {
+        if(!bird.isAlive)
+            return;
+
         if (bird.framesSinceBirdStartedMoving >= 90 && bird.isMovingUp) {
             bird.isMovingUp = false;
             bird.framesSinceBirdStartedMoving = 0;
@@ -162,7 +174,9 @@ public class GameLoop extends Thread {
             bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
             bird.framesSinceBirdStartedMoving += 6;
         }
-        bird.nextMove(pipes.get(0));
+
+        bird.totalTraveledDistance += (int) (0.067 * getBlockSizePx());
+        bird.nextMove(pipes);
     }
 
     private void gameStartingLogic() {
@@ -190,7 +204,10 @@ public class GameLoop extends Thread {
         }
 
         if(birds.areAllBirdsDead()) {
-            return GameState.LOST; //TODO: temp
+//            for(Bird bird : birds)
+//                System.out.println(bird.brain.fitnessTotalDistance);
+
+            return GameState.NEXT_GENERATION; //TODO: temp
         }
 
         return GameState.RUNNING;
