@@ -1,6 +1,7 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
+import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.keybinds.GameKeybinds;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
@@ -24,6 +25,8 @@ public class GamePanel extends JPanel {
     private GameLoop loop;
     private final ScoreDisplay scoreDisplay;
     private final BestPlayersDialog bestPlayersDialog;
+    public final BirdsStatsDisplay birdsStatsDisplay;
+    public int birdsStatDisplayWidth = 16 * getBlockSizePx();
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {
@@ -37,12 +40,15 @@ public class GamePanel extends JPanel {
             return;
         }
 
-        drawBackgroundAndGround(g);
 
+        drawBackgroundAndGround(g);
         for(PipeFormation pipe : loop.getPipes())
             pipe.draw(g);
 
-
+        g.setColor(GameColors.borderColor);
+        g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
+        g.setColor(Color.BLACK);
+        birdsStatsDisplay.draw(g);
 
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
@@ -96,7 +102,7 @@ public class GamePanel extends JPanel {
         options.setFocusable(false);
 
         BoxLayout layout = new BoxLayout(toolbar, BoxLayout.X_AXIS);
-        toolbar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(233, 252, 217)));
+        toolbar.setBorder(new MatteBorder(0, 0, 2, 0, GameColors.borderColor));
         toolbar.setBackground(GameColors.groundColor);
         toolbar.setLayout(layout);
         toolbar.add(Box.createHorizontalGlue());
@@ -117,7 +123,6 @@ public class GamePanel extends JPanel {
         groundX = LEFT;
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
-        parent.setPreferredSize(this.getPreferredSize());
 
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
@@ -125,6 +130,7 @@ public class GamePanel extends JPanel {
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
         loop = new GameLoop(this);
+        birdsStatsDisplay = new BirdsStatsDisplay(loop.getBirds());
 
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
@@ -153,7 +159,11 @@ public class GamePanel extends JPanel {
 
         loop.start();
         parent.setMinimumSize(this.getPreferredSize());
-        parent.setPreferredSize(this.getPreferredSize());
+        //        parent.setPreferredSize(this.getPreferredSize());
+        parent.setPreferredSize(new Dimension(
+                this.getPreferredSize().width + birdsStatsDisplay.getPreferredSize().width,
+                this.getPreferredSize().height
+        ));
         repaint();
     }
 

@@ -67,7 +67,7 @@ public class GameLoop extends Thread {
             scoreLogic(birds);
 
             gameState = updateGameState();
-            currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT, BOTTOM - TOP);
+            currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT + currentPanel.birdsStatDisplayWidth, BOTTOM - TOP);
         }
 
         //game over falling animation
@@ -237,12 +237,30 @@ public class GameLoop extends Thread {
     @Override
     public void run() {
         gameState = GameState.STARTING;
+//        birdsStatsDialogThread().start();
         try {
             gameLoop();
         } catch (InterruptedException e) {
             new ErrorDialog("Game thread interrupted!", e);
         }
     }
+
+//    private Thread birdsStatsDialogThread() {
+//        Thread thread = new Thread(() -> {
+//            while(gameState != GameState.ENDED) {
+//                try {
+//                    sleep(1000 / 15);
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
+//
+//                if(birdsStatsDialog.isVisible())
+//                    SwingUtilities.invokeLater(birdsStatsDialog::repaint);
+//            }
+//        });
+//        thread.setDaemon(true);
+//        return thread;
+//    }
 
     public void startGame() {
         gameState = GameState.RUNNING;

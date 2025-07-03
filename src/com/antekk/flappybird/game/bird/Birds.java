@@ -10,6 +10,8 @@ import java.util.Iterator;
 
 public class Birds implements PlayerBird, Iterable<Bird> {
     private ArrayList<Bird> birds = new ArrayList<>();
+    private int badPopulationStreak = 0;
+    private int generationNumber = 1;
 
     public Birds(int amount) {
         for(int i = 0; i < amount; i++) birds.add(new Bird(new NeuralNetwork()));
@@ -69,17 +71,19 @@ public class Birds implements PlayerBird, Iterable<Bird> {
         ArrayList<Bird> newPopulation = new ArrayList<>();
         birds.sort(this::birdsFitnessSortComparator);
 
-//        if(birds.get(0).getFitness() <= 0) {
-//            for(int i = 0; i < birds.size(); i++) {
-//                newPopulation.add(new Bird(new NeuralNetwork()));
-//            }
-//            birds = newPopulation;
-//            return;
-//        }
+        if(birds.get(0).getFitness() <= 0)
+            badPopulationStreak++;
+
+        if(badPopulationStreak >= 2) {
+            System.out.println("more than 2 bad populations, resetting...");
+            for(int i = 0; i < birds.size(); i++) {
+                newPopulation.add(new Bird(new NeuralNetwork()));
+            }
+            badPopulationStreak = 0;
+            return;
+        }
 
         ArrayList<Bird> top4 = get4BestBirds();
-//        newPopulation.addAll(top4);
-
         for(Bird bird : top4) {
             newPopulation.add(new Bird(bird.brain.clone()));
         }
@@ -90,8 +94,6 @@ public class Birds implements PlayerBird, Iterable<Bird> {
         newPopulation.add(createOffSpring(top4.get((int) (Math.random() * 4)), top4.get((int) (Math.random() * 4))));
         newPopulation.add(createOffSpring(top4.get((int) (Math.random() * 4)), top4.get((int) (Math.random() * 4))));
 
-//        newPopulation.add(top4.get((int) (Math.random() * 4)));
-//        newPopulation.add(top4.get((int) (Math.random() * 4)));
 
         newPopulation.add(new Bird(top4.get((int) (Math.random() * 4)).brain.clone()));
         newPopulation.add(new Bird(top4.get((int) (Math.random() * 4)).brain.clone()));
@@ -104,6 +106,7 @@ public class Birds implements PlayerBird, Iterable<Bird> {
 
         for(Bird bird : this)
             bird.resetPosition();
+        generationNumber++;
     }
 
     private Bird createOffSpring(Bird p1, Bird p2) {
@@ -138,6 +141,10 @@ public class Birds implements PlayerBird, Iterable<Bird> {
             arr.add(top4Bird);
         }
         return arr;
+    }
+
+    public int getGenerationNumber() {
+        return generationNumber;
     }
 
     public Bird getDefault() {

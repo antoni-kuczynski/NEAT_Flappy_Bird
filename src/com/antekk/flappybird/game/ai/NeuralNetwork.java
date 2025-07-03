@@ -96,11 +96,12 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
     }
 
     public void mutate() {
+        if(fitnessTotalDistance > 0 && (int) (Math.random() * 2) >= 1)
+            return;
+
         double mutationFactor = Math.random() * 3;
         for(Neuron neuron : this) {
             neuron.bias *= mutationFactor;
-//            for(int i = 0; i < neuron.getWeights().size(); i++)
-//                neuron.getWeights().set(i, neuron.getWeights().get(i) * mutationFactor);
         }
     }
 

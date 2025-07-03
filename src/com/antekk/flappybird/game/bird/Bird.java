@@ -192,7 +192,7 @@ public class Bird implements PlayerBird{
         if(prediction > 0.5) {
             flap();
         }
-        System.out.println(prediction);
+//        System.out.println(prediction);
 
         if(getHitboxPosY() <= GamePanel.TOP) {
             brain.fitnessTotalDistance = 0;
