@@ -2,6 +2,7 @@ package com.antekk.flappybird.game.keybinds;
 
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
+import com.antekk.flappybird.view.GamePanel;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -11,8 +12,9 @@ import java.awt.event.MouseEvent;
 public class GameKeybinds extends MouseAdapter {
     private GameLoop gameLoop;
 
-    public GameKeybinds(GameLoop loop) {
-        this.gameLoop = loop;
+    public GameKeybinds(GamePanel gamePanel) {
+        this.gameLoop = gamePanel.getGameLoop();
+        GameKeybind.currentPanel = gamePanel;
     }
 
     public void setupKeyBindings(InputMap inputMap, ActionMap actionMap) {
@@ -24,11 +26,11 @@ public class GameKeybinds extends MouseAdapter {
         GameKeybind.actionMap = actionMap;
 
         new GameKeybind("FLAP_PRIMARY", KeyEvent.VK_SPACE,
-                () -> gameLoop.getDefaultBird().flap()
+                () -> gameLoop.getPlayerControlledBird().flap()
         ).bindKeyPressed();
 
         new GameKeybind("FLAP_SECONDARY", KeyEvent.VK_UP,
-                () -> gameLoop.getDefaultBird().flap()
+                () -> gameLoop.getPlayerControlledBird().flap()
         ).bindKeyPressed();
 
         new GameKeybind("PAUSE_GAME_PRESSED", KeyEvent.VK_ESCAPE,
@@ -43,7 +45,9 @@ public class GameKeybinds extends MouseAdapter {
         }
         if(gameLoop.getGameState() == GameState.STARTING)
             gameLoop.startGame();
-        gameLoop.getDefaultBird().flap();
+
+        if(gameLoop.getPlayerControlledBird() != null)
+            gameLoop.getPlayerControlledBird().flap();
     }
 
     public void setGameLoop(GameLoop gameLoop) {

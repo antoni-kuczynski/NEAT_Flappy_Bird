@@ -1,45 +1,88 @@
-package com.antekk.flappybird.game.bird;
+package com.antekk.flappybird.game.bird.gamemodes;
 
+import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.ai.Neuron;
+import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Birds implements PlayerBird, Iterable<Bird> {
-    private ArrayList<Bird> birds = new ArrayList<>();
+public class MachineLearningMode implements GameMode {
     private int badPopulationStreak = 0;
     private int generationNumber = 1;
+    protected int populationSize = 0;
 
-    public Birds(int amount) {
-        for(int i = 0; i < amount; i++) birds.add(new Bird(new NeuralNetwork()));
+    @Override
+    public synchronized void draw(Graphics g, Birds birds) {
+        for(Iterator<Bird> it = birds.iterator(); it.hasNext();) it.next().draw(g);
     }
 
     @Override
-    public void draw(Graphics g) {
-        for(Bird bird : birds) bird.draw(g);
-    }
-
-    @Override
-    public void drawWithoutRotation(Graphics g) {
+    public void drawWithoutRotation(Graphics g, Birds birds) {
         for(Bird bird : birds) bird.drawWithoutRotation(g);
     }
 
     @Override
-    public void resetPosition() {
+    public void resetPosition(Birds birds) {
         for(Bird bird : birds) bird.resetPosition();
     }
 
     @Override
-    public void flap() {
+    public void flap(Birds birds) {
         for(Bird bird : birds) bird.flap();
     }
 
     @Override
-    public Iterator<Bird> iterator() {
-        return birds.iterator();
+    public boolean isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
+        for(Bird bird : birds) {
+            if(bird.isBetweenPipes(pipeFormation)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean areAllBirdsDead(Birds birds) {
+        for(Bird bird : birds.mlBirdsArray) {
+            if(bird.isAlive)
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Iterator<Bird> iterator(Birds birds) {
+        return birds.mlBirdsArray.iterator();
+    }
+
+    @Override
+    public void init(Birds birds) {
+        this.populationSize = 10;
+        birds.mlBirdsArray = new ArrayList<>();
+        for(int i = 0; i < populationSize; i++) birds.mlBirdsArray.add(new Bird(new NeuralNetwork()));
+        birds.playerControlledBird = null;
+    }
+
+    @Override
+    public boolean usesMachineLearning() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "ML_MODE";
+    }
+
+    @Override
+    public int size(Birds birds) {
+        return birds.mlBirdsArray.size();
+    }
+
+    @Override
+    public Bird getBirdAt(int index, Birds birds) {
+        return birds.mlBirdsArray.get(index);
     }
 
     private int birdsFitnessSortComparator(Bird b1, Bird b2) {
@@ -51,39 +94,23 @@ public class Birds implements PlayerBird, Iterable<Bird> {
             return 1;
     }
 
-    public boolean areAllBirdsDead() {
-        for(Bird bird : this) {
-            if(bird.isAlive)
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isBetweenPipes(PipeFormation pipeFormation) {
-        for(Bird bird : this) {
-            if(bird.isBetweenPipes(pipeFormation)) return true;
-        }
-        return false;
-    }
-
-    public void newPopulation() {
+    public void newPopulation(Birds birds) {
         ArrayList<Bird> newPopulation = new ArrayList<>();
-        birds.sort(this::birdsFitnessSortComparator);
+        birds.mlBirdsArray.sort(this::birdsFitnessSortComparator);
 
-        if(birds.get(0).getFitness() <= 0)
+        if(birds.mlBirdsArray.get(0).getFitness() <= 0)
             badPopulationStreak++;
 
         if(badPopulationStreak >= 2) {
             System.out.println("more than 2 bad populations, resetting...");
-            for(int i = 0; i < birds.size(); i++) {
+            for(int i = 0; i < birds.mlBirdsArray.size(); i++) {
                 newPopulation.add(new Bird(new NeuralNetwork()));
             }
             badPopulationStreak = 0;
             return;
         }
 
-        ArrayList<Bird> top4 = get4BestBirds();
+        ArrayList<Bird> top4 = get4BestBirds(birds);
         for(Bird bird : top4) {
             newPopulation.add(new Bird(bird.brain.clone()));
         }
@@ -102,9 +129,9 @@ public class Birds implements PlayerBird, Iterable<Bird> {
             newPopulation.get(i).brain.mutate();
         }
 
-        birds = newPopulation;
+        birds.mlBirdsArray = newPopulation;
 
-        for(Bird bird : this)
+        for(Bird bird : birds.mlBirdsArray)
             bird.resetPosition();
         generationNumber++;
     }
@@ -133,29 +160,17 @@ public class Birds implements PlayerBird, Iterable<Bird> {
         return (int) (Math.random() * 2) == 1 ? new Bird(parent1) : new Bird(parent2);
     }
 
-    private ArrayList<Bird> get4BestBirds() {
+    private ArrayList<Bird> get4BestBirds(Birds birds) {
         ArrayList<Bird> arr = new ArrayList<>();
         for(int i = 0; i < 4; i++) {
-            Bird top4Bird = birds.get(i);
+            Bird top4Bird = birds.mlBirdsArray.get(i);
             top4Bird.resetPosition();
             arr.add(top4Bird);
         }
         return arr;
     }
 
-    public int getGenerationNumber() {
+    protected int getGenerationNumber() {
         return generationNumber;
-    }
-
-    public Bird getDefault() {
-        return birds.get(0);
-    }
-
-    public Bird get(int index) {
-        return birds.get(index);
-    }
-
-    public int size() {
-        return birds.size();
     }
 }

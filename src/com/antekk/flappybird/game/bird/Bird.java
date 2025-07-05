@@ -11,11 +11,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import static com.antekk.flappybird.view.GamePanel.TOP;
-import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
+import static com.antekk.flappybird.view.GamePanel.*;
 import static com.antekk.flappybird.view.themes.GameColors.*;
+import static java.lang.Thread.sleep;
 
-public class Bird implements PlayerBird{
+public class Bird {
     private int spritePosX;
     private int spritePosY;
     private int spriteWidth;
@@ -31,6 +31,15 @@ public class Bird implements PlayerBird{
     public NeuralNetwork brain;
     public long totalTraveledDistance = 0;
 
+    public Bird() {
+        resetPosition();
+    }
+
+    public Bird(NeuralNetwork network) {
+        resetPosition();
+        this.brain = network;
+        brain.fitnessTotalDistance = 0;
+    }
 
     private static BufferedImage rotateImage(BufferedImage image, double angle) {
         int w = image.getWidth();
@@ -122,6 +131,11 @@ public class Bird implements PlayerBird{
         hitboxPosY -= dy;
     }
 
+    public void moveHorizontallyBy(int dx) {
+        spritePosX -= dx;
+        hitboxPosY -= dx;
+    }
+
     public boolean collidesWithPipeFormation(PipeFormation pipeFormation) {
         BottomPipe bottomPipe = pipeFormation.getBottomPipe();
         TopPipe topPipe = pipeFormation.getTopPipe();
@@ -164,16 +178,6 @@ public class Bird implements PlayerBird{
                 getHitboxPosY() + getHitboxHeight() <= pipeFormation.getBottomPipe().getY());
     }
 
-    public Bird() {
-        resetPosition();
-    }
-
-    public Bird(NeuralNetwork network) {
-        resetPosition();
-        this.brain = network;
-        brain.fitnessTotalDistance = 0;
-    }
-
     public void nextMove(ArrayList<PipeFormation> pipes) {
         if(brain == null || !isAlive) return;
         PipeFormation closestPipeFormation = pipes.get(0);
@@ -202,6 +206,31 @@ public class Bird implements PlayerBird{
 //        System.out.println(distX);
 //        System.out.println(distY);
 //        System.out.println(getFitness());
+    }
+
+    public Thread deathAnimationThread(int timeBetweenFramesMillis, GamePanel currentPanel) {
+        Thread thread = new Thread(() -> {
+            //game over falling animation
+            int gameOverFallingFrames = 25;
+            rotationAngle = 15;
+            isMovingUp = false;
+            while(getSpritePosY() < GROUND) {
+                isMovingUp = false;
+                rotationAngle++;
+                moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 3 * Math.tan((double) gameOverFallingFrames / 60))));
+                if (gameOverFallingFrames < 90)
+                    gameOverFallingFrames += 1;
+                framesSinceBirdStartedMoving = gameOverFallingFrames;
+                currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT + currentPanel.birdsStatDisplayWidth, BOTTOM - TOP);
+                try {
+                    sleep(timeBetweenFramesMillis);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        thread.setDaemon(true);
+        return thread;
     }
 
     public int getSpriteXPos() {

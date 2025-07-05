@@ -1,6 +1,9 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
+import com.antekk.flappybird.game.bird.gamemodes.GameMode;
+import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
+import com.antekk.flappybird.game.bird.gamemodes.PlayerMode;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
@@ -82,6 +85,16 @@ public class OptionsDialog extends JDialog {
         showNewBestDialogBox.setSelected(ConfigJSON.showNewBestDialog());
         generalOptions.add(showNewBestDialogPanel);
 
+        JPanel machineLearningOptions = new JPanel();
+        BoxLayout layout1 = new BoxLayout(machineLearningOptions, BoxLayout.Y_AXIS);
+        machineLearningOptions.setLayout(layout1);
+
+        JPanel enableMachineLearning = new JPanel();
+        JCheckBox useMachineLearning = new JCheckBox();
+        enableMachineLearning.add(new JLabel("Enable: "));
+        enableMachineLearning.add(useMachineLearning);
+        useMachineLearning.setSelected(ConfigJSON.getGameMode().usesMachineLearning());
+        machineLearningOptions.add(enableMachineLearning);
 
         JPanel buttons = new JPanel();
         JButton okButton = new JButton("OK");
@@ -111,7 +124,12 @@ public class OptionsDialog extends JDialog {
             if(newPipesGap != PipeFormation.futureGap)
                 PipeFormation.futureGap = newPipesGap;
 
-            ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize, showNewBestDialogBox.isSelected());
+            GameMode gameModeToSave = useMachineLearning.isSelected() ? new MachineLearningMode() : new PlayerMode();
+            parent.getGameLoop().getBirds().setGameMode(gameModeToSave);
+
+            ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize, showNewBestDialogBox.isSelected(),
+                gameModeToSave
+            );
             this.dispose();
             parent.repaint();
         });
@@ -124,6 +142,7 @@ public class OptionsDialog extends JDialog {
         buttons.add(cancelButton);
 
         tabbedPane.addTab("General", generalOptions);
+        tabbedPane.addTab("Machine learning", machineLearningOptions);
         add(tabbedPane, BorderLayout.PAGE_START);
         add(buttons, BorderLayout.PAGE_END);
 

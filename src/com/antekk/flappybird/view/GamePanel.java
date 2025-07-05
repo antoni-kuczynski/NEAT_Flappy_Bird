@@ -11,6 +11,7 @@ import com.antekk.flappybird.view.themes.GameColors;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
+import java.util.Iterator;
 
 public class GamePanel extends JPanel {
     public static int LEFT;
@@ -37,13 +38,15 @@ public class GamePanel extends JPanel {
 
         if(loop.getGameState() == GameState.PAUSED) {
             drawPauseScreen(g1);
+            g.setColor(GameColors.borderColor);
+            g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
             return;
         }
 
 
         drawBackgroundAndGround(g);
-        for(PipeFormation pipe : loop.getPipes())
-            pipe.draw(g);
+        for(Iterator<PipeFormation> it = loop.getPipes().iterator(); it.hasNext();)
+            it.next().draw(g);
 
         g.setColor(GameColors.borderColor);
         g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
@@ -85,6 +88,7 @@ public class GamePanel extends JPanel {
 
     protected GamePanel(JFrame parent) {
         ConfigJSON.initializeValuesFromConfigFile();
+        loop = new GameLoop(this);
 
         JButton newGame = new JButton("New game");
         JButton pauseGame = new JButton("Pause game");
@@ -129,12 +133,12 @@ public class GamePanel extends JPanel {
 //        setBackground(GameColors.boardColor);
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
-        loop = new GameLoop(this);
-        birdsStatsDisplay = new BirdsStatsDisplay(loop.getBirds());
+//        loop = new GameLoop(this);
+        birdsStatsDisplay = new BirdsStatsDisplay(loop);
 
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
-        GameKeybinds keybinds = new GameKeybinds(loop);
+        GameKeybinds keybinds = new GameKeybinds(this);
         keybinds.setupKeyBindings(inputMap, actionMap);
         addMouseListener(keybinds);
 
