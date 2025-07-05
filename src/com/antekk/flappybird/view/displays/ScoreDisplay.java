@@ -1,5 +1,6 @@
-package com.antekk.flappybird.view;
+package com.antekk.flappybird.view.displays;
 
+import com.antekk.flappybird.view.GamePanel;
 import com.antekk.flappybird.view.themes.GameColors;
 
 import java.awt.*;

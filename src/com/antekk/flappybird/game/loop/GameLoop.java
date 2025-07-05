@@ -100,6 +100,8 @@ public class GameLoop extends Thread {
         }
         if(bird.isAlive || bird.getSpritePosY() >= GROUND || bird.getSpritePosY() < TOP) return;
 
+        if(birds.getGameMode() instanceof MachineLearningMode) return;
+
         bird.deathAnimationThread(timeBetweenFramesMillis, currentPanel).start();
     }
 

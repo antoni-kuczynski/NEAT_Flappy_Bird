@@ -71,7 +71,6 @@ public final class ConfigJSON {
         object.put("game_mode", new PlayerMode().toString());
 
         JSONObject machineLearning = new JSONObject();
-        machineLearning.put("ml_population_size", 10);
         object.put("machine_learning", machineLearning);
     }
 
@@ -92,8 +91,7 @@ public final class ConfigJSON {
             writeToFile();
         }
         if(!object.has("vertical_pipes_gap") || !object.has("theme") || !object.has("block_size")
-            || !object.has("show_new_best_dialog") || !object.has("game_mode") || !object.has("machine_learning") ||
-                !object.getJSONObject("machine_learning").has("ml_population_size")) {
+            || !object.has("show_new_best_dialog") || !object.has("game_mode") || !object.has("machine_learning")) {
             generateNewJsonObject();
         }
     }

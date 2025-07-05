@@ -131,6 +131,7 @@ public class OptionsDialog extends JDialog {
                 gameModeToSave
             );
             this.dispose();
+            parent.setPreferredSize(parent.getPreferredSize());
             parent.repaint();
         });
 

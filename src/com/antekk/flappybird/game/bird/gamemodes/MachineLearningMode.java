@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MachineLearningMode implements GameMode {
-    private int badPopulationStreak = 0;
     private int generationNumber = 1;
     protected int populationSize = 0;
 
@@ -97,18 +96,6 @@ public class MachineLearningMode implements GameMode {
     public void newPopulation(Birds birds) {
         ArrayList<Bird> newPopulation = new ArrayList<>();
         birds.mlBirdsArray.sort(this::birdsFitnessSortComparator);
-
-        if(birds.mlBirdsArray.get(0).getFitness() <= 0)
-            badPopulationStreak++;
-
-        if(badPopulationStreak >= 2) {
-            System.out.println("more than 2 bad populations, resetting...");
-            for(int i = 0; i < birds.mlBirdsArray.size(); i++) {
-                newPopulation.add(new Bird(new NeuralNetwork()));
-            }
-            badPopulationStreak = 0;
-            return;
-        }
 
         ArrayList<Bird> top4 = get4BestBirds(birds);
         for(Bird bird : top4) {

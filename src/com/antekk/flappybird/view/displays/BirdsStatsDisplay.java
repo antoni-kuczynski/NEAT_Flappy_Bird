@@ -1,4 +1,4 @@
-package com.antekk.flappybird.view;
+package com.antekk.flappybird.view.displays;
 
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.bird.gamemodes.Birds;
@@ -37,6 +37,9 @@ public class BirdsStatsDisplay {
     }
 
     public Dimension getPreferredSize() {
+        if(!(loop.getBirds().getGameMode() instanceof MachineLearningMode))
+            return new Dimension(0,0);
+
         return new Dimension(
                 10 * getBlockSizePx(),
                 16 * getBlockSizePx()

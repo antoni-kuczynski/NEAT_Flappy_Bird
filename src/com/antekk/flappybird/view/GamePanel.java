@@ -1,11 +1,12 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
-import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.keybinds.GameKeybinds;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
+import com.antekk.flappybird.view.displays.BirdsStatsDisplay;
+import com.antekk.flappybird.view.displays.ScoreDisplay;
 import com.antekk.flappybird.view.themes.GameColors;
 
 import javax.swing.*;
@@ -89,6 +90,7 @@ public class GamePanel extends JPanel {
     protected GamePanel(JFrame parent) {
         ConfigJSON.initializeValuesFromConfigFile();
         loop = new GameLoop(this);
+        loop.getBirds().setGameMode(ConfigJSON.getGameMode());
 
         JButton newGame = new JButton("New game");
         JButton pauseGame = new JButton("Pause game");
@@ -163,11 +165,7 @@ public class GamePanel extends JPanel {
 
         loop.start();
         parent.setMinimumSize(this.getPreferredSize());
-        //        parent.setPreferredSize(this.getPreferredSize());
-        parent.setPreferredSize(new Dimension(
-                this.getPreferredSize().width + birdsStatsDisplay.getPreferredSize().width,
-                this.getPreferredSize().height
-        ));
+        parent.setPreferredSize(this.getPreferredSize());
         repaint();
     }
 
@@ -188,7 +186,14 @@ public class GamePanel extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(LEFT + RIGHT, BOTTOM + TOP);
+        return new Dimension(LEFT + RIGHT + birdsStatsDisplay.getPreferredSize().width, BOTTOM + TOP);
+    }
+
+    @Override
+    public void setPreferredSize(Dimension preferredSize) {
+        super.setPreferredSize(preferredSize);
+        SwingUtilities.getWindowAncestor(this).setSize(preferredSize);
+        SwingUtilities.getWindowAncestor(this).setPreferredSize(preferredSize);
     }
 
     public static int getBoardRows() {
