@@ -1,6 +1,7 @@
 package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
+import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.keybinds.GameKeybinds;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
@@ -56,10 +57,15 @@ public class GamePanel extends JPanel {
 
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
-            loop.getBirds().drawWithoutRotation(g);
+//            loop.getBirds().drawWithoutRotation(g);
+            for(Bird bird : loop.getGameMode().getBirds())
+                bird.drawWithoutRotation(g);
             return;
         }
-        loop.getBirds().draw(g);
+
+        for(Bird bird : loop.getGameMode().getBirds())
+            bird.draw(g);
+
         scoreDisplay.draw(g);
 
         if(loop.getGameState() == GameState.LOST) {
@@ -90,7 +96,7 @@ public class GamePanel extends JPanel {
     protected GamePanel(JFrame parent) {
         ConfigJSON.initializeValuesFromConfigFile();
         loop = new GameLoop(this);
-        loop.getBirds().setGameMode(ConfigJSON.getGameMode());
+        loop.setGameMode(ConfigJSON.getGameMode());
 
         JButton newGame = new JButton("New game");
         JButton pauseGame = new JButton("Pause game");

@@ -1,6 +1,7 @@
 package com.antekk.flappybird.game.bird.gamemodes;
 
 import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
@@ -13,38 +14,38 @@ public class PlayerMode implements GameMode {
     private ArrayList<FlappyBirdPlayer> players;
     private Bird playerControlledBird;
 
-    @Override
-    public void draw(Graphics g, Birds birds) {
-        playerControlledBird.draw(g);
-    }
+//    @Override
+//    public void draw(Graphics g, GameLoop loop) {
+//        playerControlledBird.draw(g);
+//    }
+//
+//    @Override
+//    public void drawWithoutRotation(Graphics g, GameLoop loop) {
+//        playerControlledBird.drawWithoutRotation(g);
+//    }
 
     @Override
-    public void drawWithoutRotation(Graphics g, Birds birds) {
-        playerControlledBird.drawWithoutRotation(g);
-    }
-
-    @Override
-    public void resetPosition(Birds birds) {
+    public void resetPosition() {
         playerControlledBird.resetPosition();
     }
 
     @Override
-    public void flap(Birds birds) {
+    public void flap() {
         playerControlledBird.flap();
     }
 
     @Override
-    public Bird isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
+    public Bird isBetweenPipes(PipeFormation pipeFormation) {
         return playerControlledBird.isBetweenPipes(pipeFormation) ? playerControlledBird : null;
     }
 
     @Override
-    public boolean areAllBirdsDead(Birds birds) {
+    public boolean areAllBirdsDead() {
         return !playerControlledBird.isAlive;
     }
 
     @Override
-    public Iterator<Bird> iterator(Birds birds) {
+    public Iterator<Bird> iterator() {
         return new Iterator<>() {
             int index = 0;
 
@@ -65,7 +66,7 @@ public class PlayerMode implements GameMode {
     }
 
     @Override
-    public void init(Birds birds) {
+    public void init() {
         playerControlledBird = new Bird();
 //        birds.mlBirdsArray = null;
     }
@@ -81,25 +82,36 @@ public class PlayerMode implements GameMode {
     }
 
     @Override
-    public int size(Birds birds) {
+    public int size() {
         return 1;
     }
 
     @Override
-    public Bird getBirdAt(int index, Birds birds) {
+    public Bird getBirdAt(int index) {
         if(index > 0)
             throw new IllegalArgumentException("index" + index + " is higher than the size (1)");
         return playerControlledBird;
     }
 
     @Override
-    public ArrayList<FlappyBirdPlayer> players(Birds birds) {
+    public ArrayList<FlappyBirdPlayer> getPlayers() {
         if(players == null || players.isEmpty())
             players = new ArrayList<>(Arrays.asList(playerControlledBird.getPlayer()));
         return players;
     }
 
+    @Override
+    public FlappyBirdPlayer getBestPlayer() {
+        return players.get(0);
+    }
+
+    @Override
     public Bird getPlayerControlledBird() {
         return playerControlledBird;
+    }
+
+    @Override
+    public ArrayList<Bird> getBirds() {
+        return new ArrayList<>(Arrays.asList(getPlayerControlledBird()));
     }
 }

@@ -3,6 +3,7 @@ package com.antekk.flappybird.game.bird.gamemodes;
 import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.ai.Neuron;
 import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
@@ -16,36 +17,36 @@ public class MachineLearningMode implements GameMode {
     private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
     private ArrayList<Bird> mlBirdsArray = new ArrayList<>();
 
+//    @Override
+//    public synchronized void draw(Graphics g, GameLoop loop) {
+//        for(Iterator<Bird> it = birds.iterator(); it.hasNext();) it.next().draw(g);
+//    }
+
+//    @Override
+//    public void drawWithoutRotation(Graphics g, GameLoop loop) {
+//        for(Bird bird : birds) bird.drawWithoutRotation(g);
+//    }
+
     @Override
-    public synchronized void draw(Graphics g, Birds birds) {
-        for(Iterator<Bird> it = birds.iterator(); it.hasNext();) it.next().draw(g);
+    public void resetPosition() {
+        for(Bird bird : mlBirdsArray) bird.resetPosition();
     }
 
     @Override
-    public void drawWithoutRotation(Graphics g, Birds birds) {
-        for(Bird bird : birds) bird.drawWithoutRotation(g);
+    public void flap() {
+        for(Bird bird : mlBirdsArray) bird.flap();
     }
 
     @Override
-    public void resetPosition(Birds birds) {
-        for(Bird bird : birds) bird.resetPosition();
-    }
-
-    @Override
-    public void flap(Birds birds) {
-        for(Bird bird : birds) bird.flap();
-    }
-
-    @Override
-    public Bird isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
-        for(Bird bird : birds) {
+    public Bird isBetweenPipes(PipeFormation pipeFormation) {
+        for(Bird bird : mlBirdsArray) {
             if(bird.isBetweenPipes(pipeFormation)) return bird;
         }
         return null;
     }
 
     @Override
-    public boolean areAllBirdsDead(Birds birds) {
+    public boolean areAllBirdsDead() {
         for(Bird bird : mlBirdsArray) {
             if(bird.isAlive)
                 return false;
@@ -54,15 +55,16 @@ public class MachineLearningMode implements GameMode {
     }
 
     @Override
-    public Iterator<Bird> iterator(Birds birds) {
+    public Iterator<Bird> iterator() {
         return mlBirdsArray.iterator();
     }
 
     @Override
-    public void init(Birds birds) {
+    public void init() {
         this.populationSize = 10;
         mlBirdsArray = new ArrayList<>();
         for(int i = 0; i < populationSize; i++) mlBirdsArray.add(new Bird(new NeuralNetwork()));
+        initPlayers();
 //        birds.playerControlledBird = null;
     }
 
@@ -77,24 +79,45 @@ public class MachineLearningMode implements GameMode {
     }
 
     @Override
-    public int size(Birds birds) {
+    public int size() {
         return mlBirdsArray.size();
     }
 
     @Override
-    public Bird getBirdAt(int index, Birds birds) {
+    public Bird getBirdAt(int index) {
         return mlBirdsArray.get(index);
     }
 
     @Override
-    public ArrayList<FlappyBirdPlayer> players(Birds birds) {
-        if(players.isEmpty()) initPlayers(birds);
+    public ArrayList<FlappyBirdPlayer> getPlayers() {
+        if(players.isEmpty())
+            initPlayers();
         return players;
     }
 
-    private void initPlayers(Birds birds) {
+    @Override
+    public FlappyBirdPlayer getBestPlayer() {
+        FlappyBirdPlayer bestPlayer = players.get(0);
+        for(FlappyBirdPlayer player : players) {
+            if(player.score > bestPlayer.score)
+                bestPlayer = player;
+        }
+        return bestPlayer;
+    }
+
+    @Override
+    public Bird getPlayerControlledBird() {
+        return null;
+    }
+
+    @Override
+    public ArrayList<Bird> getBirds() {
+        return mlBirdsArray;
+    }
+
+    private void initPlayers() {
         players.clear();
-        for(Bird bird : birds) players.add(bird.getPlayer());
+        for(Bird bird : mlBirdsArray) players.add(bird.getPlayer());
     }
 
     private int birdsFitnessSortComparator(Bird b1, Bird b2) {
@@ -106,11 +129,11 @@ public class MachineLearningMode implements GameMode {
             return 1;
     }
 
-    public void newPopulation(Birds birds) {
+    public void newPopulation() {
         ArrayList<Bird> newPopulation = new ArrayList<>();
         mlBirdsArray.sort(this::birdsFitnessSortComparator);
 
-        ArrayList<Bird> top4 = get4BestBirds(birds);
+        ArrayList<Bird> top4 = get4BestBirds();
         for(Bird bird : top4) {
             newPopulation.add(new Bird(bird.brain.clone()));
         }
@@ -134,7 +157,7 @@ public class MachineLearningMode implements GameMode {
         for(Bird bird : mlBirdsArray)
             bird.resetPosition();
 
-        initPlayers(birds);
+        initPlayers();
 
         generationNumber++;
     }
@@ -163,7 +186,7 @@ public class MachineLearningMode implements GameMode {
         return (int) (Math.random() * 2) == 1 ? new Bird(parent1) : new Bird(parent2);
     }
 
-    private ArrayList<Bird> get4BestBirds(Birds birds) {
+    private ArrayList<Bird> get4BestBirds() {
         ArrayList<Bird> arr = new ArrayList<>();
         for(int i = 0; i < 4; i++) {
             Bird top4Bird = mlBirdsArray.get(i);
@@ -173,7 +196,7 @@ public class MachineLearningMode implements GameMode {
         return arr;
     }
 
-    protected int getGenerationNumber() {
+    public int getGenerationNumber() {
         return generationNumber;
     }
 }

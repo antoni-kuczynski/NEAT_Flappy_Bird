@@ -1,8 +1,8 @@
 package com.antekk.flappybird.view.displays;
 
 import com.antekk.flappybird.game.bird.Bird;
-import com.antekk.flappybird.game.bird.gamemodes.Birds;
 import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
+import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.view.GamePanel;
 
 import java.awt.*;
@@ -20,16 +20,16 @@ public class BirdsStatsDisplay {
     }
 
     public synchronized void draw(Graphics g) {
-        Birds birds = panel.getGameLoop().getBirds();
-        if(!(birds.getGameMode() instanceof MachineLearningMode))
+        GameLoop loop = panel.getGameLoop();
+        if(!loop.getGameMode().isMlMode())
             return;
 
         g.setFont(g.getFont().deriveFont(32f));
-        g.drawString("Generation " + birds.getGenerationNumber(), RIGHT + 2 * getBlockSizePx(), 2 * getBlockSizePx());
+        g.drawString("Generation " + loop.getGenerationNumber(), RIGHT + 2 * getBlockSizePx(), 2 * getBlockSizePx());
 
         g.setFont(g.getFont().deriveFont(18f));
-        for(int i = 0; i < birds.size(); i++) {
-            Bird bird = birds.getBirdAt(i);
+        for(int i = 0; i < loop.getAmountOfBirds(); i++) {
+            Bird bird = loop.getBirdAt(i);
             int y = (int) ((int) ((i+1) * 1.3 * getBlockSizePx()) + 1.2 * getBlockSizePx());
                 g.drawImage(birdMidFlap, RIGHT + getBlockSizePx(),y,getBlockSizePx(), getBlockSizePx(), null);
             g.drawString("Fitness = " + bird.getFitness(), (int) (2.5 * getBlockSizePx()) + RIGHT, y + getBlockSizePx() / 2);
@@ -39,7 +39,7 @@ public class BirdsStatsDisplay {
     }
 
     public Dimension getPreferredSize() {
-        if(!(panel.getGameLoop().getBirds().getGameMode() instanceof MachineLearningMode))
+        if(!panel.getGameLoop().getGameMode().isMlMode())
             return new Dimension(0,0);
 
         return new Dimension(

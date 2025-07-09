@@ -1,6 +1,7 @@
 package com.antekk.flappybird.game.bird.gamemodes;
 
 import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
@@ -9,18 +10,23 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public interface GameMode {
-    void draw(Graphics g, Birds birds);
-    void drawWithoutRotation(Graphics g, Birds birds);
-    void resetPosition(Birds birds);
-    void flap(Birds birds);
-    Bird isBetweenPipes(PipeFormation pipeFormation, Birds birds);
-    boolean areAllBirdsDead(Birds birds);
-    Iterator<Bird> iterator(Birds birds);
-    void init(Birds birds);
+//    void draw(Graphics g, GameLoop loop);
+//    void drawWithoutRotation(Graphics g, GameLoop loop);
+    void resetPosition();
+    void flap();
+    Bird isBetweenPipes(PipeFormation pipeFormation);
+    boolean areAllBirdsDead();
+    Iterator<Bird> iterator();
+    void init();
     boolean usesMachineLearning();
-    int size(Birds birds);
-    Bird getBirdAt(int index, Birds birds);
-    ArrayList<FlappyBirdPlayer> players(Birds birds);
+    int size();
+    Bird getBirdAt(int index);
+    ArrayList<FlappyBirdPlayer> getPlayers();
+
+
+    FlappyBirdPlayer getBestPlayer();
+    Bird getPlayerControlledBird();
+    ArrayList<Bird> getBirds();
 
     static GameMode valueOf(String s) {
         return switch (s) {
@@ -28,5 +34,13 @@ public interface GameMode {
             case "ML_MODE" -> new MachineLearningMode();
             default -> throw new IllegalStateException("Unexpected value: " + s);
         };
+    }
+
+    default boolean isPlayerMode() {
+        return this instanceof PlayerMode;
+    }
+
+    default boolean isMlMode() {
+        return this instanceof MachineLearningMode;
     }
 }

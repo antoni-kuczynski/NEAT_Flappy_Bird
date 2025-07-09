@@ -2,7 +2,7 @@ package com.antekk.flappybird.game.loop;
 
 import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.bird.Bird;
-import com.antekk.flappybird.game.bird.gamemodes.Birds;
+import com.antekk.flappybird.game.bird.gamemodes.GameMode;
 import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
@@ -20,10 +20,12 @@ public class GameLoop extends Thread {
     private final GamePanel currentPanel;
     private GameState gameState;
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
-    private final Birds birds = new Birds(ConfigJSON.getGameMode());
+//    private final Birds birds = new Birds(ConfigJSON.getGameMode());
     private int framesSincePipeSpawned = 0;
     private int framesSinceIdleSpriteChanged = 0;
     private final int timeBetweenFramesMillis = 1000 / 60;
+    private GameMode gameMode;
+
 
     private void gameLoop() throws InterruptedException {
         pipes.add(new PipeFormation());
@@ -46,7 +48,7 @@ public class GameLoop extends Thread {
             }
 
             if(gameState == GameState.NEXT_GENERATION) {
-                ((MachineLearningMode) birds.getGameMode()).newPopulation(birds);
+                ((MachineLearningMode) gameMode).newPopulation();
                 pipes.clear();
                 framesSincePipeSpawned = 0;
                 pipes.add(new PipeFormation());
@@ -56,12 +58,12 @@ public class GameLoop extends Thread {
 
             pipeLogic();
 
-            for(Bird bird : birds) {
+            for(Bird bird : gameMode.getBirds()) {
                 birdLogic(bird);
                 birdDeathLogic(bird);
             }
 
-            scoreLogic(birds);
+            scoreLogic();
 
             gameState = updateGameState();
             currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT + currentPanel.birdsStatDisplayWidth, BOTTOM - TOP);
@@ -96,13 +98,13 @@ public class GameLoop extends Thread {
         }
         if(bird.isAlive || bird.getSpritePosY() >= GROUND || bird.getSpritePosY() < TOP) return;
 
-        if(birds.getGameMode() instanceof MachineLearningMode) return;
+        if(gameMode.isMlMode()) return;
 
         bird.deathAnimationThread(timeBetweenFramesMillis, currentPanel).start();
     }
 
-    private void scoreLogic(Birds birds) {
-        for(Bird bird : birds) {
+    private void scoreLogic() {
+        for(Bird bird : gameMode.getBirds()) {
             for (PipeFormation pipeFormation : pipes) {
                 FlappyBirdPlayer player = bird.getPlayer();
                 if (bird.isAlive && !player.wasScoreAddedAtPipe && bird.isBetweenPipes(pipeFormation)) {
@@ -112,7 +114,7 @@ public class GameLoop extends Thread {
             }
         }
 
-        for (Bird bird : birds) {
+        for (Bird bird : gameMode.getBirds()) {
             boolean isBetweenAll = false;
             for (PipeFormation pipeFormation : pipes) {
                 if (bird.isBetweenPipes(pipeFormation))
@@ -167,7 +169,7 @@ public class GameLoop extends Thread {
     }
 
     private void gameStartingLogic() {
-        for(Bird bird : birds) {
+        for(Bird bird : gameMode.getBirds()) {
             framesSinceIdleSpriteChanged++;
             if (framesSinceIdleSpriteChanged <= 20) {
                 currentPanel.repaint();
@@ -189,13 +191,14 @@ public class GameLoop extends Thread {
             return GameState.PAUSED;
         }
 
-        if(birds.getGameMode() instanceof MachineLearningMode && birds.areAllBirdsDead()) { //TODO
+        if(!gameMode.areAllBirdsDead())
+            return GameState.RUNNING;
+
+        if(gameMode.isMlMode()) { //TODO
             return GameState.NEXT_GENERATION;
-        } else if(!(birds.getGameMode() instanceof MachineLearningMode) && birds.areAllBirdsDead()) {
+        } else  {
             return GameState.LOST;
         }
-
-        return GameState.RUNNING;
     }
 
     public void pauseAndUnpauseGame() {
@@ -211,12 +214,9 @@ public class GameLoop extends Thread {
 
     public GameLoop(GamePanel panel) {
         this.currentPanel = panel;
-        birds.resetPosition();
+        setGameMode(ConfigJSON.getGameMode());
+        gameMode.resetPosition();
         pipes.clear();
-    }
-
-    public Bird getPlayerControlledBird() {
-        return birds.getPlayerControlledBird();
     }
 
     @Override
@@ -230,14 +230,6 @@ public class GameLoop extends Thread {
         }
     }
 
-    public FlappyBirdPlayer getBestPlayer() {
-        return birds.getBestPlayer();
-    }
-
-    private ArrayList<FlappyBirdPlayer> getPlayers() {
-        return birds.getPlayers();
-    }
-
     public void startGame() {
         gameState = GameState.RUNNING;
         for(FlappyBirdPlayer p : getPlayers())
@@ -249,6 +241,16 @@ public class GameLoop extends Thread {
         gameState = GameState.ENDED;
     }
 
+    public int getGenerationNumber() {
+        if(!gameMode.isMlMode()) return 0;
+        return ((MachineLearningMode) gameMode).getGenerationNumber();
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+        gameMode.init();
+    }
+
     public GameState getGameState() {
         return gameState;
     }
@@ -257,7 +259,27 @@ public class GameLoop extends Thread {
         return pipes;
     }
 
-    public Birds getBirds() {
-        return birds;
+    public FlappyBirdPlayer getBestPlayer() {
+        return gameMode.getBestPlayer();
+    }
+
+    private ArrayList<FlappyBirdPlayer> getPlayers() {
+        return gameMode.getPlayers();
+    }
+
+    public Bird getPlayerControlledBird() {
+        return gameMode.getPlayerControlledBird();
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public int getAmountOfBirds() {
+        return gameMode.getBirds().size();
+    }
+
+    public Bird getBirdAt(int index) {
+        return gameMode.getBirds().get(index);
     }
 }

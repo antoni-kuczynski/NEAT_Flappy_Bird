@@ -131,7 +131,7 @@ public class OptionsDialog extends JDialog {
                 PipeFormation.futureGap = newPipesGap;
 
             GameMode gameModeToSave = useMachineLearning.isSelected() ? new MachineLearningMode() : new PlayerMode();
-            parent.getGameLoop().getBirds().setGameMode(gameModeToSave);
+            parent.getGameLoop().setGameMode(gameModeToSave);
 
             ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize, showNewBestDialogBox.isSelected(),
                 gameModeToSave
