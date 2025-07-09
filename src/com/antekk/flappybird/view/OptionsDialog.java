@@ -96,6 +96,12 @@ public class OptionsDialog extends JDialog {
         useMachineLearning.setSelected(ConfigJSON.getGameMode().usesMachineLearning());
         machineLearningOptions.add(enableMachineLearning);
 
+        JButton saveNetworkToJSON = new JButton("Save to JSON");
+        saveNetworkToJSON.addActionListener(e -> {
+
+        });
+
+
         JPanel buttons = new JPanel();
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {

@@ -1,6 +1,10 @@
 package com.antekk.flappybird.game.ai;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
@@ -11,15 +15,15 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
     public long fitnessTotalDistance = 0;
 
     public NeuralNetwork() {
-        inputs.add(new Neuron(1));
-        inputs.add(new Neuron(1));
+        inputs.add(new Neuron(1,0));
+        inputs.add(new Neuron(1,1));
 
 
         for(int i = 0; i < 6; i++) {
-            hidden.add(new Neuron(2));
+            hidden.add(new Neuron(2, 2 + i));
         }
 
-        output = new Neuron(6);
+        output = new Neuron(6, 8);
 
         totalSize = inputs.size() + hidden.size() + 1;
     }
@@ -120,6 +124,27 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
             neuron = output;
         }
         return neuron;
+    }
+
+    public void saveToJSON(String filename) {
+        JSONObject object = new JSONObject();
+        JSONObject layers = new JSONObject();
+
+        layers.put("input", getLayer(inputs));
+        layers.put("hidden", getLayer(hidden));
+        layers.put("output", getLayer(new ArrayList<>(Arrays.asList(output))));
+
+        object.put("layers", layers);
+        object.put("total_size", totalSize);
+    }
+
+    private JSONObject getLayer(ArrayList<Neuron> layer) {
+        JSONObject neuronLayer = new JSONObject();
+        for(Neuron n : layer) {
+            neuronLayer.put(String.valueOf(n.getId()), n.getJSONObject());
+        }
+        neuronLayer.put("size", layer.size());
+        return neuronLayer;
     }
 
     public int size() {

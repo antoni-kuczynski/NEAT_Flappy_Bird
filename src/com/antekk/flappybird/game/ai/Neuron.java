@@ -1,20 +1,20 @@
 package com.antekk.flappybird.game.ai;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Neuron implements Cloneable{
     public double bias;
     private final Random random = new Random();
-    private static int number = 0;
     private int id;
     private ArrayList<Double> weights = new ArrayList<>();
 
-    Neuron(int amountOfWeights) {
+    Neuron(int amountOfWeights, int id) {
+        this.id = id;
         bias = random.nextDouble(-1,1);
         for(int i = 0; i < amountOfWeights; i++) weights.add(random.nextDouble(-1,1));
-        id = number;
-        number++;
     }
 
     protected double compute(double... input) {
@@ -40,12 +40,26 @@ public class Neuron implements Cloneable{
                 '}';
     }
 
-    public int getId() {
+    protected int getId() {
         return id;
     }
 
     public ArrayList<Double> getWeights() {
         return weights;
+    }
+
+    protected JSONObject getJSONObject() {
+        JSONObject object = new JSONObject();
+        object.put("id", id);
+        object.put("bias", bias);
+
+        JSONObject weightsObject = new JSONObject();
+        for(int i = 0; i < weights.size(); i++) {
+            weightsObject.put(String.valueOf(i), weights.get(i));
+        }
+        object.put("weights", weightsObject);
+
+        return object;
     }
 
     @Override

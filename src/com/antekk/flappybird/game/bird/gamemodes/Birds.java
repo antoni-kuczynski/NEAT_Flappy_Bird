@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Birds implements Iterable<Bird> {
-    protected ArrayList<Bird> mlBirdsArray = new ArrayList<>();
-    protected Bird playerControlledBird;
 
     private GameMode gameMode;
 
@@ -63,7 +61,9 @@ public class Birds implements Iterable<Bird> {
     }
 
     public Bird getPlayerControlledBird() {
-        return playerControlledBird;
+        if(gameMode instanceof PlayerMode)
+            return ((PlayerMode) gameMode).getPlayerControlledBird();
+        return null;
     }
 
     public GameMode getGameMode() {

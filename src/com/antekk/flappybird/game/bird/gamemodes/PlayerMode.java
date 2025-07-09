@@ -11,35 +11,36 @@ import java.util.Iterator;
 
 public class PlayerMode implements GameMode {
     private ArrayList<FlappyBirdPlayer> players;
+    private Bird playerControlledBird;
 
     @Override
     public void draw(Graphics g, Birds birds) {
-        birds.getPlayerControlledBird().draw(g);
+        playerControlledBird.draw(g);
     }
 
     @Override
     public void drawWithoutRotation(Graphics g, Birds birds) {
-        birds.getPlayerControlledBird().drawWithoutRotation(g);
+        playerControlledBird.drawWithoutRotation(g);
     }
 
     @Override
     public void resetPosition(Birds birds) {
-        birds.getPlayerControlledBird().resetPosition();
+        playerControlledBird.resetPosition();
     }
 
     @Override
     public void flap(Birds birds) {
-        birds.getPlayerControlledBird().flap();
+        playerControlledBird.flap();
     }
 
     @Override
     public Bird isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
-        return birds.getPlayerControlledBird().isBetweenPipes(pipeFormation) ? birds.getPlayerControlledBird() : null;
+        return playerControlledBird.isBetweenPipes(pipeFormation) ? playerControlledBird : null;
     }
 
     @Override
     public boolean areAllBirdsDead(Birds birds) {
-        return !birds.getPlayerControlledBird().isAlive;
+        return !playerControlledBird.isAlive;
     }
 
     @Override
@@ -58,15 +59,15 @@ public class PlayerMode implements GameMode {
 
             @Override
             public Bird next() {
-                return birds.getPlayerControlledBird();
+                return playerControlledBird;
             }
         };
     }
 
     @Override
     public void init(Birds birds) {
-        birds.playerControlledBird = new Bird();
-        birds.mlBirdsArray = null;
+        playerControlledBird = new Bird();
+//        birds.mlBirdsArray = null;
     }
 
     @Override
@@ -88,13 +89,17 @@ public class PlayerMode implements GameMode {
     public Bird getBirdAt(int index, Birds birds) {
         if(index > 0)
             throw new IllegalArgumentException("index" + index + " is higher than the size (1)");
-        return birds.playerControlledBird;
+        return playerControlledBird;
     }
 
     @Override
     public ArrayList<FlappyBirdPlayer> players(Birds birds) {
         if(players == null || players.isEmpty())
-            players = new ArrayList<>(Arrays.asList(birds.playerControlledBird.getPlayer()));
+            players = new ArrayList<>(Arrays.asList(playerControlledBird.getPlayer()));
         return players;
+    }
+
+    public Bird getPlayerControlledBird() {
+        return playerControlledBird;
     }
 }

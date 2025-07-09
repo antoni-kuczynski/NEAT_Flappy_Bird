@@ -14,6 +14,7 @@ public class MachineLearningMode implements GameMode {
     private int generationNumber = 1;
     protected int populationSize = 0;
     private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
+    private ArrayList<Bird> mlBirdsArray = new ArrayList<>();
 
     @Override
     public synchronized void draw(Graphics g, Birds birds) {
@@ -45,7 +46,7 @@ public class MachineLearningMode implements GameMode {
 
     @Override
     public boolean areAllBirdsDead(Birds birds) {
-        for(Bird bird : birds.mlBirdsArray) {
+        for(Bird bird : mlBirdsArray) {
             if(bird.isAlive)
                 return false;
         }
@@ -54,15 +55,15 @@ public class MachineLearningMode implements GameMode {
 
     @Override
     public Iterator<Bird> iterator(Birds birds) {
-        return birds.mlBirdsArray.iterator();
+        return mlBirdsArray.iterator();
     }
 
     @Override
     public void init(Birds birds) {
         this.populationSize = 10;
-        birds.mlBirdsArray = new ArrayList<>();
-        for(int i = 0; i < populationSize; i++) birds.mlBirdsArray.add(new Bird(new NeuralNetwork()));
-        birds.playerControlledBird = null;
+        mlBirdsArray = new ArrayList<>();
+        for(int i = 0; i < populationSize; i++) mlBirdsArray.add(new Bird(new NeuralNetwork()));
+//        birds.playerControlledBird = null;
     }
 
     @Override
@@ -77,12 +78,12 @@ public class MachineLearningMode implements GameMode {
 
     @Override
     public int size(Birds birds) {
-        return birds.mlBirdsArray.size();
+        return mlBirdsArray.size();
     }
 
     @Override
     public Bird getBirdAt(int index, Birds birds) {
-        return birds.mlBirdsArray.get(index);
+        return mlBirdsArray.get(index);
     }
 
     @Override
@@ -107,7 +108,7 @@ public class MachineLearningMode implements GameMode {
 
     public void newPopulation(Birds birds) {
         ArrayList<Bird> newPopulation = new ArrayList<>();
-        birds.mlBirdsArray.sort(this::birdsFitnessSortComparator);
+        mlBirdsArray.sort(this::birdsFitnessSortComparator);
 
         ArrayList<Bird> top4 = get4BestBirds(birds);
         for(Bird bird : top4) {
@@ -128,9 +129,9 @@ public class MachineLearningMode implements GameMode {
             newPopulation.get(i).brain.mutate();
         }
 
-        birds.mlBirdsArray = newPopulation;
+        mlBirdsArray = newPopulation;
 
-        for(Bird bird : birds.mlBirdsArray)
+        for(Bird bird : mlBirdsArray)
             bird.resetPosition();
 
         initPlayers(birds);
@@ -165,7 +166,7 @@ public class MachineLearningMode implements GameMode {
     private ArrayList<Bird> get4BestBirds(Birds birds) {
         ArrayList<Bird> arr = new ArrayList<>();
         for(int i = 0; i < 4; i++) {
-            Bird top4Bird = birds.mlBirdsArray.get(i);
+            Bird top4Bird = mlBirdsArray.get(i);
             top4Bird.resetPosition();
             arr.add(top4Bird);
         }
