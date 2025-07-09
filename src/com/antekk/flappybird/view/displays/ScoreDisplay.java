@@ -15,7 +15,7 @@ public class ScoreDisplay {
     }
 
     public void draw(Graphics g) {
-        String s = String.valueOf(panel.getGameLoop().getPlayer().score);
+        String s = String.valueOf(panel.getGameLoop().getBestPlayer().score);
         for(int i = 0; i < s.length(); i++) {
             char c = s.toCharArray()[i];
             g.drawImage(GameColors.numbers.get(c - 48), (int) (5 * getBlockSizePx() + (i * 0.67 * getBlockSizePx()) + (double) getBlockSizePx() / 6),

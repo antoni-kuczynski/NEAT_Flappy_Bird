@@ -2,8 +2,10 @@ package com.antekk.flappybird.game.bird.gamemodes;
 
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.pipes.PipeFormation;
+import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public interface GameMode {
@@ -11,13 +13,14 @@ public interface GameMode {
     void drawWithoutRotation(Graphics g, Birds birds);
     void resetPosition(Birds birds);
     void flap(Birds birds);
-    boolean isBetweenPipes(PipeFormation pipeFormation, Birds birds);
+    Bird isBetweenPipes(PipeFormation pipeFormation, Birds birds);
     boolean areAllBirdsDead(Birds birds);
     Iterator<Bird> iterator(Birds birds);
     void init(Birds birds);
     boolean usesMachineLearning();
     int size(Birds birds);
     Bird getBirdAt(int index, Birds birds);
+    ArrayList<FlappyBirdPlayer> players(Birds birds);
 
     static GameMode valueOf(String s) {
         return switch (s) {

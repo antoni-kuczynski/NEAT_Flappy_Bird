@@ -1,5 +1,6 @@
 package com.antekk.flappybird.game.keybinds;
 
+import com.antekk.flappybird.game.bird.gamemodes.PlayerMode;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.view.GamePanel;
@@ -26,11 +27,17 @@ public class GameKeybinds extends MouseAdapter {
         GameKeybind.actionMap = actionMap;
 
         new GameKeybind("FLAP_PRIMARY", KeyEvent.VK_SPACE,
-                () -> gameLoop.getPlayerControlledBird().flap()
+                () -> {
+                    if(gameLoop.getPlayerControlledBird() != null)
+                        gameLoop.getPlayerControlledBird().flap();
+                }
         ).bindKeyPressed();
 
         new GameKeybind("FLAP_SECONDARY", KeyEvent.VK_UP,
-                () -> gameLoop.getPlayerControlledBird().flap()
+                () -> {
+                    if(gameLoop.getPlayerControlledBird() != null)
+                        gameLoop.getPlayerControlledBird().flap();
+                }
         ).bindKeyPressed();
 
         new GameKeybind("PAUSE_GAME_PRESSED", KeyEvent.VK_ESCAPE,

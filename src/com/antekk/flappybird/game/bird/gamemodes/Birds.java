@@ -4,6 +4,7 @@ import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.ai.Neuron;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.pipes.PipeFormation;
+import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ public class Birds implements Iterable<Bird> {
         gameMode.init(this);
     }
 
-
     public void draw(Graphics g) {
         gameMode.draw(g, this);
     }
@@ -41,7 +41,7 @@ public class Birds implements Iterable<Bird> {
         gameMode.flap(this);
     }
 
-    public boolean isBetweenPipes(PipeFormation pipeFormation) {
+    public Bird isBetweenPipes(PipeFormation pipeFormation) {
         return gameMode.isBetweenPipes(pipeFormation, this);
     }
 
@@ -70,8 +70,21 @@ public class Birds implements Iterable<Bird> {
         return gameMode;
     }
 
+    public ArrayList<FlappyBirdPlayer> getPlayers() {
+        return gameMode.players(this);
+    }
+
     public int getGenerationNumber() {
         if(!(getGameMode() instanceof MachineLearningMode)) return 0;
         return ((MachineLearningMode) gameMode).getGenerationNumber();
+    }
+
+    public FlappyBirdPlayer getBestPlayer() {
+        FlappyBirdPlayer bestPlayer = getPlayers().get(0);
+        for(FlappyBirdPlayer player : getPlayers()) {
+            if(player.score > bestPlayer.score)
+                bestPlayer = player;
+        }
+        return bestPlayer;
     }
 }

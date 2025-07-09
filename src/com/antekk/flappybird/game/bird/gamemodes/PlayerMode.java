@@ -2,11 +2,16 @@ package com.antekk.flappybird.game.bird.gamemodes;
 
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.pipes.PipeFormation;
+import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class PlayerMode implements GameMode {
+    private ArrayList<FlappyBirdPlayer> players;
+
     @Override
     public void draw(Graphics g, Birds birds) {
         birds.getPlayerControlledBird().draw(g);
@@ -28,8 +33,8 @@ public class PlayerMode implements GameMode {
     }
 
     @Override
-    public boolean isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
-        return birds.getPlayerControlledBird().isBetweenPipes(pipeFormation);
+    public Bird isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
+        return birds.getPlayerControlledBird().isBetweenPipes(pipeFormation) ? birds.getPlayerControlledBird() : null;
     }
 
     @Override
@@ -84,5 +89,12 @@ public class PlayerMode implements GameMode {
         if(index > 0)
             throw new IllegalArgumentException("index" + index + " is higher than the size (1)");
         return birds.playerControlledBird;
+    }
+
+    @Override
+    public ArrayList<FlappyBirdPlayer> players(Birds birds) {
+        if(players == null || players.isEmpty())
+            players = new ArrayList<>(Arrays.asList(birds.playerControlledBird.getPlayer()));
+        return players;
     }
 }

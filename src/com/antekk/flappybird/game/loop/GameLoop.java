@@ -19,11 +19,8 @@ import static com.antekk.flappybird.view.GamePanel.*;
 public class GameLoop extends Thread {
     private final GamePanel currentPanel;
     private GameState gameState;
-    private final FlappyBirdPlayer player = new FlappyBirdPlayer();
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
     private final Birds birds = new Birds(ConfigJSON.getGameMode());
-
-    private boolean wasScoreAddedAtCurrentPipe = false;
     private int framesSincePipeSpawned = 0;
     private int framesSinceIdleSpriteChanged = 0;
     private final int timeBetweenFramesMillis = 1000 / 60;
@@ -53,7 +50,6 @@ public class GameLoop extends Thread {
                 pipes.clear();
                 framesSincePipeSpawned = 0;
                 pipes.add(new PipeFormation());
-                player.score = 0;
                 gameState = GameState.RUNNING;
                 continue;
             }
@@ -74,15 +70,15 @@ public class GameLoop extends Thread {
         if(!ConfigJSON.showNewBestDialog())
             return;
 
-        player.name = JOptionPane.showInputDialog(
+        getBestPlayer().name = JOptionPane.showInputDialog(
                 null,
                 "Enter your name",
-                "Game over",
+                "Game over - Score: " + getBestPlayer().score,
                 JOptionPane.INFORMATION_MESSAGE
         );
 
-        if(player.name != null && !player.name.isEmpty())
-            FlappyBirdPlayer.getStatsFile().addPlayer(player);
+        if(getBestPlayer().name != null && !getBestPlayer().name.isEmpty())
+            FlappyBirdPlayer.getStatsFile().addPlayer(getBestPlayer());
     }
 
     private void birdDeathLogic(Bird bird) throws InterruptedException {
@@ -106,24 +102,24 @@ public class GameLoop extends Thread {
     }
 
     private void scoreLogic(Birds birds) {
-        for (PipeFormation pipeFormation : pipes) {
-            if (birds.isBetweenPipes(pipeFormation) && !wasScoreAddedAtCurrentPipe) {
-                player.addScore();
-                wasScoreAddedAtCurrentPipe = true;
-                break;
+        for(Bird bird : birds) {
+            for (PipeFormation pipeFormation : pipes) {
+                FlappyBirdPlayer player = bird.getPlayer();
+                if (bird.isAlive && !player.wasScoreAddedAtPipe && bird.isBetweenPipes(pipeFormation)) {
+                    player.addScore();
+                    player.wasScoreAddedAtPipe = true;
+                }
             }
         }
 
-        boolean wasAdded = false;
-        for (PipeFormation pipeFormation : pipes) {
-            if (birds.isBetweenPipes(pipeFormation)) {
-                wasAdded = true;
-                break;
+        for (Bird bird : birds) {
+            boolean isBetweenAll = false;
+            for (PipeFormation pipeFormation : pipes) {
+                if (bird.isBetweenPipes(pipeFormation))
+                    isBetweenAll = true;
             }
+            bird.getPlayer().wasScoreAddedAtPipe = isBetweenAll;
         }
-
-        if (!wasAdded)
-            wasScoreAddedAtCurrentPipe = false;
     }
 
     private void pipeLogic() {
@@ -143,7 +139,7 @@ public class GameLoop extends Thread {
     }
 
     private void birdLogic(Bird bird) {
-        if(!bird.isAlive) {
+        if(!bird.isAlive && bird.getSpriteXPos() >= LEFT - bird.getSpriteWidth()) {
             bird.moveHorizontallyBy((int) (0.067 * getBlockSizePx()));
             return;
         }
@@ -234,26 +230,18 @@ public class GameLoop extends Thread {
         }
     }
 
-//    private Thread birdsStatsDialogThread() {
-//        Thread thread = new Thread(() -> {
-//            while(gameState != GameState.ENDED) {
-//                try {
-//                    sleep(1000 / 15);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//
-//                if(birdsStatsDialog.isVisible())
-//                    SwingUtilities.invokeLater(birdsStatsDialog::repaint);
-//            }
-//        });
-//        thread.setDaemon(true);
-//        return thread;
-//    }
+    public FlappyBirdPlayer getBestPlayer() {
+        return birds.getBestPlayer();
+    }
+
+    private ArrayList<FlappyBirdPlayer> getPlayers() {
+        return birds.getPlayers();
+    }
 
     public void startGame() {
         gameState = GameState.RUNNING;
-        player.pipesVerticalGap = PipeFormation.futureGap;
+        for(FlappyBirdPlayer p : getPlayers())
+            p.pipesVerticalGap = PipeFormation.futureGap;
         PipeFormation.updatePipeGap();
     }
 
@@ -263,10 +251,6 @@ public class GameLoop extends Thread {
 
     public GameState getGameState() {
         return gameState;
-    }
-
-    public FlappyBirdPlayer getPlayer() {
-        return player;
     }
 
     public ArrayList<PipeFormation> getPipes() {

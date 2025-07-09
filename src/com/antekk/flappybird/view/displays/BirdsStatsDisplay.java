@@ -30,9 +30,11 @@ public class BirdsStatsDisplay {
         g.setFont(g.getFont().deriveFont(18f));
         for(int i = 0; i < birds.size(); i++) {
             Bird bird = birds.getBirdAt(i);
-            int y = (int) ((int) ((i+1) * 1.2 * getBlockSizePx()) + 1.2 * getBlockSizePx());
+            int y = (int) ((int) ((i+1) * 1.3 * getBlockSizePx()) + 1.2 * getBlockSizePx());
                 g.drawImage(birdMidFlap, RIGHT + getBlockSizePx(),y,getBlockSizePx(), getBlockSizePx(), null);
             g.drawString("Fitness = " + bird.getFitness(), (int) (2.5 * getBlockSizePx()) + RIGHT, y + getBlockSizePx() / 2);
+            g.drawString("Score = " + bird.getPlayer().score,
+                    (int) (2.5 * getBlockSizePx()) + RIGHT, y + getBlockSizePx() / 2 + g.getFontMetrics().getHeight());
         }
     }
 

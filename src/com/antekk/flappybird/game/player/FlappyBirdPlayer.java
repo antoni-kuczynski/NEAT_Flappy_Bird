@@ -1,10 +1,11 @@
 package com.antekk.flappybird.game.player;
 
 public class FlappyBirdPlayer {
-    public static final PlayersStatsJSON playerStats = new PlayersStatsJSON();
+    private static final PlayersStatsJSON playerStats = new PlayersStatsJSON();
     public long score = 0;
     public int pipesVerticalGap = 0;
     public String name;
+    public boolean wasScoreAddedAtPipe = false;
 
     public void addScore() {
         score++;

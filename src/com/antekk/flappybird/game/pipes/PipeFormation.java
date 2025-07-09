@@ -30,7 +30,7 @@ public class PipeFormation {
     }
 
     public int getCenterY() {
-        return (int) (bottomPipe.y - (gap * 0.42));
+        return (int) (bottomPipe.y - (gap * 0.5));
     }
 
     public TopPipe getTopPipe() {

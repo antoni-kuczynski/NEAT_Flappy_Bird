@@ -17,7 +17,7 @@ public class BestPlayersDialog extends JDialog {
     protected void reloadData() {
         model.setRowCount(0);
         int place = 1;
-        for(FlappyBirdPlayer player : FlappyBirdPlayer.playerStats.getPlayers()) {
+        for(FlappyBirdPlayer player : FlappyBirdPlayer.getStatsFile().getPlayers()) {
             model.addRow(new String[] {
                     String.valueOf(place),
                     player.name,

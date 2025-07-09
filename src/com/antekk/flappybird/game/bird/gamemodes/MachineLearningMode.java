@@ -1,10 +1,10 @@
 package com.antekk.flappybird.game.bird.gamemodes;
 
-import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.ai.Neuron;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.pipes.PipeFormation;
+import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import java.util.Iterator;
 public class MachineLearningMode implements GameMode {
     private int generationNumber = 1;
     protected int populationSize = 0;
+    private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
 
     @Override
     public synchronized void draw(Graphics g, Birds birds) {
@@ -35,11 +36,11 @@ public class MachineLearningMode implements GameMode {
     }
 
     @Override
-    public boolean isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
+    public Bird isBetweenPipes(PipeFormation pipeFormation, Birds birds) {
         for(Bird bird : birds) {
-            if(bird.isBetweenPipes(pipeFormation)) return true;
+            if(bird.isBetweenPipes(pipeFormation)) return bird;
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -84,6 +85,17 @@ public class MachineLearningMode implements GameMode {
         return birds.mlBirdsArray.get(index);
     }
 
+    @Override
+    public ArrayList<FlappyBirdPlayer> players(Birds birds) {
+        if(players.isEmpty()) initPlayers(birds);
+        return players;
+    }
+
+    private void initPlayers(Birds birds) {
+        players.clear();
+        for(Bird bird : birds) players.add(bird.getPlayer());
+    }
+
     private int birdsFitnessSortComparator(Bird b1, Bird b2) {
         if(b1.getFitness() > b2.getFitness())
             return -1;
@@ -120,6 +132,9 @@ public class MachineLearningMode implements GameMode {
 
         for(Bird bird : birds.mlBirdsArray)
             bird.resetPosition();
+
+        initPlayers(birds);
+
         generationNumber++;
     }
 

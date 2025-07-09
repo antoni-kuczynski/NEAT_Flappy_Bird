@@ -4,6 +4,7 @@ import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.pipes.BottomPipe;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.pipes.TopPipe;
+import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 import com.antekk.flappybird.view.GamePanel;
 
 import java.awt.*;
@@ -30,6 +31,7 @@ public class Bird {
     public boolean isAlive = true;
     public NeuralNetwork brain;
     public long totalTraveledDistance = 0;
+    private final FlappyBirdPlayer player = new FlappyBirdPlayer();
 
     public Bird() {
         resetPosition();
@@ -267,5 +269,9 @@ public class Bird {
 
     public long getFitness() {
         return brain.fitnessTotalDistance;
+    }
+
+    public FlappyBirdPlayer getPlayer() {
+        return player;
     }
 }
