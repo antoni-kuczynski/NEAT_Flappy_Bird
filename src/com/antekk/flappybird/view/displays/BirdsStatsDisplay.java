@@ -3,7 +3,7 @@ package com.antekk.flappybird.view.displays;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.bird.gamemodes.Birds;
 import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
-import com.antekk.flappybird.game.loop.GameLoop;
+import com.antekk.flappybird.view.GamePanel;
 
 import java.awt.*;
 
@@ -12,15 +12,15 @@ import static com.antekk.flappybird.view.GamePanel.RIGHT;
 import static com.antekk.flappybird.view.themes.GameColors.birdMidFlap;
 
 public class BirdsStatsDisplay {
-    private final GameLoop loop;
+    private final GamePanel panel;
 
 
-    public BirdsStatsDisplay(GameLoop loop) {
-        this.loop = loop;
+    public BirdsStatsDisplay(GamePanel panel) {
+        this.panel = panel;
     }
 
     public synchronized void draw(Graphics g) {
-        Birds birds = loop.getBirds();
+        Birds birds = panel.getGameLoop().getBirds();
         if(!(birds.getGameMode() instanceof MachineLearningMode))
             return;
 
@@ -39,7 +39,7 @@ public class BirdsStatsDisplay {
     }
 
     public Dimension getPreferredSize() {
-        if(!(loop.getBirds().getGameMode() instanceof MachineLearningMode))
+        if(!(panel.getGameLoop().getBirds().getGameMode() instanceof MachineLearningMode))
             return new Dimension(0,0);
 
         return new Dimension(

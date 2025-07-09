@@ -166,7 +166,7 @@ public class Bird {
     }
 
     private int distanceToPipeFormationX(PipeFormation pipeFormation) {
-        return pipeFormation.getTopPipe().getX() - (getHitboxPosX() + getHitboxWidth());
+        return (int) (pipeFormation.getTopPipe().getX() - (getHitboxPosX()));
     }
 
     private int distanceToPipeCenterY(PipeFormation pipeFormation) {

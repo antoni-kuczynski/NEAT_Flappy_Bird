@@ -136,7 +136,7 @@ public class GamePanel extends JPanel {
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
 //        loop = new GameLoop(this);
-        birdsStatsDisplay = new BirdsStatsDisplay(loop);
+        birdsStatsDisplay = new BirdsStatsDisplay(this);
 
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
@@ -192,8 +192,8 @@ public class GamePanel extends JPanel {
     @Override
     public void setPreferredSize(Dimension preferredSize) {
         super.setPreferredSize(preferredSize);
-        SwingUtilities.getWindowAncestor(this).setSize(preferredSize);
         SwingUtilities.getWindowAncestor(this).setPreferredSize(preferredSize);
+        SwingUtilities.getWindowAncestor(this).setSize(preferredSize);
     }
 
     public static int getBoardRows() {
