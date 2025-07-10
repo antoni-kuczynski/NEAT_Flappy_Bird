@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Neuron implements Cloneable{
-    public double bias;
+    public float bias;
     private final Random random = new Random();
     private int id;
-    private ArrayList<Double> weights = new ArrayList<>();
+    private ArrayList<Float> weights = new ArrayList<>();
 
     Neuron(int amountOfWeights, int id) {
         this.id = id;
-        bias = random.nextDouble(-1,1);
-        for(int i = 0; i < amountOfWeights; i++) weights.add(random.nextDouble(-1,1));
+        bias = random.nextFloat(-1,1);
+        for(int i = 0; i < amountOfWeights; i++) weights.add(random.nextFloat(-1,1));
     }
 
     protected double compute(double... input) {
@@ -44,7 +44,7 @@ public class Neuron implements Cloneable{
         return id;
     }
 
-    public ArrayList<Double> getWeights() {
+    public ArrayList<Float> getWeights() {
         return weights;
     }
 

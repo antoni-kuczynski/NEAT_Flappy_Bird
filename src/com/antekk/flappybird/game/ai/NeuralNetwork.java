@@ -1,8 +1,10 @@
 package com.antekk.flappybird.game.ai;
 
-import org.json.JSONArray;
+import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.view.ErrorDialog;
 import org.json.JSONObject;
-
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
     private Neuron output;
     private final int totalSize;
     public long fitnessTotalDistance = 0;
+    private Bird owner;
 
     public NeuralNetwork() {
         inputs.add(new Neuron(1,0));
@@ -108,7 +111,7 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
             if(rand == 2) continue;
 
             int randomIndex = (int) (Math.random() * (this.size() - 1));
-            double biasI = getNeuronAt(i).bias;
+            float biasI = getNeuronAt(i).bias;
             getNeuronAt(i).bias = getNeuronAt(randomIndex).bias;
             getNeuronAt(randomIndex).bias = biasI;
         }
@@ -136,6 +139,19 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
 
         object.put("layers", layers);
         object.put("total_size", totalSize);
+        object.put("fitness", fitnessTotalDistance);
+
+        JSONObject gameParams = new JSONObject();
+        gameParams.put("pipe_gap", owner.getPlayer().pipesVerticalGap);
+        gameParams.put("achieved_score", owner.getPlayer().score);
+
+        object.put("game_params", gameParams);
+
+        try(FileWriter writer = new FileWriter(filename)) {
+            writer.write(object.toString(4));
+        } catch (IOException e) {
+            new ErrorDialog("Cannot save the neural network to json", e);
+        }
     }
 
     private JSONObject getLayer(ArrayList<Neuron> layer) {
@@ -172,5 +188,9 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    public void setOwner(Bird owner) {
+        this.owner = owner;
     }
 }

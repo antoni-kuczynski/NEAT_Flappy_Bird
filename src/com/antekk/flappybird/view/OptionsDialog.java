@@ -96,10 +96,26 @@ public class OptionsDialog extends JDialog {
         useMachineLearning.setSelected(ConfigJSON.getGameMode().usesMachineLearning());
         machineLearningOptions.add(enableMachineLearning);
 
-        JButton saveNetworkToJSON = new JButton("Save to JSON");
+        JButton saveNetworkToJSON = new JButton("Save the best player to JSON");
         saveNetworkToJSON.addActionListener(e -> {
+            if(!parent.getGameLoop().getGameMode().isMlMode())
+                return;
+
+            FileDialog dialog = new FileDialog((Frame) null);
+            dialog.setMode(FileDialog.SAVE);
+            dialog.setTitle("Save best player to JSON");
+            dialog.setFile("*.json");
+
+            dialog.setVisible(true);
+            String fileName = dialog.getFile();
+
+            if(fileName == null || fileName.isBlank())
+                return;
+
+            parent.getGameLoop().getSmartestBrain().saveToJSON(fileName);
 
         });
+        machineLearningOptions.add(saveNetworkToJSON);
 
 
         JPanel buttons = new JPanel();
@@ -154,6 +170,18 @@ public class OptionsDialog extends JDialog {
         add(buttons, BorderLayout.PAGE_END);
 
         pack();
+
+
+        if(parent.getGameLoop().getGameState() == GameState.RUNNING) {
+            pipesGap.setEnabled(false);
+            pipesGap.setToolTipText("Can't change while in-game");
+
+            sizeSpinner.setEnabled(false);
+            sizeSpinner.setToolTipText("Can't change while in-game");
+
+            useMachineLearning.setEnabled(false);
+            useMachineLearning.setToolTipText("Can't change while in-game");
+        }
     }
 
     private static SpinnerNumberModel getSpinnerNumberModel() {

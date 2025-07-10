@@ -14,16 +14,6 @@ public class PlayerMode implements GameMode {
     private ArrayList<FlappyBirdPlayer> players;
     private Bird playerControlledBird;
 
-//    @Override
-//    public void draw(Graphics g, GameLoop loop) {
-//        playerControlledBird.draw(g);
-//    }
-//
-//    @Override
-//    public void drawWithoutRotation(Graphics g, GameLoop loop) {
-//        playerControlledBird.drawWithoutRotation(g);
-//    }
-
     @Override
     public void resetPosition() {
         playerControlledBird.resetPosition();
@@ -68,7 +58,6 @@ public class PlayerMode implements GameMode {
     @Override
     public void init() {
         playerControlledBird = new Bird();
-//        birds.mlBirdsArray = null;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.antekk.flappybird.game.loop;
 
 import com.antekk.flappybird.game.ConfigJSON;
+import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.bird.gamemodes.GameMode;
 import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
@@ -83,7 +84,7 @@ public class GameLoop extends Thread {
             FlappyBirdPlayer.getStatsFile().addPlayer(getBestPlayer());
     }
 
-    private void birdDeathLogic(Bird bird) throws InterruptedException {
+    private void birdDeathLogic(Bird bird) {
         //bird collided with the ground
         if (bird.getSpritePosY() >= GROUND) {
             bird.isAlive = false;
@@ -282,4 +283,14 @@ public class GameLoop extends Thread {
     public Bird getBirdAt(int index) {
         return gameMode.getBirds().get(index);
     }
+
+    public NeuralNetwork getSmartestBrain() {
+        Bird smartest = getBirdAt(0);
+        for(Bird bird : gameMode.getBirds()) {
+            if(bird.getFitness() > smartest.getFitness())
+                smartest = bird;
+        }
+        return smartest.brain;
+    }
+
 }

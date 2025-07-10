@@ -39,6 +39,7 @@ public class Bird {
 
     public Bird(NeuralNetwork network) {
         resetPosition();
+        network.setOwner(this);
         this.brain = network;
         brain.fitnessTotalDistance = 0;
     }

@@ -17,16 +17,6 @@ public class MachineLearningMode implements GameMode {
     private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
     private ArrayList<Bird> mlBirdsArray = new ArrayList<>();
 
-//    @Override
-//    public synchronized void draw(Graphics g, GameLoop loop) {
-//        for(Iterator<Bird> it = birds.iterator(); it.hasNext();) it.next().draw(g);
-//    }
-
-//    @Override
-//    public void drawWithoutRotation(Graphics g, GameLoop loop) {
-//        for(Bird bird : birds) bird.drawWithoutRotation(g);
-//    }
-
     @Override
     public void resetPosition() {
         for(Bird bird : mlBirdsArray) bird.resetPosition();
@@ -65,7 +55,6 @@ public class MachineLearningMode implements GameMode {
         mlBirdsArray = new ArrayList<>();
         for(int i = 0; i < populationSize; i++) mlBirdsArray.add(new Bird(new NeuralNetwork()));
         initPlayers();
-//        birds.playerControlledBird = null;
     }
 
     @Override
@@ -178,7 +167,7 @@ public class MachineLearningMode implements GameMode {
             Neuron parent1Neuron = parent1.getNeuronAt(i);
             Neuron parent2Neuron = parent2.getNeuronAt(i);
 
-            double bias1 = parent1Neuron.bias;
+            float bias1 = parent1Neuron.bias;
             parent1Neuron.bias = parent2Neuron.bias;
             parent2Neuron.bias = bias1;
         }
