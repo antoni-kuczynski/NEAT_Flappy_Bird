@@ -3,11 +3,9 @@ package com.antekk.flappybird.game.bird.gamemodes;
 import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.ai.Neuron;
 import com.antekk.flappybird.game.bird.Bird;
-import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -28,11 +26,11 @@ public class MachineLearningMode implements GameMode {
     }
 
     @Override
-    public Bird isBetweenPipes(PipeFormation pipeFormation) {
+    public boolean isBetweenPipes(PipeFormation pipeFormation) {
         for(Bird bird : mlBirdsArray) {
-            if(bird.isBetweenPipes(pipeFormation)) return bird;
+            if(bird.isBetweenPipes(pipeFormation)) return true;
         }
-        return null;
+        return false;
     }
 
     @Override

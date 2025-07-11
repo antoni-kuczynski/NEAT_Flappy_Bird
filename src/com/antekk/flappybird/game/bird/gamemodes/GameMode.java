@@ -1,11 +1,9 @@
 package com.antekk.flappybird.game.bird.gamemodes;
 
 import com.antekk.flappybird.game.bird.Bird;
-import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -14,7 +12,7 @@ public interface GameMode {
 //    void drawWithoutRotation(Graphics g, GameLoop loop);
     void resetPosition();
     void flap();
-    Bird isBetweenPipes(PipeFormation pipeFormation);
+    boolean isBetweenPipes(PipeFormation pipeFormation);
     boolean areAllBirdsDead();
     Iterator<Bird> iterator();
     void init();
@@ -32,6 +30,7 @@ public interface GameMode {
         return switch (s) {
             case "PLAYER_MODE" -> new PlayerMode();
             case "ML_MODE" -> new MachineLearningMode();
+            case "PRE_TRAINED_MODE" -> new PretrainedMode();
             default -> throw new IllegalStateException("Unexpected value: " + s);
         };
     }
@@ -42,5 +41,9 @@ public interface GameMode {
 
     default boolean isMlMode() {
         return this instanceof MachineLearningMode;
+    }
+
+    default boolean isPretrainedMode() {
+        return this instanceof PretrainedMode;
     }
 }

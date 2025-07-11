@@ -37,7 +37,7 @@ public class GameColors {
         foregroundColor = new Color(238, 238, 238);
         groundColor = new Color(0, 135, 147);
         shapeBorderColor = Color.BLACK;
-        borderColor = new Color(233, 252, 217);
+        borderColor = new Color(202, 202, 170);
 
         try {
             background = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/background-night.png"));
@@ -68,7 +68,7 @@ public class GameColors {
         foregroundColor = new Color(28, 28, 28);
         groundColor = new Color(78, 192, 202);
         shapeBorderColor = Color.BLACK;
-        borderColor = new Color(233, 252, 217);
+        borderColor = new Color(202, 202, 170);
 
         try {
             background = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/background-day.png"));

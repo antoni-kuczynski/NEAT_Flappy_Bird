@@ -9,6 +9,9 @@ import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.displays.BirdsStatsDisplay;
 import com.antekk.flappybird.view.displays.ScoreDisplay;
 import com.antekk.flappybird.view.themes.GameColors;
+import com.formdev.flatlaf.ui.FlatDropShadowBorder;
+import com.formdev.flatlaf.ui.FlatLineBorder;
+import com.formdev.flatlaf.ui.FlatRoundBorder;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;

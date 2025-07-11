@@ -11,6 +11,7 @@ import com.antekk.flappybird.view.themes.Theme;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.GamePanel.setBlockSizePx;
@@ -116,6 +117,21 @@ public class OptionsDialog extends JDialog {
 
         });
         machineLearningOptions.add(saveNetworkToJSON);
+
+        JButton loadNetworkFromJSON = new JButton("Load player from JSON");
+        loadNetworkFromJSON.addActionListener(e -> {
+            JFileChooser dialog = new JFileChooser();
+            dialog.setDialogType(JFileChooser.OPEN_DIALOG);
+            dialog.setDialogTitle("Load player from JSON");
+
+            dialog.showOpenDialog(this);
+            File file = dialog.getSelectedFile();
+
+            if(file == null || file.getName().isBlank())
+                return;
+            
+        });
+        machineLearningOptions.add(loadNetworkFromJSON);
 
 
         JPanel buttons = new JPanel();

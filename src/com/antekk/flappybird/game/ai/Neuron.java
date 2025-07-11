@@ -17,6 +17,12 @@ public class Neuron implements Cloneable{
         for(int i = 0; i < amountOfWeights; i++) weights.add(random.nextFloat(-1,1));
     }
 
+    private Neuron(int id, float bias, ArrayList<Float> weights) {
+        this.bias = bias;
+        this.id = id;
+        this.weights = weights;
+    }
+
     protected double compute(double... input) {
         double z = 0;
         for(int i = 0; i < input.length; i++) {
@@ -58,8 +64,24 @@ public class Neuron implements Cloneable{
             weightsObject.put(String.valueOf(i), weights.get(i));
         }
         object.put("weights", weightsObject);
+        object.put("amount_of_connections", weights.size());
 
         return object;
+    }
+
+    protected static Neuron getFromJSON(JSONObject object) {
+        int id = object.getInt("id");
+        int amountOfConnections = object.getInt("amount_of_connections");
+        ArrayList<Float> weights = new ArrayList<>();
+        float bias = object.getFloat("bias");
+
+        JSONObject weightsJSON = object.getJSONObject("weights");
+        for(int i = 0; i < amountOfConnections; i++) {
+            String key = String.valueOf(i);
+            weights.add(weightsJSON.getFloat(key));
+        }
+
+        return new Neuron(id, bias, weights);
     }
 
     @Override

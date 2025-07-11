@@ -1,5 +1,6 @@
 package com.antekk.flappybird.game.bird.gamemodes;
 
+import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
@@ -8,28 +9,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class PlayerMode implements GameMode {
-    private ArrayList<FlappyBirdPlayer> players;
-    private Bird playerControlledBird;
+public class PretrainedMode implements GameMode {
+    private Bird pretrainedBird;
+    private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
 
     @Override
     public void resetPosition() {
-        playerControlledBird.resetPosition();
+        pretrainedBird.resetPosition();
     }
 
     @Override
     public void flap() {
-        playerControlledBird.flap();
+        pretrainedBird.flap();
     }
 
     @Override
     public boolean isBetweenPipes(PipeFormation pipeFormation) {
-        return playerControlledBird.isBetweenPipes(pipeFormation);
+        return pretrainedBird.isBetweenPipes(pipeFormation);
     }
 
     @Override
     public boolean areAllBirdsDead() {
-        return !playerControlledBird.isAlive;
+        return !pretrainedBird.isAlive;
     }
 
     @Override
@@ -48,24 +49,21 @@ public class PlayerMode implements GameMode {
 
             @Override
             public Bird next() {
-                return playerControlledBird;
+                return pretrainedBird;
             }
         };
     }
 
     @Override
     public void init() {
-        playerControlledBird = new Bird();
+        pretrainedBird = new Bird(
+                new NeuralNetwork() //TODO
+        );
     }
 
     @Override
     public boolean usesMachineLearning() {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "PLAYER_MODE";
+        return true;
     }
 
     @Override
@@ -75,30 +73,28 @@ public class PlayerMode implements GameMode {
 
     @Override
     public Bird getBirdAt(int index) {
-        if(index > 0)
-            throw new IllegalArgumentException("index" + index + " is higher than the size (1)");
-        return playerControlledBird;
+        if(index > 0) throw new IllegalArgumentException("Index can't be higher than 0 in pretrained mode (index = " + index + ").");
+        return pretrainedBird;
     }
 
     @Override
     public ArrayList<FlappyBirdPlayer> getPlayers() {
-        if(players == null || players.isEmpty())
-            players = new ArrayList<>(Arrays.asList(playerControlledBird.getPlayer()));
+        if(players.isEmpty()) players.add(pretrainedBird.getPlayer());
         return players;
     }
 
     @Override
     public FlappyBirdPlayer getBestPlayer() {
-        return players.get(0);
+        return pretrainedBird.getPlayer();
     }
 
     @Override
     public Bird getPlayerControlledBird() {
-        return playerControlledBird;
+        return null;
     }
 
     @Override
     public ArrayList<Bird> getBirds() {
-        return new ArrayList<>(Arrays.asList(getPlayerControlledBird()));
+        return new ArrayList<>(Arrays.asList(pretrainedBird));
     }
 }

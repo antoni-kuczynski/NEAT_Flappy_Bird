@@ -2,11 +2,17 @@ package com.antekk.flappybird.game.ai;
 
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.view.ErrorDialog;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 
 public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
@@ -28,6 +34,13 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
 
         output = new Neuron(6, 8);
 
+        totalSize = inputs.size() + hidden.size() + 1;
+    }
+
+    private NeuralNetwork(ArrayList<Neuron> inputs, ArrayList<Neuron> hidden, Neuron output) {
+        this.inputs = inputs;
+        this.hidden = hidden;
+        this.output = output;
         totalSize = inputs.size() + hidden.size() + 1;
     }
 
@@ -154,12 +167,44 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
         }
     }
 
-    private JSONObject getLayer(ArrayList<Neuron> layer) {
-        JSONObject neuronLayer = new JSONObject();
-        for(Neuron n : layer) {
-            neuronLayer.put(String.valueOf(n.getId()), n.getJSONObject());
+    public NeuralNetwork getFromJSON(File json) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        for(String s : Files.readAllLines(json.toPath())) {
+            builder.append(s).append("\n");
         }
-        neuronLayer.put("size", layer.size());
+
+        JSONObject object = new JSONObject(builder.toString());
+        ArrayList<Neuron> loadedInputs = new ArrayList<>();
+        ArrayList<Neuron> loadedHidden = new ArrayList<>();
+        Neuron loadedOutput;
+
+        JSONObject layers = object.getJSONObject("layers");
+        JSONArray inputLayer = layers.getJSONArray("input");
+        JSONArray hiddenLayer = layers.getJSONArray("hidden");
+        JSONArray outputLayer = layers.getJSONArray("hidden");
+
+
+        for(int i = 0; i < inputLayer.length(); i++) {
+            loadedInputs.add(Neuron.getFromJSON(inputLayer.getJSONObject(i)));
+        }
+
+        for(int i = 0; i < hiddenLayer.length(); i++) {
+            loadedHidden.add(Neuron.getFromJSON(hiddenLayer.getJSONObject(i)));
+        }
+
+        loadedOutput = Neuron.getFromJSON(outputLayer.getJSONObject(0));
+
+        loadedInputs.sort(Comparator.comparingInt(Neuron::getId));
+        loadedHidden.sort(Comparator.comparingInt(Neuron::getId));
+
+        return new NeuralNetwork(loadedInputs, loadedHidden, loadedOutput);
+    }
+
+    private JSONArray getLayer(ArrayList<Neuron> layer) {
+        JSONArray neuronLayer = new JSONArray();
+        for(Neuron n : layer) {
+            neuronLayer.put(n.getJSONObject());
+        }
         return neuronLayer;
     }
 
