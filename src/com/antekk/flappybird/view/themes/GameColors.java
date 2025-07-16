@@ -1,9 +1,10 @@
 package com.antekk.flappybird.view.themes;
 
+import com.antekk.flappybird.view.ErrorDialog;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class GameColors {
     public static Color groundColor;
     public static Color shapeBorderColor;
     public static Color borderColor;
+    private static boolean areDefaultSpritesInitialized = false;
 
     public static BufferedImage birdMidFlap;
     public static BufferedImage birdDownFlap;
@@ -41,7 +43,6 @@ public class GameColors {
 
         try {
             background = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/background-night.png"));
-            setDefaultSprites();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,6 +62,7 @@ public class GameColors {
         for(int i = 0; i <= 9; i++) {
             numbers.add(ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/numbers/" + i + ".png")));
         }
+        areDefaultSpritesInitialized = true;
     }
 
     private static void setLightThemeValues() {
@@ -72,14 +74,20 @@ public class GameColors {
 
         try {
             background = ImageIO.read(getResource("com/antekk/flappybird/assets/sprites/background-day.png"));
-            setDefaultSprites();
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static void setTheme(Theme theme) {
+        if(!areDefaultSpritesInitialized) {
+            try {
+                setDefaultSprites();
+            } catch (IOException e) {
+                new ErrorDialog("Cannot load game sprites - missing assets.", e);
+            }
+        }
+
         if(theme == Theme.DAY) {
             setLightThemeValues();
         } else if(theme == Theme.NIGHT) {

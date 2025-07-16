@@ -9,9 +9,6 @@ import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.displays.BirdsStatsDisplay;
 import com.antekk.flappybird.view.displays.ScoreDisplay;
 import com.antekk.flappybird.view.themes.GameColors;
-import com.formdev.flatlaf.ui.FlatDropShadowBorder;
-import com.formdev.flatlaf.ui.FlatLineBorder;
-import com.formdev.flatlaf.ui.FlatRoundBorder;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -33,6 +30,7 @@ public class GamePanel extends JPanel {
     private final BestPlayersDialog bestPlayersDialog;
     public final BirdsStatsDisplay birdsStatsDisplay;
     public int birdsStatDisplayWidth = 16 * getBlockSizePx();
+    private OptionsDialog optionsDialog;
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {
@@ -168,12 +166,20 @@ public class GamePanel extends JPanel {
 
         showBestPlayers.addActionListener(e -> showBestPlayersDialog(!bestPlayersDialog.isVisible()));
 
-        options.addActionListener(e -> new OptionsDialog(GamePanel.this).setVisible(true));
+        options.addActionListener(e -> {
+            if(optionsDialog != null && optionsDialog.isVisible()) {
+                optionsDialog.requestFocus();
+                return;
+            }
+
+            optionsDialog = new OptionsDialog(GamePanel.this);
+            optionsDialog.setVisible(true);
+        });
 
         add(toolbar, BorderLayout.PAGE_START);
 
         loop.start();
-        parent.setMinimumSize(this.getPreferredSize());
+//        parent.setMinimumSize(this.getPreferredSize());
         parent.setPreferredSize(this.getPreferredSize());
         repaint();
     }
@@ -191,6 +197,16 @@ public class GamePanel extends JPanel {
 
         bestPlayersDialog.reloadData();
         bestPlayersDialog.setVisible(true);
+    }
+
+    public void setOptionsEnabled(boolean enable) {
+        if(optionsDialog != null)
+            optionsDialog.setOptionsEnabled(enable);
+    }
+
+    public void setSaveNetworkButtonEnabled(boolean enable) {
+        if(optionsDialog != null)
+            optionsDialog.setSaveNetworkButtonEnabled(enable);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.antekk.flappybird.view.displays;
 
 import com.antekk.flappybird.game.bird.Bird;
-import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.view.GamePanel;
 
@@ -21,7 +20,7 @@ public class BirdsStatsDisplay {
 
     public synchronized void draw(Graphics g) {
         GameLoop loop = panel.getGameLoop();
-        if(!loop.getGameMode().isMlMode())
+        if(!loop.getGameMode().isTrainingMode())
             return;
 
         g.setFont(g.getFont().deriveFont(32f));
@@ -39,7 +38,7 @@ public class BirdsStatsDisplay {
     }
 
     public Dimension getPreferredSize() {
-        if(!panel.getGameLoop().getGameMode().isMlMode())
+        if(!panel.getGameLoop().getGameMode().isTrainingMode())
             return new Dimension(0,0);
 
         return new Dimension(

@@ -3,7 +3,7 @@ package com.antekk.flappybird.view;
 import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.bird.gamemodes.GameMode;
-import com.antekk.flappybird.game.bird.gamemodes.PretrainedMode;
+import com.antekk.flappybird.game.bird.gamemodes.MlPretrainedMode;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
@@ -18,6 +18,11 @@ import static com.antekk.flappybird.view.GamePanel.setBlockSizePx;
 
 public class OptionsDialog extends JDialog {
     private String loadedNeuralNetworkPath = "";
+    private final JSpinner pipesGap = new JSpinner();
+    private final JSpinner sizeSpinner = new JSpinner();
+    private final JComboBox<GameMode> gameModeSwitcher = new JComboBox<>();
+    private final JButton openNetworkButton;
+    private final JButton saveNetworkButton;
 
     protected OptionsDialog(GamePanel parent) {
         super(SwingUtilities.getWindowAncestor(parent));
@@ -26,6 +31,9 @@ public class OptionsDialog extends JDialog {
                 (int) (0.6 * GamePanel.getBoardRows() * getBlockSizePx())));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        openNetworkButton = getLoadNetworkFromJSONButton();
+        saveNetworkButton = getSaveNetworkToJSONButton(parent);
 
         JTabbedPane mainTabbedPane = new JTabbedPane();
         JPanel generalOptions = new JPanel();
@@ -40,8 +48,7 @@ public class OptionsDialog extends JDialog {
 
 
         SpinnerNumberModel pipesGapModel = getSpinnerNumberModel();
-
-        JSpinner pipesGap = new JSpinner(pipesGapModel);
+        pipesGap.setModel(pipesGapModel);
         pipesGap.setPreferredSize(new Dimension(80,25));
 
         JPanel setPipesGap = new JPanel();
@@ -75,10 +82,10 @@ public class OptionsDialog extends JDialog {
                 Integer.MAX_VALUE,
                 5
         );
-        JSpinner sizeSpinner = new JSpinner(blockSizeModel);
+
         sizeSpinner.setPreferredSize(new Dimension(80,25));
         blockSize.add(sizeSpinner);
-
+        sizeSpinner.setModel(blockSizeModel);
         generalOptions.add(blockSize);
 
         JPanel showNewBestDialogPanel = new JPanel();
@@ -92,26 +99,24 @@ public class OptionsDialog extends JDialog {
         BoxLayout layout1 = new BoxLayout(machineLearningOptions, BoxLayout.Y_AXIS);
         machineLearningOptions.setLayout(layout1);
 
-//        JPanel enableMachineLearning = new JPanel();
-//        JCheckBox useMachineLearning = new JCheckBox();
-//        enableMachineLearning.add(new JLabel("Enable: "));
-//        enableMachineLearning.add(useMachineLearning);
-//        useMachineLearning.setSelected(ConfigJSON.getGameMode().usesMachineLearning());
-//        machineLearningOptions.add(enableMachineLearning);
         JPanel gameModeSelection = new JPanel();
         DefaultComboBoxModel<GameMode> gameModeModel = new DefaultComboBoxModel<>();
-        JComboBox<GameMode> gameModeSwitcher = new JComboBox<>(gameModeModel);
+        gameModeSwitcher.setModel(gameModeModel);
         gameModeModel.addAll(GameMode.values());
         gameModeSelection.add(new JLabel("Game mode: "));
         gameModeSelection.add(gameModeSwitcher);
         gameModeModel.setSelectedItem(ConfigJSON.getGameMode());
         machineLearningOptions.add(gameModeSelection);
 
-        JButton saveNetworkToJSON = getSaveNetworkToJSONButton(parent);
-        machineLearningOptions.add(saveNetworkToJSON);
+        JPanel saveNetworkPanel = new JPanel();
+        saveNetworkPanel.add(new JLabel("<html>Save best player to JSON:<br><center><p style=\"font-size:9px\">(from current generation)</p></center></html>"));
+        saveNetworkPanel.add(saveNetworkButton);
+        machineLearningOptions.add(saveNetworkPanel);
 
-        JButton loadNetworkFromJSON = getLoadNetworkFromJSONButton();
-        machineLearningOptions.add(loadNetworkFromJSON);
+        JPanel openNetworkPanel = new JPanel();
+        openNetworkPanel.add(new JLabel("Load player from JSON:"));
+        openNetworkPanel.add(openNetworkButton);
+        machineLearningOptions.add(openNetworkPanel);
 
         JPanel bottomButtons = new JPanel();
         JButton okButton = new JButton("OK");
@@ -170,24 +175,39 @@ public class OptionsDialog extends JDialog {
         pack();
 
 
-        if(parent.getGameLoop().getGameState() == GameState.RUNNING) {
-            pipesGap.setEnabled(false);
-            pipesGap.setToolTipText("Can't change while in-game");
+        if(parent.getGameLoop().getGameState() == GameState.RUNNING || parent.getGameLoop().getGameState() == GameState.PAUSED) {
+            setOptionsEnabled(false);
+        }
 
-            sizeSpinner.setEnabled(false);
-            sizeSpinner.setToolTipText("Can't change while in-game");
-
-            gameModeSwitcher.setEnabled(false);
-            gameModeSwitcher.setToolTipText("Can't change while in-game");
+        if(!parent.getGameLoop().getGameMode().isTrainingMode()) {
+            setSaveNetworkButtonEnabled(false);
         }
     }
 
+    public void setSaveNetworkButtonEnabled(boolean enable) {
+        saveNetworkButton.setEnabled(enable);
+        saveNetworkButton.setToolTipText(enable ? null : "Can only be used in training mode & game must be running");
+    }
+
+    public void setOptionsEnabled(boolean enabled) {
+        pipesGap.setEnabled(enabled);
+        sizeSpinner.setEnabled(enabled);
+        gameModeSwitcher.setEnabled(enabled);
+        openNetworkButton.setEnabled(enabled);
+
+
+        pipesGap.setToolTipText(enabled ? null : "Can't change while in-game");
+        sizeSpinner.setToolTipText(enabled ? null : "Can't change while in-game");
+        gameModeSwitcher.setToolTipText(enabled ? null : "Can't change while in-game");
+        openNetworkButton.setToolTipText(enabled ? null : "Can't use while in-game");
+    }
+
     private JButton getLoadNetworkFromJSONButton() {
-        JButton loadNetworkFromJSON = new JButton("Load player from JSON");
+        JButton loadNetworkFromJSON = new JButton("Open");
         loadNetworkFromJSON.addActionListener(e -> {
             JFileChooser dialog = new JFileChooser();
             dialog.setDialogType(JFileChooser.OPEN_DIALOG);
-            dialog.setDialogTitle("Load player from JSON");
+            dialog.setDialogTitle("Open player from JSON");
 
             dialog.showOpenDialog(this);
             File file = dialog.getSelectedFile();
@@ -201,9 +221,9 @@ public class OptionsDialog extends JDialog {
     }
 
     private static JButton getSaveNetworkToJSONButton(GamePanel parent) {
-        JButton saveNetworkToJSON = new JButton("Save the best player to JSON");
+        JButton saveNetworkToJSON = new JButton("Save");
         saveNetworkToJSON.addActionListener(e -> {
-            if(!parent.getGameLoop().getGameMode().isMlMode())
+            if(!parent.getGameLoop().getGameMode().isTrainingMode())
                 return;
 
             FileDialog dialog = new FileDialog((Frame) null);
@@ -226,7 +246,7 @@ public class OptionsDialog extends JDialog {
     private GameMode getGameModeBasedOnUserSelection(JComboBox<GameMode> gameModeSwitcher) {
         GameMode gameMode = (GameMode) gameModeSwitcher.getSelectedItem();
         if(gameMode != null && gameMode.isPretrainedMode() && !loadedNeuralNetworkPath.isBlank()) {
-            ((PretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(loadedNeuralNetworkPath));
+            ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(loadedNeuralNetworkPath));
         }
         return gameMode;
     }

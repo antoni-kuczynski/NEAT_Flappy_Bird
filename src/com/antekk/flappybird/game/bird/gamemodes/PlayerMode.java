@@ -65,7 +65,7 @@ public class PlayerMode implements GameMode {
 
     @Override
     public String toString() {
-        return "PLAYER_MODE";
+        return "Player mode";
     }
 
     @Override

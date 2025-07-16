@@ -4,7 +4,7 @@ import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.game.bird.gamemodes.GameMode;
-import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
+import com.antekk.flappybird.game.bird.gamemodes.MlTrainingMode;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 import com.antekk.flappybird.view.ErrorDialog;
@@ -18,21 +18,23 @@ import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.GamePanel.*;
 
 public class GameLoop extends Thread {
-    private final GamePanel currentPanel;
+    private final GamePanel parentPanel;
     private GameState gameState;
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
     private int framesSincePipeSpawned = 0;
     private int framesSinceIdleSpriteChanged = 0;
-    private final int timeBetweenFramesMillis = 1000 / 60;
     private GameMode gameMode;
 
+    private final int FPS = 60;
+    private final int X_DISTANCE_PER_FRAME = (int) (0.067 * getBlockSizePx());
+    private final int timeBetweenFramesMillis = 1000 / FPS;
 
     private void gameLoop() throws InterruptedException {
         pipes.add(new PipeFormation());
         while (gameState != GameState.LOST) {
             Thread.sleep(timeBetweenFramesMillis); //this sucks, but uses less cpu than time ms tracking
 
-            groundX -= (int) (0.067 * getBlockSizePx());
+            groundX -= X_DISTANCE_PER_FRAME;
 
             if(gameState == GameState.ENDED) {
                 return;
@@ -48,7 +50,7 @@ public class GameLoop extends Thread {
             }
 
             if(gameState == GameState.NEXT_GENERATION) {
-                ((MachineLearningMode) gameMode).newPopulation();
+                ((MlTrainingMode) gameMode).newPopulation();
                 pipes.clear();
                 framesSincePipeSpawned = 0;
                 pipes.add(new PipeFormation());
@@ -66,7 +68,7 @@ public class GameLoop extends Thread {
             scoreLogic();
 
             gameState = updateGameState();
-            currentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT + currentPanel.birdsStatDisplayWidth, BOTTOM - TOP);
+            parentPanel.paintImmediately(LEFT, TOP, RIGHT - LEFT + parentPanel.birdsStatDisplayWidth, BOTTOM - TOP);
         }
 
         if(!ConfigJSON.showNewBestDialog())
@@ -98,9 +100,9 @@ public class GameLoop extends Thread {
         }
         if(bird.isAlive || bird.getSpritePosY() >= GROUND || bird.getSpritePosY() < TOP) return;
 
-        if(gameMode.isMlMode()) return;
+        if(gameMode.isTrainingMode()) return;
 
-        bird.deathAnimationThread(timeBetweenFramesMillis, currentPanel).start();
+        bird.deathAnimationThread(timeBetweenFramesMillis, parentPanel).start();
     }
 
     private void scoreLogic() {
@@ -132,7 +134,7 @@ public class GameLoop extends Thread {
 
         for(Iterator<PipeFormation> it = pipes.iterator(); it.hasNext();) {
             PipeFormation pipe = it.next();
-            pipe.moveX(-(int) (0.067 * getBlockSizePx()));
+            pipe.moveX(-X_DISTANCE_PER_FRAME);
             if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
                 it.remove();
             }
@@ -142,7 +144,7 @@ public class GameLoop extends Thread {
 
     private void birdLogic(Bird bird) {
         if(!bird.isAlive && bird.getSpriteXPos() >= LEFT - bird.getSpriteWidth()) {
-            bird.moveHorizontallyBy((int) (0.067 * getBlockSizePx()));
+            bird.moveHorizontallyBy(X_DISTANCE_PER_FRAME);
             return;
         }
 
@@ -153,18 +155,18 @@ public class GameLoop extends Thread {
 
         if (!bird.isMovingUp) {
             bird.rotationAngle++;
-            bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / 60))));
+            bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / FPS))));
             if (bird.framesSinceBirdStartedMoving < 90)
                 bird.framesSinceBirdStartedMoving += 9;
         }
 
         if (bird.isMovingUp) {
             bird.rotationAngle = 0;
-            bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / 60)));
+            bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / FPS)));
             bird.framesSinceBirdStartedMoving += 6;
         }
 
-        bird.totalTraveledDistance += (int) (0.067 * getBlockSizePx());
+        bird.totalTraveledDistance += X_DISTANCE_PER_FRAME;
         bird.nextMove(pipes);
     }
 
@@ -172,7 +174,7 @@ public class GameLoop extends Thread {
         for(Bird bird : gameMode.getBirds()) {
             framesSinceIdleSpriteChanged++;
             if (framesSinceIdleSpriteChanged <= 20) {
-                currentPanel.repaint();
+                parentPanel.repaint();
                 continue;
             }
 
@@ -194,7 +196,7 @@ public class GameLoop extends Thread {
         if(!gameMode.areAllBirdsDead())
             return GameState.RUNNING;
 
-        if(gameMode.isMlMode()) { //TODO
+        if(gameMode.isTrainingMode()) {
             return GameState.NEXT_GENERATION;
         } else  {
             return GameState.LOST;
@@ -213,7 +215,7 @@ public class GameLoop extends Thread {
     }
 
     public GameLoop(GamePanel panel) {
-        this.currentPanel = panel;
+        this.parentPanel = panel;
         setGameMode(ConfigJSON.getGameMode());
         gameMode.resetPosition();
         pipes.clear();
@@ -223,6 +225,8 @@ public class GameLoop extends Thread {
     public void run() {
         gameState = GameState.STARTING;
 //        birdsStatsDialogThread().start();
+        parentPanel.setOptionsEnabled(true);
+        parentPanel.setSaveNetworkButtonEnabled(false);
         try {
             gameLoop();
         } catch (InterruptedException e) {
@@ -232,6 +236,8 @@ public class GameLoop extends Thread {
 
     public void startGame() {
         gameState = GameState.RUNNING;
+        parentPanel.setOptionsEnabled(false);
+        parentPanel.setSaveNetworkButtonEnabled(gameMode.isTrainingMode());
         for(FlappyBirdPlayer p : getPlayers())
             p.pipesVerticalGap = PipeFormation.futureGap;
         PipeFormation.updatePipeGap();
@@ -242,8 +248,8 @@ public class GameLoop extends Thread {
     }
 
     public int getGenerationNumber() {
-        if(!gameMode.isMlMode()) return 0;
-        return ((MachineLearningMode) gameMode).getGenerationNumber();
+        if(!gameMode.isTrainingMode()) return 0;
+        return ((MlTrainingMode) gameMode).getGenerationNumber();
     }
 
     public void setGameMode(GameMode gameMode) {

@@ -3,7 +3,7 @@ package com.antekk.flappybird.game;
 import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.bird.gamemodes.GameMode;
 import com.antekk.flappybird.game.bird.gamemodes.PlayerMode;
-import com.antekk.flappybird.game.bird.gamemodes.PretrainedMode;
+import com.antekk.flappybird.game.bird.gamemodes.MlPretrainedMode;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
@@ -128,8 +128,11 @@ public final class ConfigJSON {
 
     public static GameMode getGameMode() {
         GameMode gameMode = GameMode.valueOf(object.getString("game_mode"));
+        if(gameMode.isPretrainedMode() && getPretrainedJSONFilePath().isBlank())
+            gameMode = GameMode.valueOf("Player mode");
+
         if(gameMode.isPretrainedMode() && !getPretrainedJSONFilePath().isBlank()) {
-            ((PretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(getPretrainedJSONFilePath()));
+            ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(getPretrainedJSONFilePath()));
         }
         return gameMode;
     }

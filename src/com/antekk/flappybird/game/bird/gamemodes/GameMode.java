@@ -27,9 +27,9 @@ public interface GameMode {
 
     static GameMode valueOf(String s) {
         return switch (s) {
-            case "PLAYER_MODE" -> new PlayerMode();
-            case "ML_MODE" -> new MachineLearningMode();
-            case "PRE_TRAINED_MODE" -> new PretrainedMode();
+            case "Player mode" -> new PlayerMode();
+            case "Training mode" -> new MlTrainingMode();
+            case "Pretrained mode" -> new MlPretrainedMode();
             default -> throw new IllegalStateException("Unexpected value: " + s);
         };
     }
@@ -37,8 +37,8 @@ public interface GameMode {
     static ArrayList<GameMode> values() {
         return new ArrayList<>(Arrays.asList(
                 new PlayerMode(),
-                new MachineLearningMode(),
-                new PretrainedMode()
+                new MlTrainingMode(),
+                new MlPretrainedMode()
         ));
     }
 
@@ -46,11 +46,11 @@ public interface GameMode {
         return this instanceof PlayerMode;
     }
 
-    default boolean isMlMode() {
-        return this instanceof MachineLearningMode;
+    default boolean isTrainingMode() {
+        return this instanceof MlTrainingMode;
     }
 
     default boolean isPretrainedMode() {
-        return this instanceof PretrainedMode;
+        return this instanceof MlPretrainedMode;
     }
 }

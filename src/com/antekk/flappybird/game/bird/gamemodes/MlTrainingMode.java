@@ -9,7 +9,7 @@ import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MachineLearningMode implements GameMode {
+public class MlTrainingMode implements GameMode {
     private int generationNumber = 1;
     protected int populationSize = 0;
     private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
@@ -62,7 +62,7 @@ public class MachineLearningMode implements GameMode {
 
     @Override
     public String toString() {
-        return "ML_MODE";
+        return "Training mode";
     }
 
     @Override

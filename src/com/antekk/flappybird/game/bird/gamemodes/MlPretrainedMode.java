@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class PretrainedMode implements GameMode {
+public class MlPretrainedMode implements GameMode {
     private Bird pretrainedBird;
     private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
     private NeuralNetwork birdsNeuralNetwork = new NeuralNetwork();
@@ -99,7 +99,7 @@ public class PretrainedMode implements GameMode {
 
     @Override
     public String toString() {
-        return "PRE_TRAINED_MODE";
+        return "Pretrained mode";
     }
 
     public void setBirdsNeuralNetwork(NeuralNetwork birdsNeuralNetwork) {
