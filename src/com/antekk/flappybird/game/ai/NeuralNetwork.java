@@ -167,9 +167,18 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
         }
     }
 
-    public NeuralNetwork getFromJSON(File json) throws IOException {
+    public static NeuralNetwork getFromJSON(String jsonPath) {
         StringBuilder builder = new StringBuilder();
-        for(String s : Files.readAllLines(json.toPath())) {
+
+        ArrayList<String> lines;
+        try {
+            lines = (ArrayList<String>) Files.readAllLines(Path.of(jsonPath));
+        } catch (IOException e) {
+            new ErrorDialog("Cannot read neural network json file at \"" + jsonPath + "\" - I/O error", e);
+            return null;
+        }
+
+        for(String s : lines) {
             builder.append(s).append("\n");
         }
 
@@ -181,7 +190,7 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
         JSONObject layers = object.getJSONObject("layers");
         JSONArray inputLayer = layers.getJSONArray("input");
         JSONArray hiddenLayer = layers.getJSONArray("hidden");
-        JSONArray outputLayer = layers.getJSONArray("hidden");
+        JSONArray outputLayer = layers.getJSONArray("output");
 
 
         for(int i = 0; i < inputLayer.length(); i++) {

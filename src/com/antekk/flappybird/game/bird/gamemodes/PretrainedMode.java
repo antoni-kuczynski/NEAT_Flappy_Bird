@@ -12,6 +12,7 @@ import java.util.Iterator;
 public class PretrainedMode implements GameMode {
     private Bird pretrainedBird;
     private ArrayList<FlappyBirdPlayer> players = new ArrayList<>();
+    private NeuralNetwork birdsNeuralNetwork = new NeuralNetwork();
 
     @Override
     public void resetPosition() {
@@ -56,9 +57,7 @@ public class PretrainedMode implements GameMode {
 
     @Override
     public void init() {
-        pretrainedBird = new Bird(
-                new NeuralNetwork() //TODO
-        );
+        pretrainedBird = new Bird(birdsNeuralNetwork);
     }
 
     @Override
@@ -96,5 +95,15 @@ public class PretrainedMode implements GameMode {
     @Override
     public ArrayList<Bird> getBirds() {
         return new ArrayList<>(Arrays.asList(pretrainedBird));
+    }
+
+    @Override
+    public String toString() {
+        return "PRE_TRAINED_MODE";
+    }
+
+    public void setBirdsNeuralNetwork(NeuralNetwork birdsNeuralNetwork) {
+        this.birdsNeuralNetwork = birdsNeuralNetwork;
+        init();
     }
 }

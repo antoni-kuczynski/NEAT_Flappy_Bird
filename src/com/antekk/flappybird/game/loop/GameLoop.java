@@ -21,7 +21,6 @@ public class GameLoop extends Thread {
     private final GamePanel currentPanel;
     private GameState gameState;
     private final ArrayList<PipeFormation> pipes = new ArrayList<>();
-//    private final Birds birds = new Birds(ConfigJSON.getGameMode());
     private int framesSincePipeSpawned = 0;
     private int framesSinceIdleSpriteChanged = 0;
     private final int timeBetweenFramesMillis = 1000 / 60;

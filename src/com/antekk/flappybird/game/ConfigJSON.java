@@ -1,8 +1,9 @@
 package com.antekk.flappybird.game;
 
+import com.antekk.flappybird.game.ai.NeuralNetwork;
 import com.antekk.flappybird.game.bird.gamemodes.GameMode;
-import com.antekk.flappybird.game.bird.gamemodes.MachineLearningMode;
 import com.antekk.flappybird.game.bird.gamemodes.PlayerMode;
+import com.antekk.flappybird.game.bird.gamemodes.PretrainedMode;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.ErrorDialog;
 import com.antekk.flappybird.view.GamePanel;
@@ -48,17 +49,13 @@ public final class ConfigJSON {
     }
 
     public static void saveValues(int pipesVGap, Theme theme, int blockSize, boolean showNewBestDialog,
-                                  GameMode gameMode) {
+                                  GameMode gameMode, String pretrainedJSON) {
         object.put("vertical_pipes_gap", pipesVGap);
         object.put("theme", theme);
         object.put("block_size", blockSize);
         object.put("show_new_best_dialog", showNewBestDialog);
         object.put("game_mode", gameMode.toString());
-
-
-        JSONObject machineLearning = new JSONObject();
-
-        object.put("machine_learning", machineLearning);
+        object.put("pretrained_json_file", pretrainedJSON);
         writeToFile();
     }
 
@@ -69,9 +66,7 @@ public final class ConfigJSON {
         object.put("block_size", 50);
         object.put("show_new_best_dialog", true);
         object.put("game_mode", new PlayerMode().toString());
-
-        JSONObject machineLearning = new JSONObject();
-        object.put("machine_learning", machineLearning);
+        object.put("pretrained_json_file", "");
     }
 
     private static void initialize() throws IOException {
@@ -91,7 +86,7 @@ public final class ConfigJSON {
             writeToFile();
         }
         if(!object.has("vertical_pipes_gap") || !object.has("theme") || !object.has("block_size")
-            || !object.has("show_new_best_dialog") || !object.has("game_mode") || !object.has("machine_learning")) {
+            || !object.has("show_new_best_dialog") || !object.has("game_mode") || !object.has("pretrained_json_file")) {
             generateNewJsonObject();
         }
     }
@@ -103,10 +98,6 @@ public final class ConfigJSON {
         } catch (IOException e) {
             new ErrorDialog("Cannot write new values to config!", e);
         }
-    }
-
-    public static GameMode getGameMode() {
-        return GameMode.valueOf(object.getString("game_mode"));
     }
 
     public static int getPipesVGap() {
@@ -129,6 +120,18 @@ public final class ConfigJSON {
 
     public static boolean showNewBestDialog() {
         return object.getBoolean("show_new_best_dialog");
+    }
+
+    public static String getPretrainedJSONFilePath() {
+        return object.getString("pretrained_json_file");
+    }
+
+    public static GameMode getGameMode() {
+        GameMode gameMode = GameMode.valueOf(object.getString("game_mode"));
+        if(gameMode.isPretrainedMode() && !getPretrainedJSONFilePath().isBlank()) {
+            ((PretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(getPretrainedJSONFilePath()));
+        }
+        return gameMode;
     }
 }
 

@@ -5,11 +5,10 @@ import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.game.player.FlappyBirdPlayer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public interface GameMode {
-//    void draw(Graphics g, GameLoop loop);
-//    void drawWithoutRotation(Graphics g, GameLoop loop);
     void resetPosition();
     void flap();
     boolean isBetweenPipes(PipeFormation pipeFormation);
@@ -33,6 +32,14 @@ public interface GameMode {
             case "PRE_TRAINED_MODE" -> new PretrainedMode();
             default -> throw new IllegalStateException("Unexpected value: " + s);
         };
+    }
+
+    static ArrayList<GameMode> values() {
+        return new ArrayList<>(Arrays.asList(
+                new PlayerMode(),
+                new MachineLearningMode(),
+                new PretrainedMode()
+        ));
     }
 
     default boolean isPlayerMode() {
