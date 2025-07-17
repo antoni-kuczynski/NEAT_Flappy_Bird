@@ -29,6 +29,14 @@ public class PipeFormation {
         bottomPipe.draw(g);
     }
 
+    public int getX() {
+        return topPipe.x;
+    }
+
+    public int getWidth() {
+        return topPipe.width;
+    }
+
     public int getCenterY() {
         return (int) (bottomPipe.y - (gap * 0.5));
     }
@@ -42,8 +50,8 @@ public class PipeFormation {
     }
 
     public void moveX(int dx) {
-        getTopPipe().moveX(dx);
-        getBottomPipe().moveX(dx);
+        topPipe.moveX(dx);
+        bottomPipe.moveX(dx);
     }
 
     public static void updatePipeGap() {

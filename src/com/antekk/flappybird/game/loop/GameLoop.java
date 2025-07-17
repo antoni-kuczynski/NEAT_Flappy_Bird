@@ -26,8 +26,10 @@ public class GameLoop extends Thread {
     private GameMode gameMode;
 
     private final int FPS = 60;
-    private final int X_DISTANCE_PER_FRAME = (int) (0.067 * getBlockSizePx());
     private final int timeBetweenFramesMillis = 1000 / FPS;
+    private final int X_DISTANCE_PER_FRAME = (int) (0.067 * getBlockSizePx());
+    private final int MAX_FRAMES_SINCE_PIPE_SPAWN = 90;
+    private final float MOVEMENT_SINE_MULTIPLIER = (float) getBlockSizePx() / 6;
 
     private void gameLoop() throws InterruptedException {
         pipes.add(new PipeFormation());
@@ -127,7 +129,7 @@ public class GameLoop extends Thread {
     }
 
     private void pipeLogic() {
-        if(framesSincePipeSpawned >= 90) {
+        if(framesSincePipeSpawned >= MAX_FRAMES_SINCE_PIPE_SPAWN) {
             pipes.add(new PipeFormation());
             framesSincePipeSpawned = 0;
         }
@@ -135,7 +137,7 @@ public class GameLoop extends Thread {
         for(Iterator<PipeFormation> it = pipes.iterator(); it.hasNext();) {
             PipeFormation pipe = it.next();
             pipe.moveX(-X_DISTANCE_PER_FRAME);
-            if(pipe.getTopPipe().getX() + getBlockSizePx() < LEFT) {
+            if(pipe.getX() + getBlockSizePx() < LEFT) {
                 it.remove();
             }
         }
@@ -155,19 +157,19 @@ public class GameLoop extends Thread {
 
         if (!bird.isMovingUp) {
             bird.rotationAngle++;
-            bird.moveUpBy((int) -Math.ceil(((double) getBlockSizePx() / 6 * Math.sin((double) bird.framesSinceBirdStartedMoving / FPS))));
+            bird.moveUpBy((int) -Math.ceil((MOVEMENT_SINE_MULTIPLIER * Math.sin((double) bird.framesSinceBirdStartedMoving / FPS))));
             if (bird.framesSinceBirdStartedMoving < 90)
                 bird.framesSinceBirdStartedMoving += 9;
         }
 
         if (bird.isMovingUp) {
             bird.rotationAngle = 0;
-            bird.moveUpBy((int) Math.floor((double) getBlockSizePx() / 6 * Math.cos((double) bird.framesSinceBirdStartedMoving / FPS)));
+            bird.moveUpBy((int) Math.floor(MOVEMENT_SINE_MULTIPLIER * Math.cos((double) bird.framesSinceBirdStartedMoving / FPS)));
             bird.framesSinceBirdStartedMoving += 6;
         }
 
         bird.totalTraveledDistance += X_DISTANCE_PER_FRAME;
-        bird.nextMove(pipes);
+        bird.performNextMlMove(pipes);
     }
 
     private void gameStartingLogic() {
@@ -224,7 +226,6 @@ public class GameLoop extends Thread {
     @Override
     public void run() {
         gameState = GameState.STARTING;
-//        birdsStatsDialogThread().start();
         parentPanel.setOptionsEnabled(true);
         parentPanel.setSaveNetworkButtonEnabled(false);
         try {
@@ -255,6 +256,7 @@ public class GameLoop extends Thread {
     public void setGameMode(GameMode gameMode) {
         this.gameMode = gameMode;
         gameMode.init();
+        parentPanel.changeNewGameButtonMode(gameMode);
     }
 
     public GameState getGameState() {

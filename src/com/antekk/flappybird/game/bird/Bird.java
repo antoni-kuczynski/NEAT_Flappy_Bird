@@ -33,6 +33,10 @@ public class Bird {
     public long totalTraveledDistance = 0;
     private final FlappyBirdPlayer player = new FlappyBirdPlayer();
 
+    private final int MAX_ROTATION_ANGLE = 33;
+    private final int DEFAULT_HITBOX_SIZE = (int) (getBlockSizePx() * 0.75);
+    private final int DEFAULT_SPRITE_SIZE = (int) (1.7 * getBlockSizePx());
+
     public Bird() {
         resetPosition();
     }
@@ -72,13 +76,13 @@ public class Bird {
     public void resetPosition() {
         spritePosX = (int) ((GamePanel.getBoardCols() - 1.5) * getBlockSizePx() / 2);
         spritePosY = (GamePanel.getBoardRows() - 3) * getBlockSizePx() / 2;
-        spriteWidth = (int) (1.7 * getBlockSizePx());
-        spriteHeight = (int) (1.7 * getBlockSizePx());
-
         hitboxPosX = spritePosX + getBlockSizePx() / 2;
         hitboxPosY = spritePosY + getBlockSizePx() / 2;
-        hitboxWidth = (int) (getBlockSizePx() * 0.75);
-        hitboxHeight = (int) (getBlockSizePx() * 0.75);
+
+        spriteWidth = DEFAULT_SPRITE_SIZE;
+        spriteHeight = DEFAULT_SPRITE_SIZE;
+        hitboxWidth = DEFAULT_HITBOX_SIZE;
+        hitboxHeight = DEFAULT_HITBOX_SIZE;
 
         totalTraveledDistance = 0;
         isAlive = true;
@@ -94,27 +98,43 @@ public class Bird {
 
     public void draw(Graphics g) {
         //so that the bird doesnt flip when falling
-        if(rotationAngle > 33) {
-            rotationAngle = 33;
+        if(rotationAngle > MAX_ROTATION_ANGLE) {
+            rotationAngle = MAX_ROTATION_ANGLE;
         }
 
         if(isMovingUp && framesSinceBirdStartedMoving != 0 || rotationAngle < 15) {
+            //1.17 multiplier because it looked good like that
+            int scaledSpriteWidth = (int) (1.17 * getSpriteWidth());
+            int scaledSpriteHeight = (int) (1.17 * getSpriteWidth());
             BufferedImage img = rotateImage(birdUpFlap, -20);
             g.drawImage(
                     img,
                     getSpriteXPos(),
                     getSpritePosY(),
-                    (int) (1.17 * getSpriteWidth()),
-                    (int) (1.17 * getSpriteHeight()),
+                    scaledSpriteWidth,
+                    scaledSpriteHeight,
                     null
             );
         } else if(!isMovingUp && framesSinceBirdStartedMoving != 0) {
             BufferedImage img = rotateImage(birdDownFlap, 3 * rotationAngle - 15);
-            g.drawImage(img,
-                    getSpriteXPos(), getSpritePosY(), getSpriteWidth(), getSpriteHeight(), null);
+            g.drawImage(
+                    img,
+                    getSpriteXPos(),
+                    getSpritePosY(),
+                    getSpriteWidth(),
+                    getSpriteHeight(),
+                    null
+            );
 
         } else {
-            g.drawImage(birdMidFlap, getSpriteXPos(), getSpritePosY(), getSpriteWidth(), getSpriteHeight(), null);
+            g.drawImage(
+                    birdMidFlap,
+                    getSpriteXPos(),
+                    getSpritePosY(),
+                    getSpriteWidth(),
+                    getSpriteHeight(),
+                    null
+            );
         }
     }
 
@@ -167,7 +187,7 @@ public class Bird {
     }
 
     private int distanceToPipeFormationX(PipeFormation pipeFormation) {
-        return (int) (pipeFormation.getTopPipe().getX() - (getHitboxPosX()));
+        return pipeFormation.getX() - (getHitboxPosX() + getHitboxWidth() / 2);
     }
 
     private int distanceToPipeCenterY(PipeFormation pipeFormation) {
@@ -175,19 +195,19 @@ public class Bird {
     }
 
     public boolean isBetweenPipes(PipeFormation pipeFormation) {
-        return (getHitboxPosX() + getHitboxWidth() >= pipeFormation.getTopPipe().getX() &&
-                getHitboxPosX() <= pipeFormation.getTopPipe().getX() + pipeFormation.getTopPipe().getWidth() &&
+        return (getHitboxPosX() + getHitboxWidth() >= pipeFormation.getX() &&
+                getHitboxPosX() <= pipeFormation.getX() + pipeFormation.getWidth() &&
                 getHitboxPosY() >= pipeFormation.getTopPipe().getY() + pipeFormation.getTopPipe().getHeight() &&
                 getHitboxPosY() + getHitboxHeight() <= pipeFormation.getBottomPipe().getY());
     }
 
-    public void nextMove(ArrayList<PipeFormation> pipes) {
+    public void performNextMlMove(ArrayList<PipeFormation> pipes) {
         if(brain == null || !isAlive) return;
         PipeFormation closestPipeFormation = pipes.get(0);
         int distX;
         int distY;
 
-        if(hitboxPosX < closestPipeFormation.getTopPipe().getX() + closestPipeFormation.getTopPipe().getWidth()) {
+        if(hitboxPosX < closestPipeFormation.getX() + closestPipeFormation.getWidth()) {
             distX = distanceToPipeFormationX(closestPipeFormation);
             distY = distanceToPipeCenterY(closestPipeFormation);
         } else {
@@ -195,20 +215,11 @@ public class Bird {
             distY = distanceToPipeCenterY(pipes.get(1));
         }
 
-        double prediction = brain.predict(distX, -distY);
+        double prediction = brain.predict(distX, distY);
         if(prediction > 0.5) {
             flap();
         }
-//        System.out.println(prediction);
-
-        if(getHitboxPosY() <= GamePanel.TOP) {
-            brain.fitnessTotalDistance = 0;
-        } else {
             brain.fitnessTotalDistance = totalTraveledDistance - distX;
-        }
-//        System.out.println(distX);
-//        System.out.println(distY);
-//        System.out.println(getFitness());
     }
 
     public Thread deathAnimationThread(int timeBetweenFramesMillis, GamePanel currentPanel) {

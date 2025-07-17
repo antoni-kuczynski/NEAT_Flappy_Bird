@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class Neuron implements Cloneable{
     public float bias;
-    private final Random random = new Random();
+    private static final Random random = new Random();
     private int id;
     private ArrayList<Float> weights = new ArrayList<>();
 
@@ -30,11 +30,11 @@ public class Neuron implements Cloneable{
         }
         z += bias;
 
-        return sigmoid(z);
+        return reLU(z);
     }
 
-    private static double sigmoid(double x) {
-        return 1 / (1 + Math.exp(-x));
+    private static float reLU(double x) {
+        return (float) ((x + Math.abs(x)) / 2);
     }
 
     @Override

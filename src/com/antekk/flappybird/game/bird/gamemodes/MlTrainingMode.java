@@ -120,25 +120,35 @@ public class MlTrainingMode implements GameMode {
         ArrayList<Bird> newPopulation = new ArrayList<>();
         mlBirdsArray.sort(this::birdsFitnessSortComparator);
 
-        ArrayList<Bird> top4 = get4BestBirds();
+        ArrayList<Bird> top4 = get4FirstBirds();
         for(Bird bird : top4) {
             newPopulation.add(new Bird(bird.brain.clone()));
         }
 
+        newPopulation.add(new Bird(new NeuralNetwork()));
+
+        newPopulation.add(new Bird(top4.get((int) (Math.random() * 4)).brain.clone()));
+
         newPopulation.add(createOffSpring(top4.get(0), top4.get(1)));
 
-        newPopulation.add(createOffSpring(top4.get((int) (Math.random() * 4)), top4.get((int) (Math.random() * 4))));
-        newPopulation.add(createOffSpring(top4.get((int) (Math.random() * 4)), top4.get((int) (Math.random() * 4))));
-        newPopulation.add(createOffSpring(top4.get((int) (Math.random() * 4)), top4.get((int) (Math.random() * 4))));
+        for (int i = 0; i < 3; i++) {
+            int rand1 = (int)(Math.random() * 4);
+            int rand2 = (int)(Math.random() * 4);
 
+            while(rand1 == rand2)
+                rand2 = (int)(Math.random() * 4);
 
-        newPopulation.add(new Bird(top4.get((int) (Math.random() * 4)).brain.clone()));
-        newPopulation.add(new Bird(top4.get((int) (Math.random() * 4)).brain.clone()));
-
-        for(int i = 4; i < newPopulation.size(); i++) {
-            newPopulation.get(i).brain.mutate();
+            Bird parent1 = top4.get(rand1);
+            Bird parent2 = top4.get(rand2);
+            newPopulation.add(createOffSpring(parent1, parent2));
         }
 
+        for(int i = 5; i < newPopulation.size(); i++) {
+            NeuralNetwork network = newPopulation.get(i).brain;
+            network.performSwapMutation(0.6f);
+        }
+
+        mlBirdsArray.clear();
         mlBirdsArray = newPopulation;
 
         for(Bird bird : mlBirdsArray)
@@ -173,7 +183,7 @@ public class MlTrainingMode implements GameMode {
         return (int) (Math.random() * 2) == 1 ? new Bird(parent1) : new Bird(parent2);
     }
 
-    private ArrayList<Bird> get4BestBirds() {
+    private ArrayList<Bird> get4FirstBirds() {
         ArrayList<Bird> arr = new ArrayList<>();
         for(int i = 0; i < 4; i++) {
             Bird top4Bird = mlBirdsArray.get(i);

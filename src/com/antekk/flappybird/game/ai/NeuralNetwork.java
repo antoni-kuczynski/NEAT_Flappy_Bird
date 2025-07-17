@@ -5,15 +5,11 @@ import com.antekk.flappybird.view.ErrorDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 
 public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
     private ArrayList<Neuron> inputs = new ArrayList<>();
@@ -22,6 +18,7 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
     private final int totalSize;
     public long fitnessTotalDistance = 0;
     private Bird owner;
+    private static final Random random = new Random();
 
     public NeuralNetwork() {
         inputs.add(new Neuron(1,0));
@@ -115,15 +112,12 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
         };
     }
 
-    public void mutate() {
-        if(fitnessTotalDistance > 0 && (int) (Math.random() * 2) >= 1)
-            return;
-
+    public void performSwapMutation(float swapProbability) {
         for(int i = 0; i < this.size(); i++) {
-            int rand = (int) (Math.random() * 2);
-            if(rand == 2) continue;
+            if(random.nextFloat() <= swapProbability)
+                continue;
 
-            int randomIndex = (int) (Math.random() * (this.size() - 1));
+            int randomIndex = (int) (Math.random() * this.size());
             float biasI = getNeuronAt(i).bias;
             getNeuronAt(i).bias = getNeuronAt(randomIndex).bias;
             getNeuronAt(randomIndex).bias = biasI;

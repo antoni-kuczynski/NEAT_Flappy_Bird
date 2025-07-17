@@ -2,6 +2,7 @@ package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.bird.gamemodes.GameMode;
 import com.antekk.flappybird.game.keybinds.GameKeybinds;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
@@ -31,6 +32,7 @@ public class GamePanel extends JPanel {
     public final BirdsStatsDisplay birdsStatsDisplay;
     public int birdsStatDisplayWidth = 16 * getBlockSizePx();
     private OptionsDialog optionsDialog;
+    private final JButton newGame = new JButton("New game");
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {
@@ -99,7 +101,6 @@ public class GamePanel extends JPanel {
         loop = new GameLoop(this);
         loop.setGameMode(ConfigJSON.getGameMode());
 
-        JButton newGame = new JButton("New game");
         JButton pauseGame = new JButton("Pause game");
         JButton showBestPlayers = new JButton("Best players");
         JButton options = new JButton("Options");
@@ -197,6 +198,14 @@ public class GamePanel extends JPanel {
 
         bestPlayersDialog.reloadData();
         bestPlayersDialog.setVisible(true);
+    }
+
+    public void changeNewGameButtonMode(GameMode gameMode) {
+        if(gameMode.isTrainingMode()) {
+            newGame.setToolTipText("New population");
+        } else {
+            newGame.setToolTipText("New game");
+        }
     }
 
     public void setOptionsEnabled(boolean enable) {
