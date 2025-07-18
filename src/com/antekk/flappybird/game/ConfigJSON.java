@@ -130,7 +130,11 @@ public final class ConfigJSON {
         GameMode gameMode = GameMode.valueOf(object.getString("game_mode"));
 
         if(gameMode.isPretrainedMode() && !getPretrainedJSONFilePath().isBlank()) {
-            ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(getPretrainedJSONFilePath()));
+            try {
+                ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(getPretrainedJSONFilePath()));
+            } catch (JSONException e) {
+                System.err.println(e.getMessage());
+            }
         }
         return gameMode;
     }

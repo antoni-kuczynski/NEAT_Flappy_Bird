@@ -45,6 +45,7 @@ public class GamePanel extends JPanel {
             drawPauseScreen(g1);
             g.setColor(GameColors.borderColor);
             g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
+            drawMlTrainingStatsDisplay(g);
             return;
         }
 
@@ -53,10 +54,7 @@ public class GamePanel extends JPanel {
         for(Iterator<PipeFormation> it = loop.getPipes().iterator(); it.hasNext();)
             it.next().draw(g);
 
-        g.setColor(GameColors.borderColor);
-        g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
-        g.setColor(Color.BLACK);
-        birdsStatsDisplay.draw(g);
+        drawMlTrainingStatsDisplay(g);
 
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
@@ -74,6 +72,13 @@ public class GamePanel extends JPanel {
         if(loop.getGameState() == GameState.LOST) {
             g.drawImage(GameColors.gameOver, 3 * getBlockSizePx(), 2 * getBlockSizePx(), 6 * getBlockSizePx(), (int) (0.219 * 6 * getBlockSizePx()), null);
         }
+    }
+
+    private void drawMlTrainingStatsDisplay(Graphics2D g) {
+        g.setColor(GameColors.borderColor);
+        g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
+        g.setColor(Color.BLACK);
+        birdsStatsDisplay.draw(g);
     }
 
     private void drawBackgroundAndGround(Graphics g) {

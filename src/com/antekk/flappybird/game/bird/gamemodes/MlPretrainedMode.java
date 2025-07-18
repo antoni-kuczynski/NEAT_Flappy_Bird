@@ -57,6 +57,10 @@ public class MlPretrainedMode implements GameMode {
 
     @Override
     public void init() {
+        if(birdsNeuralNetwork == null) {
+            pretrainedBird = new Bird(new NeuralNetwork());
+            return;
+        }
         pretrainedBird = new Bird(birdsNeuralNetwork);
     }
 

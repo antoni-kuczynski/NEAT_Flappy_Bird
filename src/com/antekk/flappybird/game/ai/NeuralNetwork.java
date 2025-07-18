@@ -3,6 +3,7 @@ package com.antekk.flappybird.game.ai;
 import com.antekk.flappybird.game.bird.Bird;
 import com.antekk.flappybird.view.ErrorDialog;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileWriter;
@@ -163,7 +164,7 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
         }
     }
 
-    public static NeuralNetwork getFromJSON(String jsonPath) {
+    public static NeuralNetwork getFromJSON(String jsonPath) throws JSONException {
         StringBuilder builder = new StringBuilder();
 
         ArrayList<String> lines;

@@ -8,6 +8,7 @@ import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
 import com.antekk.flappybird.view.themes.GameColors;
 import com.antekk.flappybird.view.themes.Theme;
+import org.json.JSONException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -151,13 +152,13 @@ public class OptionsDialog extends JDialog {
             if(gameModeToSave.getClass() != parent.getGameLoop().getGameMode().getClass() ||
                 gameModeToSave.isPretrainedMode()) {
                 parent.getGameLoop().setGameMode(gameModeToSave);
+                parent.setPreferredSize(parent.getPreferredSize());
             }
 
             ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize, showNewBestDialogBox.isSelected(),
                 gameModeToSave, loadedNeuralNetworkPath
             );
             this.dispose();
-            parent.setPreferredSize(parent.getPreferredSize());
             parent.repaint();
         });
 
@@ -231,9 +232,14 @@ public class OptionsDialog extends JDialog {
         GameMode gameMode = (GameMode) gameModeSwitcher.getSelectedItem();
 
         if(gameMode != null && gameMode.isPretrainedMode() && !loadedNeuralNetworkPath.isBlank()) {
-            NeuralNetwork loadedNetwork = NeuralNetwork.getFromJSON(loadedNeuralNetworkPath);
-            ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(loadedNetwork);
-            showLoadedNeuralNetworkMessageBox(loadedNetwork);
+            NeuralNetwork loadedNetwork;
+            try {
+                loadedNetwork = NeuralNetwork.getFromJSON(loadedNeuralNetworkPath);
+                ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(loadedNetwork);
+                showLoadedNeuralNetworkMessageBox(loadedNetwork);
+            } catch (JSONException e) {
+                new ErrorDialog("Invalid neural network JSON file", e);
+            }
         }
         return gameMode;
     }

@@ -16,8 +16,8 @@ import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 public final class DialogComponentFactory {
 
     static JButton getSaveNetworkToJSONButton(GamePanel parent) {
-        JButton saveNetworkToJSON = new JButton("Save");
-        saveNetworkToJSON.addActionListener(e -> {
+        JButton saveNetworkToJSONButton = new JButton("Save");
+        saveNetworkToJSONButton.addActionListener(e -> {
             if(!parent.getGameLoop().getGameMode().isTrainingMode())
                 return;
 
@@ -35,37 +35,40 @@ public final class DialogComponentFactory {
             parent.getGameLoop().getSmartestBrain().saveToJSON(fileName);
 
         });
-        saveNetworkToJSON.setTransferHandler(getButtonTransferHandler(fileName -> {
+        saveNetworkToJSONButton.setTransferHandler(getButtonTransferHandler(fileName -> {
             if(fileName == null || fileName.isBlank())
                 return;
             parent.getGameLoop().getSmartestBrain().saveToJSON(fileName);
-        }));
+        }, saveNetworkToJSONButton));
 
-        return saveNetworkToJSON;
+        return saveNetworkToJSONButton;
     }
 
     static JButton getLoadNetworkFromJSONButton(OptionsDialog optionsDialog) {
-        JButton loadNetworkFromJSON = new JButton("Open");
-        loadNetworkFromJSON.addActionListener(e -> {
+        JButton loadNetworkFromJSONButton = new JButton("Open");
+        loadNetworkFromJSONButton.addActionListener(e -> {
             FileDialog dialog = new FileDialog(optionsDialog);
             dialog.setMode(FileDialog.LOAD);
             dialog.setTitle("Open player from JSON");
             dialog.setVisible(true);
+
+            if(dialog.getFiles().length == 0)
+                return;
 
             File file = dialog.getFiles()[0];
 
             optionsDialog.processLoadedNeuralNetworkFile(file.getAbsolutePath());
         });
 
-        loadNetworkFromJSON.setTransferHandler(getButtonTransferHandler(optionsDialog::processLoadedNeuralNetworkFile));
-        return loadNetworkFromJSON;
+        loadNetworkFromJSONButton.setTransferHandler(getButtonTransferHandler(optionsDialog::processLoadedNeuralNetworkFile, loadNetworkFromJSONButton));
+        return loadNetworkFromJSONButton;
     }
 
-    static TransferHandler getButtonTransferHandler(FileRunnable afterFileDrop) {
+    static TransferHandler getButtonTransferHandler(FileRunnable afterFileDrop, JComponent target) {
         return new TransferHandler() {
             @Override
             public boolean canImport(TransferSupport support) {
-                return true;
+                return target.isEnabled();
             }
 
             @Override
