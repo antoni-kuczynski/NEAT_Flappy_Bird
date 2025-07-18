@@ -13,6 +13,14 @@ A Flappy Bird clone with machine learning implementation based on the NEAT algor
 - Customizable game parameters (e.g. pipes gap height, game's scale)
 - Dynamic switching between machine learning modes and classic player controlled mode
 
+# Implementation details
+One population is made of 10 players, every player having a neural network which consists of 2 input, 6 hidden and 1 output neurons.<br>
+#### Inputs:
+- X distance to the closest pipe
+- Y distance to the center of the pipe gap
+
+#### Output:
+- Whether the player should flap or not
 
 # Screenshots
 TODO
