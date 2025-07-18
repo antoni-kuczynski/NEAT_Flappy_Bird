@@ -19,6 +19,8 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
     public long fitnessTotalDistance = 0;
     private Bird owner;
     private static final Random random = new Random();
+    private int maxAchievedScore = -1;
+    private int pipesVGapNetworkPlayedOn = -1;
 
     public NeuralNetwork() {
         inputs.add(new Neuron(1,0));
@@ -200,7 +202,11 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
         loadedInputs.sort(Comparator.comparingInt(Neuron::getId));
         loadedHidden.sort(Comparator.comparingInt(Neuron::getId));
 
-        return new NeuralNetwork(loadedInputs, loadedHidden, loadedOutput);
+        JSONObject gameParams = object.getJSONObject("game_params");
+        NeuralNetwork network = new NeuralNetwork(loadedInputs, loadedHidden, loadedOutput);
+        network.maxAchievedScore = gameParams.getInt("achieved_score");
+        network.pipesVGapNetworkPlayedOn = gameParams.getInt("pipe_gap");
+        return network;
     }
 
     private JSONArray getLayer(ArrayList<Neuron> layer) {
@@ -240,5 +246,13 @@ public class NeuralNetwork implements Iterable<Neuron>, Cloneable {
 
     public void setOwner(Bird owner) {
         this.owner = owner;
+    }
+
+    public int getMaxAchievedScore() {
+        return maxAchievedScore;
+    }
+
+    public int getPipesVGapNetworkPlayedOn() {
+        return pipesVGapNetworkPlayedOn;
     }
 }

@@ -202,9 +202,9 @@ public class GamePanel extends JPanel {
 
     public void changeNewGameButtonMode(GameMode gameMode) {
         if(gameMode.isTrainingMode()) {
-            newGame.setToolTipText("New population");
+            newGame.setText("New population");
         } else {
-            newGame.setToolTipText("New game");
+            newGame.setText("New game");
         }
     }
 

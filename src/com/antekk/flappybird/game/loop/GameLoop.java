@@ -219,8 +219,6 @@ public class GameLoop extends Thread {
     public GameLoop(GamePanel panel) {
         this.parentPanel = panel;
         setGameMode(ConfigJSON.getGameMode());
-        gameMode.resetPosition();
-        pipes.clear();
     }
 
     @Override

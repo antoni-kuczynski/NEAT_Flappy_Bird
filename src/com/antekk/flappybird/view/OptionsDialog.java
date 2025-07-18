@@ -148,9 +148,11 @@ public class OptionsDialog extends JDialog {
 
             GameMode gameModeToSave = getGameModeBasedOnUserSelection(gameModeSwitcher);
 
-
-
-            parent.getGameLoop().setGameMode(gameModeToSave);
+            //save the gamemode if its different than the current one (always save if its pretrained gamemode to update the network file)
+            if(gameModeToSave.getClass() != parent.getGameLoop().getGameMode().getClass() ||
+                gameModeToSave.isPretrainedMode()) {
+                parent.getGameLoop().setGameMode(gameModeToSave);
+            }
 
             ConfigJSON.saveValues((Integer) pipesGap.getValue(), (Theme) themeSelection.getSelectedItem(), newBlockSize, showNewBestDialogBox.isSelected(),
                 gameModeToSave, loadedNeuralNetworkPath
@@ -215,6 +217,12 @@ public class OptionsDialog extends JDialog {
             if(file == null || file.getName().isBlank())
                 return;
 
+            for(int i = 0; i < gameModeSwitcher.getItemCount(); i++) {
+                if(gameModeSwitcher.getItemAt(i).isPretrainedMode()) {
+                    gameModeSwitcher.setSelectedIndex(i);
+                    break;
+                }
+            }
             loadedNeuralNetworkPath = file.getAbsolutePath();
         });
         return loadNetworkFromJSON;
@@ -243,10 +251,24 @@ public class OptionsDialog extends JDialog {
         return saveNetworkToJSON;
     }
 
+    private void showLoadedNeuralNetworkMessageBox(NeuralNetwork network) {
+        if(network == null)
+            return;
+        String message = "<html>Loaded neural network:<br>" +
+                "File path: " + loadedNeuralNetworkPath + "<br>" +
+                "Achieved score: " + network.getMaxAchievedScore() + "<br>" +
+                "Pipes gap network is trained on: " + network.getPipesVGapNetworkPlayedOn() + "</html>";
+
+        JOptionPane.showMessageDialog(this, message, "Loaded neural network", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     private GameMode getGameModeBasedOnUserSelection(JComboBox<GameMode> gameModeSwitcher) {
         GameMode gameMode = (GameMode) gameModeSwitcher.getSelectedItem();
+
         if(gameMode != null && gameMode.isPretrainedMode() && !loadedNeuralNetworkPath.isBlank()) {
-            ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(loadedNeuralNetworkPath));
+            NeuralNetwork loadedNetwork = NeuralNetwork.getFromJSON(loadedNeuralNetworkPath);
+            ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(loadedNetwork);
+            showLoadedNeuralNetworkMessageBox(loadedNetwork);
         }
         return gameMode;
     }
