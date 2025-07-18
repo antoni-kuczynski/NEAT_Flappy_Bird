@@ -2,20 +2,19 @@ package com.antekk.flappybird.view;
 
 import com.antekk.flappybird.game.ConfigJSON;
 import com.antekk.flappybird.game.bird.Bird;
+import com.antekk.flappybird.game.bird.gamemodes.GameMode;
+import com.antekk.flappybird.game.keybinds.GameKeybinds;
 import com.antekk.flappybird.game.loop.GameLoop;
 import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.game.pipes.PipeFormation;
+import com.antekk.flappybird.view.displays.BirdsStatsDisplay;
+import com.antekk.flappybird.view.displays.ScoreDisplay;
 import com.antekk.flappybird.view.themes.GameColors;
-import com.antekk.flappybird.view.themes.Theme;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-
-import static com.antekk.flappybird.game.keybinds.GameKeybinds.setupKeyBindings;
+import java.util.Iterator;
 
 public class GamePanel extends JPanel {
     public static int LEFT;
@@ -25,30 +24,15 @@ public class GamePanel extends JPanel {
     public static int GROUND;
     private static int backgroundWidth;
     public static int groundX;
-    private static int blockSizePx = 60;
+    private static int blockSizePx = 50;
     private final JPanel toolbar = new JPanel();
-    private GameLoop loop = new GameLoop(this);
-    private final Bird bird;
-    private final ArrayList<PipeFormation> pipes = new ArrayList<>();
+    private GameLoop loop;
     private final ScoreDisplay scoreDisplay;
     private final BestPlayersDialog bestPlayersDialog;
-
-
-    private MouseAdapter gameMouseListener = new MouseAdapter() {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if(e.getButton() != MouseEvent.BUTTON1) {
-                return;
-            }
-            if(loop.getGameState() == GameState.STARTING)
-                loop.startGame();
-            bird.flap();
-        }
-    };
-
-    public static int getBlockSizePx() {
-        return blockSizePx;
-    }
+    public final BirdsStatsDisplay birdsStatsDisplay;
+    public int birdsStatDisplayWidth = 16 * getBlockSizePx();
+    private OptionsDialog optionsDialog;
+    private final JButton newGame = new JButton("New game");
 
     @Override
     protected synchronized void paintComponent(Graphics g1) {
@@ -59,27 +43,42 @@ public class GamePanel extends JPanel {
 
         if(loop.getGameState() == GameState.PAUSED) {
             drawPauseScreen(g1);
+            g.setColor(GameColors.borderColor);
+            g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
+            drawMlTrainingStatsDisplay(g);
             return;
         }
 
+
         drawBackgroundAndGround(g);
+        for(Iterator<PipeFormation> it = loop.getPipes().iterator(); it.hasNext();)
+            it.next().draw(g);
 
-        for(PipeFormation pipe : pipes)
-            pipe.draw(g);
-
-
+        drawMlTrainingStatsDisplay(g);
 
         if(loop.getGameState() == GameState.STARTING) {
             g.drawImage(GameColors.startingMessage, (int) (3.5 * getBlockSizePx()), 2 * getBlockSizePx(), 5 * getBlockSizePx(), (int) (1.45 * 5 * getBlockSizePx()), null);
-            bird.drawWithoutRotation(g);
+//            loop.getBirds().drawWithoutRotation(g);
+            for(Bird bird : loop.getGameMode().getBirds())
+                bird.drawWithoutRotation(g);
             return;
         }
-        bird.draw(g);
+
+        for(Bird bird : loop.getGameMode().getBirds())
+            bird.draw(g);
+
         scoreDisplay.draw(g);
 
         if(loop.getGameState() == GameState.LOST) {
             g.drawImage(GameColors.gameOver, 3 * getBlockSizePx(), 2 * getBlockSizePx(), 6 * getBlockSizePx(), (int) (0.219 * 6 * getBlockSizePx()), null);
         }
+    }
+
+    private void drawMlTrainingStatsDisplay(Graphics2D g) {
+        g.setColor(GameColors.borderColor);
+        g.fillRect(RIGHT, TOP, getWidth(), BOTTOM);
+        g.setColor(Color.BLACK);
+        birdsStatsDisplay.draw(g);
     }
 
     private void drawBackgroundAndGround(Graphics g) {
@@ -104,8 +103,9 @@ public class GamePanel extends JPanel {
 
     protected GamePanel(JFrame parent) {
         ConfigJSON.initializeValuesFromConfigFile();
+        loop = new GameLoop(this);
+        loop.setGameMode(ConfigJSON.getGameMode());
 
-        JButton newGame = new JButton("New game");
         JButton pauseGame = new JButton("Pause game");
         JButton showBestPlayers = new JButton("Best players");
         JButton options = new JButton("Options");
@@ -115,15 +115,13 @@ public class GamePanel extends JPanel {
         showBestPlayers.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
         options.setPreferredSize(new Dimension(3 * getBlockSizePx(), (int) (0.65 * getBlockSizePx())));
 
-
-
         newGame.setFocusable(false);
         pauseGame.setFocusable(false);
         showBestPlayers.setFocusable(false);
         options.setFocusable(false);
 
         BoxLayout layout = new BoxLayout(toolbar, BoxLayout.X_AXIS);
-        toolbar.setBorder(new MatteBorder(0, 0, 2, 0, new Color(233, 252, 217)));
+        toolbar.setBorder(new MatteBorder(0, 0, 2, 0, GameColors.borderColor));
         toolbar.setBackground(GameColors.groundColor);
         toolbar.setLayout(layout);
         toolbar.add(Box.createHorizontalGlue());
@@ -142,24 +140,28 @@ public class GamePanel extends JPanel {
         GROUND = BOTTOM - 3 * getBlockSizePx();
         backgroundWidth = (int) (0.5625 * GROUND);
         groundX = LEFT;
-        bird = new Bird();
         scoreDisplay = new ScoreDisplay(this);
         bestPlayersDialog = new BestPlayersDialog(this);
-        parent.setPreferredSize(this.getPreferredSize());
 
         setLayout(new BorderLayout());
         setDoubleBuffered(true);
 //        setBackground(GameColors.boardColor);
         Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
+//        loop = new GameLoop(this);
+        birdsStatsDisplay = new BirdsStatsDisplay(this);
 
+        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getActionMap();
+        GameKeybinds keybinds = new GameKeybinds(this);
+        keybinds.setupKeyBindings(inputMap, actionMap);
+        addMouseListener(keybinds);
 
         newGame.addActionListener(e -> {
             loop.endGame();
             loop = new GameLoop(this);
             loop.start();
-            bird.resetPosition();
-            pipes.clear();
+            keybinds.setGameLoop(loop);
             repaint();
         });
 
@@ -170,16 +172,20 @@ public class GamePanel extends JPanel {
 
         showBestPlayers.addActionListener(e -> showBestPlayersDialog(!bestPlayersDialog.isVisible()));
 
-        options.addActionListener(e -> new OptionsDialog(GamePanel.this).setVisible(true));
-        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = getActionMap();
-        setupKeyBindings(inputMap, actionMap, this);
+        options.addActionListener(e -> {
+            if(optionsDialog != null && optionsDialog.isVisible()) {
+                optionsDialog.requestFocus();
+                return;
+            }
+
+            optionsDialog = new OptionsDialog(GamePanel.this);
+            optionsDialog.setVisible(true);
+        });
 
         add(toolbar, BorderLayout.PAGE_START);
-        addMouseListener(gameMouseListener);
 
         loop.start();
-        parent.setMinimumSize(this.getPreferredSize());
+//        parent.setMinimumSize(this.getPreferredSize());
         parent.setPreferredSize(this.getPreferredSize());
         repaint();
     }
@@ -199,9 +205,34 @@ public class GamePanel extends JPanel {
         bestPlayersDialog.setVisible(true);
     }
 
+    public void changeNewGameButtonMode(GameMode gameMode) {
+        if(gameMode.isTrainingMode()) {
+            newGame.setText("New population");
+        } else {
+            newGame.setText("New game");
+        }
+    }
+
+    public void setOptionsEnabled(boolean enable) {
+        if(optionsDialog != null)
+            optionsDialog.setOptionsEnabled(enable);
+    }
+
+    public void setSaveNetworkButtonEnabled(boolean enable) {
+        if(optionsDialog != null)
+            optionsDialog.setSaveNetworkButtonEnabled(enable);
+    }
+
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(LEFT + RIGHT, BOTTOM + TOP);
+        return new Dimension(LEFT + RIGHT + birdsStatsDisplay.getPreferredSize().width, BOTTOM + TOP);
+    }
+
+    @Override
+    public void setPreferredSize(Dimension preferredSize) {
+        super.setPreferredSize(preferredSize);
+        SwingUtilities.getWindowAncestor(this).setPreferredSize(preferredSize);
+        SwingUtilities.getWindowAncestor(this).setSize(preferredSize);
     }
 
     public static int getBoardRows() {
@@ -216,15 +247,11 @@ public class GamePanel extends JPanel {
         return loop;
     }
 
-    public Bird getBird() {
-        return bird;
-    }
-
-    public ArrayList<PipeFormation> getPipes() {
-        return pipes;
-    }
-
     public static void setBlockSizePx(int blockSizePx) {
         GamePanel.blockSizePx = blockSizePx;
+    }
+
+    public static int getBlockSizePx() {
+        return blockSizePx;
     }
 }

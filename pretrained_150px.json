@@ -1,0 +1,93 @@
+{
+    "fitness": 271471,
+    "layers": {
+        "output": [{
+            "bias": 0.60361266,
+            "amount_of_connections": 6,
+            "id": 8,
+            "weights": {
+                "0": 0.9819478,
+                "1": -0.81247187,
+                "2": -0.42339492,
+                "3": -0.7130748,
+                "4": -0.15980005,
+                "5": -0.7815151
+            }
+        }],
+        "input": [
+            {
+                "bias": 0.3266846,
+                "amount_of_connections": 1,
+                "id": 0,
+                "weights": {"0": -0.5609125}
+            },
+            {
+                "bias": -0.36725605,
+                "amount_of_connections": 1,
+                "id": 1,
+                "weights": {"0": 0.68914616}
+            }
+        ],
+        "hidden": [
+            {
+                "bias": 0.1162473,
+                "amount_of_connections": 2,
+                "id": 2,
+                "weights": {
+                    "0": -0.08430338,
+                    "1": 0.89658964
+                }
+            },
+            {
+                "bias": 0.6821387,
+                "amount_of_connections": 2,
+                "id": 3,
+                "weights": {
+                    "0": 0.24937463,
+                    "1": -0.1820854
+                }
+            },
+            {
+                "bias": 0.53282225,
+                "amount_of_connections": 2,
+                "id": 4,
+                "weights": {
+                    "0": -0.35675454,
+                    "1": 0.79248345
+                }
+            },
+            {
+                "bias": 0.70436645,
+                "amount_of_connections": 2,
+                "id": 5,
+                "weights": {
+                    "0": -0.9025253,
+                    "1": -0.93253875
+                }
+            },
+            {
+                "bias": 0.28652728,
+                "amount_of_connections": 2,
+                "id": 6,
+                "weights": {
+                    "0": 0.14523125,
+                    "1": -0.16670287
+                }
+            },
+            {
+                "bias": -0.44385433,
+                "amount_of_connections": 2,
+                "id": 7,
+                "weights": {
+                    "0": 0.24806857,
+                    "1": -0.45953047
+                }
+            }
+        ]
+    },
+    "total_size": 9,
+    "game_params": {
+        "achieved_score": 999,
+        "pipe_gap": 150
+    }
+}

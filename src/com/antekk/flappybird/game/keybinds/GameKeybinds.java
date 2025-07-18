@@ -1,32 +1,64 @@
 package com.antekk.flappybird.game.keybinds;
 
+import com.antekk.flappybird.game.bird.gamemodes.PlayerMode;
+import com.antekk.flappybird.game.loop.GameLoop;
+import com.antekk.flappybird.game.loop.GameState;
 import com.antekk.flappybird.view.GamePanel;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class GameKeybinds {
+public class GameKeybinds extends MouseAdapter {
+    private GameLoop gameLoop;
 
-    public static void setupKeyBindings(InputMap inputMap, ActionMap actionMap, GamePanel gamePanel) {
-        if (gamePanel == null || inputMap == null || actionMap == null) {
+    public GameKeybinds(GamePanel gamePanel) {
+        this.gameLoop = gamePanel.getGameLoop();
+        GameKeybind.currentPanel = gamePanel;
+    }
+
+    public void setupKeyBindings(InputMap inputMap, ActionMap actionMap) {
+        if (gameLoop == null || inputMap == null || actionMap == null) {
             throw new RuntimeException("a value in keybinds is null");
         }
 
-        GameKeybind.currentPanel = gamePanel;
         GameKeybind.inputMap = inputMap;
         GameKeybind.actionMap = actionMap;
 
-        new GameKeybind("HARD_DROP", KeyEvent.VK_SPACE,
-                () -> gamePanel.getBird().flap()
+        new GameKeybind("FLAP_PRIMARY", KeyEvent.VK_SPACE,
+                () -> {
+                    if(gameLoop.getPlayerControlledBird() != null)
+                        gameLoop.getPlayerControlledBird().flap();
+                }
         ).bindKeyPressed();
 
-        new GameKeybind("ROTATE_RIGHT", KeyEvent.VK_UP,
-                () ->gamePanel.getBird().flap()
+        new GameKeybind("FLAP_SECONDARY", KeyEvent.VK_UP,
+                () -> {
+                    if(gameLoop.getPlayerControlledBird() != null)
+                        gameLoop.getPlayerControlledBird().flap();
+                }
         ).bindKeyPressed();
 
         new GameKeybind("PAUSE_GAME_PRESSED", KeyEvent.VK_ESCAPE,
-            () -> gamePanel.getGameLoop().pauseAndUnpauseGame()
+            () -> gameLoop.pauseAndUnpauseGame()
         ).bindKeyPressed();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if(e.getButton() != MouseEvent.BUTTON1) {
+            return;
+        }
+        if(gameLoop.getGameState() == GameState.STARTING)
+            gameLoop.startGame();
+
+        if(gameLoop.getPlayerControlledBird() != null)
+            gameLoop.getPlayerControlledBird().flap();
+    }
+
+    public void setGameLoop(GameLoop gameLoop) {
+        this.gameLoop = gameLoop;
     }
 }
 

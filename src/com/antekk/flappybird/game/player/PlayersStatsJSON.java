@@ -51,7 +51,7 @@ public class PlayersStatsJSON {
         }
 
         FlappyBirdPlayer player = new FlappyBirdPlayer(
-                loadedScore,loadedPipesGap,loadedName
+                loadedScore, loadedPipesGap, loadedName
         );
 
 

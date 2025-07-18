@@ -11,13 +11,18 @@ import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 
 public class BestPlayersDialog extends JDialog {
     private final DefaultTableModel model = new DefaultTableModel();
-    private final JTable playerList = new JTable(model);
+    private final JTable playerList = new JTable(model) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
     private final JScrollPane scrollPane = new JScrollPane(playerList);
 
     protected void reloadData() {
         model.setRowCount(0);
         int place = 1;
-        for(FlappyBirdPlayer player : FlappyBirdPlayer.playerStats.getPlayers()) {
+        for(FlappyBirdPlayer player : FlappyBirdPlayer.getStatsFile().getPlayers()) {
             model.addRow(new String[] {
                     String.valueOf(place),
                     player.name,
@@ -36,7 +41,7 @@ public class BestPlayersDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-
+        playerList.getTableHeader().setReorderingAllowed(false);
         model.addColumn("Place");
         model.addColumn("Name");
         model.addColumn("Score");

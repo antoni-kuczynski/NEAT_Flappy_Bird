@@ -1,17 +1,22 @@
 package com.antekk.flappybird.game.player;
 
+import com.antekk.flappybird.game.ConfigJSON;
+
 public class FlappyBirdPlayer {
-    public static final PlayersStatsJSON playerStats = new PlayersStatsJSON();
-    public long score = 0;
-    public int pipesVerticalGap = 0;
+    private static final PlayersStatsJSON playerStats = new PlayersStatsJSON();
+    public long score;
+    public int pipesVerticalGap;
     public String name;
+    public boolean wasScoreAddedAtPipe = false;
 
     public void addScore() {
         score++;
     }
 
     public FlappyBirdPlayer() {
-        this.pipesVerticalGap = -1; //TODO temp
+        this.score = 0;
+        this.pipesVerticalGap = ConfigJSON.getPipesVGap();
+        this.name = null;
     }
 
     public FlappyBirdPlayer(long score, int pipesVerticalGap, String name) {
