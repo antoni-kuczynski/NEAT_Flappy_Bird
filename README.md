@@ -1,11 +1,16 @@
-# Flappy Bird
-A Flappy Bird clone written in Java.
+# Flappy Bird with Machine learning
+A Flappy Bird clone with machine learning implementation based on the NEAT algorithm.
 
 # Features
-- Saving player score to JSON file
-- Flappy bird
+### Machine learning
+- Training mode
+- Saving & loading pretrained neural networks to JSON files
+
+### Game
+- Saving player score to a JSON file
+- Customizable game parameters (e.g. pipes gap height, game's scale)
+- Dynamic switching between machine learning modes and classic player controlled mode
+
 
 # Screenshots
-![flappy_bird_night](https://github.com/user-attachments/assets/8d56182d-4beb-4814-b1c1-ba536e7f3cb4)
-
-![flappy_bird_day](https://github.com/user-attachments/assets/6f2476e6-ec84-4584-b623-3a8a2444d443)
+TODO
