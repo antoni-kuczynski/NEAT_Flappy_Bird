@@ -1,6 +1,8 @@
 # Flappy Bird with Machine learning
 A Flappy Bird clone with machine learning implementation based on the NEAT algorithm.
 
+![flappybird_training](https://github.com/user-attachments/assets/9a3be307-32a3-4849-8285-a34fd4f192ec)
+
 # Features
 ### Machine learning
 - Training mode
@@ -14,3 +16,4 @@ A Flappy Bird clone with machine learning implementation based on the NEAT algor
 
 # Screenshots
 TODO
+
