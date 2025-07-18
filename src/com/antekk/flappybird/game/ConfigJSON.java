@@ -128,8 +128,6 @@ public final class ConfigJSON {
 
     public static GameMode getGameMode() {
         GameMode gameMode = GameMode.valueOf(object.getString("game_mode"));
-        if(gameMode.isPretrainedMode() && getPretrainedJSONFilePath().isBlank())
-            gameMode = GameMode.valueOf("Player mode");
 
         if(gameMode.isPretrainedMode() && !getPretrainedJSONFilePath().isBlank()) {
             ((MlPretrainedMode) gameMode).setBirdsNeuralNetwork(NeuralNetwork.getFromJSON(getPretrainedJSONFilePath()));

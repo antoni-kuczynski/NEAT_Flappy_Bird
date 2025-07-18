@@ -11,7 +11,6 @@ import com.antekk.flappybird.view.themes.Theme;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 
 import static com.antekk.flappybird.view.GamePanel.getBlockSizePx;
 import static com.antekk.flappybird.view.GamePanel.setBlockSizePx;
@@ -32,8 +31,8 @@ public class OptionsDialog extends JDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        openNetworkButton = getLoadNetworkFromJSONButton();
-        saveNetworkButton = getSaveNetworkToJSONButton(parent);
+        openNetworkButton = DialogComponentFactory.getLoadNetworkFromJSONButton(this);
+        saveNetworkButton = DialogComponentFactory.getSaveNetworkToJSONButton(parent);
 
         JTabbedPane mainTabbedPane = new JTabbedPane();
         JPanel generalOptions = new JPanel();
@@ -47,7 +46,7 @@ public class OptionsDialog extends JDialog {
         model.setSelectedItem(ConfigJSON.getTheme());
 
 
-        SpinnerNumberModel pipesGapModel = getSpinnerNumberModel();
+        SpinnerNumberModel pipesGapModel = DialogComponentFactory.getSpinnerNumberModel();
         pipesGap.setModel(pipesGapModel);
         pipesGap.setPreferredSize(new Dimension(80,25));
 
@@ -204,51 +203,17 @@ public class OptionsDialog extends JDialog {
         openNetworkButton.setToolTipText(enabled ? null : "Can't use while in-game");
     }
 
-    private JButton getLoadNetworkFromJSONButton() {
-        JButton loadNetworkFromJSON = new JButton("Open");
-        loadNetworkFromJSON.addActionListener(e -> {
-            JFileChooser dialog = new JFileChooser();
-            dialog.setDialogType(JFileChooser.OPEN_DIALOG);
-            dialog.setDialogTitle("Open player from JSON");
+    void processLoadedNeuralNetworkFile(String fileName) {
+        if(fileName == null || fileName.isBlank())
+            return;
 
-            dialog.showOpenDialog(this);
-            File file = dialog.getSelectedFile();
-
-            if(file == null || file.getName().isBlank())
-                return;
-
-            for(int i = 0; i < gameModeSwitcher.getItemCount(); i++) {
-                if(gameModeSwitcher.getItemAt(i).isPretrainedMode()) {
-                    gameModeSwitcher.setSelectedIndex(i);
-                    break;
-                }
+        for(int i = 0; i < gameModeSwitcher.getItemCount(); i++) {
+            if(gameModeSwitcher.getItemAt(i).isPretrainedMode()) {
+                gameModeSwitcher.setSelectedIndex(i);
+                break;
             }
-            loadedNeuralNetworkPath = file.getAbsolutePath();
-        });
-        return loadNetworkFromJSON;
-    }
-
-    private static JButton getSaveNetworkToJSONButton(GamePanel parent) {
-        JButton saveNetworkToJSON = new JButton("Save");
-        saveNetworkToJSON.addActionListener(e -> {
-            if(!parent.getGameLoop().getGameMode().isTrainingMode())
-                return;
-
-            FileDialog dialog = new FileDialog((Frame) null);
-            dialog.setMode(FileDialog.SAVE);
-            dialog.setTitle("Save best player to JSON");
-            dialog.setFile("*.json");
-
-            dialog.setVisible(true);
-            String fileName = dialog.getFile();
-
-            if(fileName == null || fileName.isBlank())
-                return;
-
-            parent.getGameLoop().getSmartestBrain().saveToJSON(fileName);
-
-        });
-        return saveNetworkToJSON;
+        }
+        loadedNeuralNetworkPath = fileName;
     }
 
     private void showLoadedNeuralNetworkMessageBox(NeuralNetwork network) {
@@ -271,20 +236,5 @@ public class OptionsDialog extends JDialog {
             showLoadedNeuralNetworkMessageBox(loadedNetwork);
         }
         return gameMode;
-    }
-
-    private static SpinnerNumberModel getSpinnerNumberModel() {
-        int currentPipesGap = ConfigJSON.getPipesVGap();
-        if(currentPipesGap < 1.5 * getBlockSizePx() ||
-                currentPipesGap > GamePanel.getBoardRows() / 2 * getBlockSizePx()) {
-            currentPipesGap = 3 * getBlockSizePx();
-        }
-
-        return new SpinnerNumberModel(
-                currentPipesGap,
-                (int) (1.5 * getBlockSizePx()),
-                GamePanel.getBoardRows() / 2 * getBlockSizePx(),
-                10
-        );
     }
 }

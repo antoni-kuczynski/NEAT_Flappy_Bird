@@ -24,7 +24,7 @@ public class GamePanel extends JPanel {
     public static int GROUND;
     private static int backgroundWidth;
     public static int groundX;
-    private static int blockSizePx = 60;
+    private static int blockSizePx = 50;
     private final JPanel toolbar = new JPanel();
     private GameLoop loop;
     private final ScoreDisplay scoreDisplay;
