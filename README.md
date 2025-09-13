@@ -1,4 +1,4 @@
-# Flappy Bird with Machine learning
+# NEAT Flappy Bird
 A Flappy Bird clone with machine learning implementation based on NEAT genetic algorithm.
 
 ![flappybird_training](https://github.com/user-attachments/assets/9a3be307-32a3-4849-8285-a34fd4f192ec)
